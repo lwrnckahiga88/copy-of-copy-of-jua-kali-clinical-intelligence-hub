@@ -7,6 +7,8 @@ import { SwarmRouter, GeoRouter, AmbulanceRouter, TriageEngine } from "./studioO
 import { JarvisRouter, IntentRequestSchema, IntentType } from "./jarvis";
 import { AgentIntentSchema, createJarvisAgentRouter } from "./jarvisAgent";
 import { studioOSRegistry } from "./studioOSRegistry";
+import * as hospitalApi from "./hospitalApi";
+import { fetchAndParseAgents, groupAgentsByCategory } from "./githubFetcher";
 
 export const appRouter = router({
   system: systemRouter,
@@ -143,6 +145,91 @@ export const appRouter = router({
         },
         'user'
       );
+    }),
+  }),
+
+  // Hospital Network API
+  hospitals: router({
+    getAll: publicProcedure.query(async () => {
+      return await hospitalApi.getAllHospitals();
+    }),
+
+    getById: publicProcedure
+      .input(z.object({ id: z.string() }))
+      .query(async ({ input }) => {
+        return await hospitalApi.getHospitalById(input.id);
+      }),
+
+    getBySpecialty: publicProcedure
+      .input(z.object({ specialty: z.string() }))
+      .query(async ({ input }) => {
+        return await hospitalApi.getHospitalsBySpecialty(input.specialty);
+      }),
+
+    getByStatus: publicProcedure
+      .input(z.object({ status: z.enum(['online', 'offline', 'limited']) }))
+      .query(async ({ input }) => {
+        return await hospitalApi.getHospitalsByStatus(input.status);
+      }),
+
+    getWithAvailableBeds: publicProcedure
+      .input(z.object({ minBeds: z.number().optional() }))
+      .query(async ({ input }) => {
+        return await hospitalApi.getHospitalsWithAvailableBeds(input.minBeds);
+      }),
+
+    getNearby: publicProcedure
+      .input(z.object({ latitude: z.number(), longitude: z.number(), limit: z.number().optional() }))
+      .query(async ({ input }) => {
+        return await hospitalApi.getNearestHospitals(input.latitude, input.longitude, input.limit);
+      }),
+
+    getStatistics: publicProcedure.query(async () => {
+      return await hospitalApi.getHospitalStatistics();
+    }),
+  }),
+
+  // Health-AI Agent System
+  healthAiAgents: router({
+    fetchAll: publicProcedure.query(async () => {
+      try {
+        const agents = await fetchAndParseAgents();
+        return {
+          success: true,
+          agents,
+          total: agents.length,
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return {
+          success: false,
+          error: message,
+          agents: [],
+          total: 0,
+        };
+      }
+    }),
+
+    getGrouped: publicProcedure.query(async () => {
+      try {
+        const agents = await fetchAndParseAgents();
+        const grouped = groupAgentsByCategory(agents);
+        return {
+          success: true,
+          grouped,
+          categories: Object.keys(grouped),
+          total: agents.length,
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return {
+          success: false,
+          error: message,
+          grouped: {},
+          categories: [],
+          total: 0,
+        };
+      }
     }),
   }),
 

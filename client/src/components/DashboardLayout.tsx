@@ -43,6 +43,7 @@ const jarvisAgents = [
   { icon: "🎬", label: "Intervention Planner", path: "/intervention-planner" },
   { icon: "💬", label: "Agent Debate", path: "/agent-debate" },
   { icon: "🏥", label: "NurseAI", path: "/nurse-ai" },
+  { icon: "🔬", label: "Health AI Agents", path: "/health-ai-agents" },
 ];
 
 // Additional agents (hidden by default, shown in expanded menu)
@@ -51,6 +52,7 @@ const additionalAgents = [
   { icon: "🐕", label: "Cerberus BPU", path: "/cerberus-bpu" },
   { icon: "🤖", label: "Jarvis", path: "/jarvis" },
   { icon: "🗺️", label: "Roadmap", path: "/roadmap" },
+  { icon: "⚕️", label: "Settings", path: "/settings" },
 ];
 
 export default function DashboardLayout({

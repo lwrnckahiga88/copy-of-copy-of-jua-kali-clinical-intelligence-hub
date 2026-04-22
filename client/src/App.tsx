@@ -19,6 +19,7 @@ import Jarvis from "./pages/Jarvis";
 import Roadmap from "./pages/Roadmap";
 import Skills from "./pages/Skills";
 import Settings from "./pages/Settings";
+import HealthAIAgents from "./pages/HealthAIAgents";
 
 function Router() {
   return (
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/roadmap" component={Roadmap} />
       <Route path="/skills" component={Skills} />
       <Route path="/settings" component={Settings} />
+      <Route path="/health-ai-agents" component={HealthAIAgents} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
