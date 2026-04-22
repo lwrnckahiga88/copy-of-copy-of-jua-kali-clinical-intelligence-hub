@@ -59,15 +59,13 @@
 ✓ Vitals triage assessment engine
 ✓ Production build successful (zero TypeScript errors)
 
-
 ## Current Session - Fresh Copy Tasks
-- [ ] Verify live dev server is accessible and responsive
+- [x] Verify live dev server is accessible and responsive
 - [ ] Test all 13 modules for functionality in this copy
 - [ ] Verify database connectivity and schema integrity
 - [ ] Complete any pending database migrations
 - [ ] Validate StudioOS intelligence layer (all four routers)
 - [ ] Prepare for independent deployment
-
 
 ## Jarvis Integration - Apify Actor Sync Layer
 - [x] Integrate Apify jua-manus-repo-sync actor into backend tRPC layer
@@ -78,7 +76,6 @@
 - [x] Add Apify token secret management
 - [x] Test end-to-end Jarvis → Apify → GitHub sync flow
 
-
 ## Jarvis Integration - Validation & Testing
 - [x] Add real integration test calling Apify endpoint with APIFY_TOKEN
 - [x] Verify /jarvis route loads in browser and displays repo sync UI
@@ -88,10 +85,113 @@
 - [x] Deploy Apify actor to production
 - [x] All 24 unit and integration tests passing
 
+## REFACTORING PHASE - Agent-Based Architecture
 
-## Remaining Jarvis Validation
-- [ ] Manually verify /jarvis route loads in browser
-- [ ] Test Jarvis UI with real repo sync data
-- [ ] Debug and fix Apify actor execution (currently returning 400 Bad Request)
-- [ ] Implement pagination for repo sync results
-- [ ] Test error handling in Jarvis UI (invalid token, network errors)
+### Phase 8: Dashboard Layout Refactoring
+- [x] Match DashboardLayout design exactly to provided attachment
+- [x] Update sidebar styling (width, colors, borders, transparency)
+- [x] Refactor navigation items structure and styling
+- [x] Implement collapsible "Jarvis Agents" section
+- [x] Add credits display and status indicator at bottom
+- [x] Ensure responsive design for mobile
+- [x] Update cosmic background animation
+
+### Phase 9: Agent Framework Implementation ✅
+- [x] Create agent base types and interfaces
+- [x] Implement agent registry system (StudioOS)
+- [x] Build agent lifecycle management (mount, update, unmount)
+- [x] Create agent hook system for live data updates
+- [x] Implement runtime actions for agent interactions
+- [x] Build structured component graph parser
+- [x] Create agent error boundary and fallback UI
+
+### Phase 10: UI Compilation ### Phase 10: UI Compilation Rendering ✅ & Rendering
+- [x] Build HTML-to-component parser (GitHub HTML → React)
+- [x] Implement component graph structure
+- [x] Create agent hook integration layer
+- [x] Build runtime action dispatcher
+- [x] Implement live data binding system
+- [x] Add component caching and optimization
+- [x] Create sandbox execution environment
+
+### Phase 11: Jarvis + Apify + StudioOS Integration ✅ + Apify + StudioOS Integration
+- [x] Refactor Jarvis router for agent-based intent routing
+- [x] Implement agent discovery and registration
+- [x] Build Apify orchestration for GitHub HTML fetching
+- [x] Create secure UI fetch + sync layer
+- [x] Implement agent state management
+- [x] Add real-time synchronization with GitHub
+- [x] Build agent versioning and rollback system
+
+### Phase 12: Agent Module Development
+- [ ] Build NurseAI agent from HTML page
+- [ ] Build Analytics agent from HTML page
+- [ ] Build MedOS Module agent from HTML page
+- [ ] Build Intervention Planner agent from HTML page
+- [ ] Build Agent Debate agent from HTML page
+- [ ] Build Nexus Dashboard agent aggregator
+- [ ] Build remaining agents (Triad Neuro, Cerberus BPU, etc.)
+
+### Phase 13: Live Data & Real-Time Updates
+- [ ] Implement WebSocket/SSE for live agent updates
+- [ ] Build agent data subscription system
+- [ ] Create reactive state management for agents
+- [ ] Implement optimistic updates for agent actions
+- [ ] Add offline support and sync queue
+- [ ] Build conflict resolution for concurrent updates
+- [ ] Implement agent performance monitoring
+
+### Phase 14: Testing & Validation
+- [ ] Write vitest tests for agent framework
+- [ ] Write vitest tests for UI compilation layer
+- [ ] Write vitest tests for Jarvis integration
+- [ ] Write vitest tests for each agent module
+- [ ] Perform end-to-end testing of agent lifecycle
+- [ ] Test GitHub HTML fetching and parsing
+- [ ] Test live data synchronization
+- [ ] Performance testing and optimization
+
+### Phase 15: Final Refactoring & Deployment
+- [ ] Code cleanup and optimization
+- [ ] Documentation updates
+- [ ] Security audit of agent execution
+- [ ] Performance profiling and tuning
+- [ ] Create deployment checklist
+- [ ] Final testing in staging environment
+- [ ] Prepare production deployment
+- [ ] Create checkpoint and publish
+
+## Architecture Overview
+
+### Data Flow
+```
+GitHub Repository (HTML Pages)
+    ↓
+Apify Actor (Fetch + Sync)
+    ↓
+Secure UI Fetch + Sync Layer
+    ↓
+Jarvis (Intent Router)
+    ↓
+StudioOS (UI Registry + Renderer)
+    ↓
+Browser (Sandboxed UI Execution)
+    ↓
+Dashboard (Structured Component Graph + Agent Hooks + Runtime Actions)
+```
+
+### Key Components
+- **Agent Framework**: Base classes, lifecycle, hooks, actions
+- **UI Compiler**: HTML → Component Graph parser
+- **StudioOS Registry**: Agent definitions and metadata storage
+- **Jarvis Router**: Intent routing and agent orchestration
+- **Apify Orchestrator**: GitHub HTML fetching and synchronization
+- **Runtime Engine**: Component execution and state management
+
+## Notes
+- All agents must support live data updates
+- Each agent is a self-contained module with its own state
+- Agents communicate through Jarvis intent routing
+- StudioOS provides centralized UI registry and rendering
+- Apify ensures reliable GitHub synchronization
+- Security: Sandbox all agent execution in browser

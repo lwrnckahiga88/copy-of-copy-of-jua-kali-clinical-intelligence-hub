@@ -5,6 +5,8 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { SwarmRouter, GeoRouter, AmbulanceRouter, TriageEngine } from "./studioOS";
 import { JarvisRouter, IntentRequestSchema, IntentType } from "./jarvis";
+import { AgentIntentSchema, createJarvisAgentRouter } from "./jarvisAgent";
+import { studioOSRegistry } from "./studioOSRegistry";
 
 export const appRouter = router({
   system: systemRouter,
@@ -141,6 +143,55 @@ export const appRouter = router({
         },
         'user'
       );
+    }),
+  }),
+
+  // Agent System (StudioOS + Jarvis + Apify)
+  agents: router({
+    routeIntent: protectedProcedure
+      .input(AgentIntentSchema)
+      .mutation(async ({ input }) => {
+        const apifyToken = process.env.APIFY_TOKEN;
+        if (!apifyToken) {
+          throw new Error('Apify token not configured');
+        }
+
+        const agentRouter = createJarvisAgentRouter(apifyToken);
+        return agentRouter.routeIntent({...input, payload: input.payload || {}});
+      }),
+
+    discoverAgents: protectedProcedure.mutation(async () => {
+      const apifyToken = process.env.APIFY_TOKEN;
+      if (!apifyToken) {
+        throw new Error('Apify token not configured');
+      }
+
+      const agentRouter = createJarvisAgentRouter(apifyToken);
+      return agentRouter.discoverAgents();
+    }),
+
+    getAgents: publicProcedure.query(() => {
+      return studioOSRegistry.getAllAgents();
+    }),
+
+    getAgentState: publicProcedure
+      .input(z.object({ agentId: z.string() }))
+      .query(({ input }) => {
+        return studioOSRegistry.getAgentState(input.agentId);
+      }),
+
+    getRegistryStats: publicProcedure.query(() => {
+      return studioOSRegistry.getStats();
+    }),
+
+    getSyncStatus: publicProcedure
+      .input(z.object({ agentId: z.string() }))
+      .query(({ input }) => {
+        return studioOSRegistry.getSyncStatus(input.agentId);
+      }),
+
+    getAllSyncStatuses: publicProcedure.query(() => {
+      return studioOSRegistry.getAllSyncStatuses();
     }),
   }),
 });
