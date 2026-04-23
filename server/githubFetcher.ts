@@ -129,8 +129,18 @@ export async function fetchHealthAIFiles(): Promise<GitHubFile[]> {
   const apiUrl =
     'https://api.github.com/repos/lwrnckahiga88/health-ai/contents/public';
 
+  const headers: Record<string, string> = {
+    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'juakali-platform/1.0',
+  };
+
+  const githubToken = process.env.GITHUB_TOKEN;
+  if (githubToken) {
+    headers['Authorization'] = `Bearer ${githubToken}`;
+  }
+
   try {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, { headers });
 
     if (!response.ok) {
       throw new Error(

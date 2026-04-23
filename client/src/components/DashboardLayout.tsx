@@ -21,7 +21,7 @@ import {
   Wand2,
   Stethoscope,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import CosmicBackground from "./CosmicBackground";
@@ -119,6 +119,24 @@ function Sidebar({ user }: { user: User }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAgentsExpanded, setIsAgentsExpanded] = useState(true);
   const { logout } = useAuth();
+
+  // Persistent credits via localStorage
+  const [credits, setCredits] = useState<number>(() => {
+    try {
+      const stored = localStorage.getItem("juakali_credits");
+      return stored ? parseInt(stored, 10) : 1000;
+    } catch {
+      return 1000;
+    }
+  });
+
+  const deductCredit = useCallback((amount = 15) => {
+    setCredits((prev) => {
+      const next = Math.max(0, prev - amount);
+      try { localStorage.setItem("juakali_credits", String(next)); } catch {}
+      return next;
+    });
+  }, []);
 
   const activeItem = mainNavItems.find((item) => item.path === location);
   const isAgentActive = jarvisAgents.some((agent) => agent.path === location);
@@ -269,10 +287,15 @@ function Sidebar({ user }: { user: User }) {
             <div className="text-slate-400 text-xs font-mono uppercase tracking-wide mb-2">
               Available Credits
             </div>
-            <div className="text-2xl font-bold text-cyan-400 font-mono">1000</div>
+            <div className={`text-2xl font-bold font-mono ${credits < 100 ? "text-red-400" : credits < 300 ? "text-yellow-400" : "text-cyan-400"}`}>
+              {credits.toLocaleString()}
+            </div>
             <div className="text-slate-500 text-xs mt-2">
               Cost per run: <span className="text-cyan-400">15 credits</span>
             </div>
+            {credits < 100 && (
+              <div className="text-xs text-red-400 mt-1 font-mono">⚠ Low credits</div>
+            )}
           </div>
 
           {/* Status Indicator */}

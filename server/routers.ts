@@ -4,12 +4,13 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { SwarmRouter, GeoRouter, AmbulanceRouter, TriageEngine } from "./studioOS";
-import { JarvisRouter, IntentRequestSchema, IntentType } from "./jarvis";
+import { JarvisRouter, IntentRequestSchema, IntentType, ApifyOrchestrator } from "./jarvis";
 import { AgentIntentSchema, createJarvisAgentRouter } from "./jarvisAgent";
 import { studioOSRegistry } from "./studioOSRegistry";
 import * as hospitalApi from "./hospitalApi";
-import { fetchAndParseAgents, groupAgentsByCategory } from "./githubFetcher";
+import { fetchAndParseAgents, groupAgentsByCategory, fetchHealthAIFiles } from "./githubFetcher";
 import { agentRouter } from "./routers/agentRouter";
+import { ENV } from "./_core/env";
 
 export const appRouter = router({
   system: systemRouter,
@@ -102,7 +103,7 @@ export const appRouter = router({
     routeIntent: protectedProcedure
       .input(IntentRequestSchema)
       .mutation(async ({ input, ctx }) => {
-        const apifyToken = process.env.APIFY_TOKEN;
+        const apifyToken = ENV.apifyToken;
         return JarvisRouter.routeIntent(
           input,
           ctx.user?.role,
@@ -111,7 +112,7 @@ export const appRouter = router({
       }),
 
     getRepoSync: publicProcedure.query(async () => {
-      const apifyToken = process.env.APIFY_TOKEN;
+      const apifyToken = ENV.apifyToken;
       if (!apifyToken) {
         return {
           success: false,
@@ -124,7 +125,7 @@ export const appRouter = router({
       return JarvisRouter.routeIntent(
         {
           type: IntentType.REPO_SYNC,
-          payload: { owner: 'lwrnckahiga88', repo: 'jua.manus' },
+          payload: { owner: 'lwrnckahiga88', repo: 'health-ai' },
           metadata: {
             timestamp: Date.now(),
             requestId: `repo-sync-${Date.now()}`,
@@ -136,16 +137,75 @@ export const appRouter = router({
     }),
 
     statusCheck: publicProcedure.query(async () => {
-      return JarvisRouter.routeIntent(
-        {
-          type: IntentType.STATUS_CHECK,
-          metadata: {
-            timestamp: Date.now(),
-            requestId: `status-${Date.now()}`,
-          },
+      const apifyToken = ENV.apifyToken;
+      const apifyConfigured = Boolean(apifyToken);
+      const githubConfigured = Boolean(ENV.githubToken);
+      return {
+        success: true,
+        data: {
+          jarvis: 'online',
+          studioOS: 'operational',
+          apify: apifyConfigured ? 'connected' : 'not-configured',
+          github: githubConfigured ? 'connected' : 'not-configured',
+          timestamp: Date.now(),
         },
-        'user'
-      );
+        executedAt: Date.now(),
+        executionTimeMs: 0,
+      };
+    }),
+
+    // List Apify actors available on the account
+    listActors: publicProcedure.query(async () => {
+      const apifyToken = ENV.apifyToken;
+      if (!apifyToken) {
+        return { success: false, error: 'Apify token not configured', actors: [] };
+      }
+      try {
+        const res = await fetch(`https://api.apify.com/v2/acts?token=${apifyToken}&my=true&limit=50`);
+        if (!res.ok) throw new Error(`Apify error: ${res.status}`);
+        const data = await res.json() as { data: { items: unknown[] } };
+        return { success: true, actors: data.data?.items ?? [] };
+      } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : String(err), actors: [] };
+      }
+    }),
+
+    // Run the health-ai sync actor and return result
+    runHealthAiSync: publicProcedure.mutation(async () => {
+      const apifyToken = ENV.apifyToken;
+      if (!apifyToken) {
+        return { success: false, error: 'Apify token not configured' };
+      }
+      try {
+        // Fetch direct from GitHub as primary source (faster than Apify for listing)
+        const files = await fetchHealthAIFiles();
+        return {
+          success: true,
+          filesFound: files.length,
+          files: files.map(f => ({ name: f.name, url: f.download_url, size: f.size })),
+          syncedAt: new Date().toISOString(),
+        };
+      } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : String(err) };
+      }
+    }),
+
+    // Get Apify account info to verify token
+    verifyToken: publicProcedure.query(async () => {
+      const apifyToken = ENV.apifyToken;
+      if (!apifyToken) return { valid: false, reason: 'No token configured' };
+      try {
+        const res = await fetch(`https://api.apify.com/v2/users/me?token=${apifyToken}`);
+        if (!res.ok) return { valid: false, reason: `HTTP ${res.status}` };
+        const data = await res.json() as { data: { username: string; plan: { id: string } } };
+        return {
+          valid: true,
+          username: data.data?.username,
+          plan: data.data?.plan?.id,
+        };
+      } catch (err) {
+        return { valid: false, reason: err instanceof Error ? err.message : String(err) };
+      }
     }),
   }),
 
@@ -239,7 +299,7 @@ export const appRouter = router({
     routeIntent: protectedProcedure
       .input(AgentIntentSchema)
       .mutation(async ({ input }) => {
-        const apifyToken = process.env.APIFY_TOKEN;
+        const apifyToken = ENV.apifyToken;
         if (!apifyToken) {
           throw new Error('Apify token not configured');
         }
@@ -249,7 +309,7 @@ export const appRouter = router({
       }),
 
     discoverAgents: protectedProcedure.mutation(async () => {
-      const apifyToken = process.env.APIFY_TOKEN;
+      const apifyToken = ENV.apifyToken;
       if (!apifyToken) {
         throw new Error('Apify token not configured');
       }
