@@ -9,6 +9,7 @@ import { AgentIntentSchema, createJarvisAgentRouter } from "./jarvisAgent";
 import { studioOSRegistry } from "./studioOSRegistry";
 import * as hospitalApi from "./hospitalApi";
 import { fetchAndParseAgents, groupAgentsByCategory } from "./githubFetcher";
+import { agentRouter } from "./routers/agentRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -281,6 +282,9 @@ export const appRouter = router({
       return studioOSRegistry.getAllSyncStatuses();
     }),
   }),
+
+  // Agent Synchronization System
+  agentSync: agentRouter,
 });
 
 export type AppRouter = typeof appRouter;
