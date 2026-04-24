@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-nodeVersion = "22"
+nodeVersion = "22.12.0"
 buildCommand = "pnpm install --no-frozen-lockfile && node_modules/.bin/vite build && node_modules/.bin/esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
 
 [deploy]
