@@ -1,7 +1,7 @@
 [build]
 builder = "nixpacks"
-nodeVersion = "20"
-buildCommand = "node_modules/.bin/vite build && node_modules/.bin/esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
+nodeVersion = "22"
+buildCommand = "pnpm install --no-frozen-lockfile && node_modules/.bin/vite build && node_modules/.bin/esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
 
 [deploy]
 startCommand = "NODE_ENV=production node dist/index.js"
