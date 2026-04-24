@@ -1,4 +1,3 @@
-import "./esmPatch.js"; // must be first — patches require cache before jsdom loads
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
