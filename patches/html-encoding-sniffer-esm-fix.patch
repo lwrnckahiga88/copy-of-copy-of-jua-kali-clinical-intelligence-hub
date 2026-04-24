@@ -1,0 +1,7 @@
+--- a/node_modules/.pnpm/html-encoding-sniffer@6.0.0/node_modules/html-encoding-sniffer/lib/html-encoding-sniffer.js
++++ b/node_modules/.pnpm/html-encoding-sniffer@6.0.0/node_modules/html-encoding-sniffer/lib/html-encoding-sniffer.js
+@@ -1,2 +1,4 @@
+ "use strict";
+-const { getBOMEncoding, labelToName } = require("@exodus/bytes/encoding-lite.js");
++// Patched: @exodus/bytes is ESM-only; inline the two functions we need
++const { getBOMEncoding, labelToName } = require("whatwg-encoding");

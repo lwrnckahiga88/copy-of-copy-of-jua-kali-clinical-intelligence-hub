@@ -11,6 +11,16 @@ import * as hospitalApi from "./hospitalApi";
 import { fetchAndParseAgents, groupAgentsByCategory, fetchHealthAIFiles } from "./githubFetcher";
 import { agentRouter } from "./routers/agentRouter";
 import { ENV } from "./_core/env";
+// Agent Graph Architecture
+import { compileRepoToAgentGraph } from "./agent-core/compiler";
+import { agentGraph } from "./agent-core/graph";
+import { SwarmBus } from "./swarm/swarmBus";
+import { nodeRegistry } from "./swarm/nodeRegistry";
+import { outcomeStore } from "./rl/outcomeStore";
+import { policyMemory } from "./rl/rewardEngine";
+import { processOutcome } from "./rl/feedbackLoop";
+import { applyRepoPatch } from "./agents/githubUpdateAgent";
+import { generatePatch } from "./router/jarvisPatchEngine";
 
 export const appRouter = router({
   system: systemRouter,
@@ -345,6 +355,176 @@ export const appRouter = router({
 
   // Agent Synchronization System
   agentSync: agentRouter,
+
+  // ── Agent Graph Architecture ──────────────────────────────────────────────
+
+  agentGraphRouter: router({
+    // Compile HTML files from GitHub into agent graph (no DOM/jsdom)
+    compile: publicProcedure.mutation(async () => {
+      const files = await fetchHealthAIFiles();
+      const nodes = compileRepoToAgentGraph(
+        files.map((f) => ({ name: f.name, download_url: f.download_url }))
+      );
+      agentGraph.load(nodes);
+      SwarmBus.emit("graph:reloaded", { data: { total: nodes.length } });
+      return { success: true, agentsCompiled: nodes.length, nodes };
+    }),
+
+    getGraph: publicProcedure.query(() => {
+      return { nodes: agentGraph.all(), stats: agentGraph.stats() };
+    }),
+
+    findByCapability: publicProcedure
+      .input(z.object({ capability: z.string() }))
+      .query(({ input }) => {
+        return agentGraph.findByCapability(input.capability as any);
+      }),
+  }),
+
+  // ── Swarm Bus + Hospital Node Registry ───────────────────────────────────
+
+  swarmRouter: router({
+    getNodes: publicProcedure.query(() => {
+      return {
+        all: nodeRegistry.getAllNodes(),
+        online: nodeRegistry.getOnlineNodes(),
+      };
+    }),
+
+    registerNode: publicProcedure
+      .input(z.object({
+        id: z.string(),
+        name: z.string(),
+        region: z.string(),
+        country: z.string(),
+        lat: z.number().optional(),
+        lng: z.number().optional(),
+        capabilities: z.array(z.string()),
+        activeAgents: z.array(z.string()),
+      }))
+      .mutation(({ input }) => {
+        return nodeRegistry.register(input);
+      }),
+
+    heartbeat: publicProcedure
+      .input(z.object({ nodeId: z.string() }))
+      .mutation(({ input }) => {
+        nodeRegistry.heartbeat(input.nodeId);
+        return { ok: true };
+      }),
+
+    getRecentEvents: publicProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(({ input }) => {
+        return SwarmBus.getRecentEvents(input.limit ?? 50);
+      }),
+  }),
+
+  // ── RL Outcome + Policy Router ────────────────────────────────────────────
+
+  rlRouter: router({
+    recordOutcome: publicProcedure
+      .input(z.object({
+        patientId: z.string(),
+        agentId: z.string(),
+        action: z.string(),
+        outcome: z.enum(["improved", "stable", "worsened", "critical"]),
+        context: z.record(z.string(), z.unknown()).optional(),
+      }))
+      .mutation(({ input }) => {
+        return processOutcome(input);
+      }),
+
+    getStats: publicProcedure.query(() => {
+      return {
+        outcomes: outcomeStore.stats(),
+        policies: policyMemory.size(),
+        suggestions: policyMemory.getSuggestions(),
+        policySnapshot: policyMemory.snapshot(),
+      };
+    }),
+
+    getRecentOutcomes: publicProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(({ input }) => {
+        return outcomeStore.getRecent(input.limit ?? 50);
+      }),
+
+    getAgentOutcomes: publicProcedure
+      .input(z.object({ agentId: z.string() }))
+      .query(({ input }) => {
+        return {
+          records: outcomeStore.getByAgent(input.agentId),
+          policyScore: policyMemory.snapshot(),
+        };
+      }),
+  }),
+
+  // ── GitHub Update Agent (JGA) ─────────────────────────────────────────────
+
+  jgaRouter: router({
+    // Sync compiled agent graph → registry/agents.json in GitHub
+    syncRegistryToGitHub: protectedProcedure.mutation(async () => {
+      const nodes = agentGraph.all();
+      if (nodes.length === 0) {
+        return { success: false, error: "Agent graph is empty. Run compile first." };
+      }
+
+      const patches = generatePatch({ type: "sync-agent-registry", agents: nodes });
+
+      return applyRepoPatch({
+        owner: "lwrnckahiga88",
+        repo: "copy-of-copy-of-jua-kali-clinical-intelligence-hub",
+        changes: patches,
+        commitMessage: `[JGA] Sync ${nodes.length} agents → registry/agents.json`,
+      });
+    }),
+
+    // Write RL suggestions to registry (advisory only, no code changes)
+    writeRLSuggestions: protectedProcedure.mutation(async () => {
+      const patches = generatePatch({ type: "write-rl-suggestions" });
+
+      return applyRepoPatch({
+        owner: "lwrnckahiga88",
+        repo: "copy-of-copy-of-jua-kali-clinical-intelligence-hub",
+        changes: patches,
+        commitMessage: "[JGA] Update RL optimization suggestions",
+      });
+    }),
+
+    // Write outcome log snapshot to registry
+    writeOutcomeLog: protectedProcedure.mutation(async () => {
+      const patches = generatePatch({ type: "write-outcome-log" });
+
+      return applyRepoPatch({
+        owner: "lwrnckahiga88",
+        repo: "copy-of-copy-of-jua-kali-clinical-intelligence-hub",
+        changes: patches,
+        commitMessage: "[JGA] Export outcome log snapshot",
+      });
+    }),
+
+    // Add or update a single agent in registry
+    upsertAgent: protectedProcedure
+      .input(z.object({
+        agentId: z.string(),
+        payload: z.record(z.string(), z.unknown()),
+      }))
+      .mutation(async ({ input }) => {
+        const patches = generatePatch({
+          type: "add-agent",
+          agentId: input.agentId,
+          payload: input.payload as any,
+        });
+
+        return applyRepoPatch({
+          owner: "lwrnckahiga88",
+          repo: "copy-of-copy-of-jua-kali-clinical-intelligence-hub",
+          changes: patches,
+          commitMessage: `[JGA] Upsert agent: ${input.agentId}`,
+        });
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
