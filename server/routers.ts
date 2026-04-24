@@ -10,10 +10,12 @@ import { studioOSRegistry } from "./studioOSRegistry";
 import * as hospitalApi from "./hospitalApi";
 import { fetchAndParseAgents, groupAgentsByCategory, fetchHealthAIFiles } from "./githubFetcher";
 import { agentRouter } from "./routers/agentRouter";
+import { githubUpdateRouter } from "./routers/githubUpdateRouter";
 import { ENV } from "./_core/env";
 
 export const appRouter = router({
   system: systemRouter,
+  githubUpdate: githubUpdateRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
