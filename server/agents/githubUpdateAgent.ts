@@ -402,3 +402,53 @@ export function getGitHubUpdateAgent(): GitHubUpdateAgent {
 }
 
 export { GitHubUpdateAgent };
+
+// ─── Compatibility shims for new agent-graph / RL modules ─────────────────────
+
+export type RepoPatch = { path: string; content: string };
+
+export interface PatchResult {
+  success: boolean;
+  commitSha?: string;
+  patchedFiles: string[];
+  blockedFiles: string[];
+  error?: string;
+}
+
+/**
+ * Functional wrapper around the class-based agent — used by RL / patch engine
+ */
+export async function applyRepoPatch(opts: {
+  owner: string;
+  repo: string;
+  branch?: string;
+  changes: RepoPatch[];
+  commitMessage?: string;
+}): Promise<PatchResult> {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    return { success: false, error: "GITHUB_TOKEN not configured", patchedFiles: [], blockedFiles: [] };
+  }
+
+  const agent = new GitHubUpdateAgent(token, opts.owner, opts.repo);
+
+  const fileChanges: FileChange[] = opts.changes.map((c) => ({
+    path: c.path,
+    content: c.content,
+    action: "update" as const,
+  }));
+
+  const result = await agent.applyPatch(
+    fileChanges,
+    opts.branch ?? "main",
+    opts.commitMessage ?? "[JGA] Autonomous update"
+  );
+
+  return {
+    success: result.success,
+    commitSha: result.commitSha,
+    patchedFiles: result.success ? opts.changes.map((c) => c.path) : [],
+    blockedFiles: [],
+    error: result.error,
+  };
+}
