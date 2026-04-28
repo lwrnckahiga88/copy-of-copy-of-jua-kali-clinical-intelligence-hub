@@ -1,6 +1,4 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { Zap, Heart, AlertCircle, TrendingUp } from "lucide-react";
 
@@ -9,22 +7,34 @@ export default function Overview() {
   const [, setLocation] = useLocation();
 
   if (!isAuthenticated) {
+    // Show platform overview without blocking — no login required to browse
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-center max-w-2xl px-6">
-          <h1 className="text-5xl font-bold text-glow-cyan mb-4">juA.kali</h1>
-          <p className="text-xl text-slate-300 mb-8">
-            Clinical AI Intelligence Hub
-          </p>
-          <p className="text-slate-400 mb-12">
-            Real-time patient monitoring, alert management, and predictive care workflows powered by StudioOS national health intelligence grid.
-          </p>
-          <Button
-            onClick={() => (window.location.href = getLoginUrl())}
-            className="cosmic-button-primary text-lg px-8 py-6"
-          >
-            Sign in with Manus
-          </Button>
+      <div className="min-h-screen p-6 bg-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-12 text-center py-16">
+            <h1 className="text-5xl font-bold text-cyan-400 font-mono mb-4">juA.kali</h1>
+            <p className="text-xl text-slate-300 mb-4">Clinical AI Intelligence Hub</p>
+            <p className="text-slate-400 mb-10 max-w-xl mx-auto">
+              Real-time patient monitoring, predictive care workflows, and 28+ clinical AI agents powered by the StudioOS national health intelligence grid.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center mb-12">
+              {[
+                { icon: "🧬", label: "Oncology AI", path: "/health-ai-agents" },
+                { icon: "📊", label: "Analytics", path: "/analytics" },
+                { icon: "🏥", label: "NurseAI", path: "/nurse-ai" },
+                { icon: "⚡", label: "Jarvis", path: "/jarvis" },
+                { icon: "🔬", label: "All Agents", path: "/health-ai-agents" },
+              ].map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => setLocation(item.path)}
+                  className="px-5 py-3 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 rounded-lg font-mono text-sm transition-all"
+                >
+                  {item.icon} {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
