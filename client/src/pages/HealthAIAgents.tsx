@@ -1,251 +1,183 @@
-import { useState, useEffect } from "react";
-import { trpc } from "@/lib/trpc";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, Grid3x3, List } from "lucide-react";
-import {
-  HtmlAgentRenderer,
-  AgentListView,
-  GroupedAgentView,
-} from "@/components/HtmlAgentRenderer";
-
-interface Agent {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  htmlUrl: string;
-  functionality: string[];
-  status: "active" | "inactive" | "testing";
-}
-
-type ViewMode = "grid" | "grouped" | "detail";
-
 /**
- * Health AI Agents Dashboard
- * Displays all 82+ HTML pages from health-ai repository as interactive agents
+ * HealthAIAgents — Full catalog of 49+ health-ai HTML agents
+ * Design: K-EMCI minimal dark system (#0f172a / #020617 / #06b6d4)
  */
+import { useState, useMemo } from "react";
+import { trpc } from "@/lib/trpc";
+
+const RAW = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public";
+
+// Category metadata
+const CATEGORY_META: Record<string, { label: string; icon: string; color: string }> = {
+  "medical-ai":   { label:"Medical AI",        icon:"🧠", color:"#06b6d4" },
+  "pandemic":     { label:"Pandemic Intel",     icon:"🦠", color:"#f59e0b" },
+  "clinical":     { label:"Clinical Tools",     icon:"🔬", color:"#8b5cf6" },
+  "workflow":     { label:"Workflow Builders",  icon:"🔀", color:"#2563eb" },
+  "prediction":   { label:"Prediction Models",  icon:"📊", color:"#06b6d4" },
+  "simulation":   { label:"Simulation",         icon:"⚡", color:"#16a34a" },
+  "financial":    { label:"Health Finance",     icon:"💰", color:"#f59e0b" },
+  "services":     { label:"Services",           icon:"🏥", color:"#06b6d4" },
+  "media":        { label:"Media",              icon:"🎥", color:"#64748b" },
+  "info":         { label:"Information",        icon:"ℹ️",  color:"#64748b" },
+};
+
 export default function HealthAIAgents() {
-  const [viewMode, setViewMode] = useState<ViewMode>("grouped");
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [activeAgent, setActiveAgent] = useState<{name:string; url:string} | null>(null);
 
-  // Fetch all agents
-  const allAgentsQuery = trpc.healthAiAgents.fetchAll.useQuery();
-  const groupedAgentsQuery = trpc.healthAiAgents.getGrouped.useQuery();
+  const { data, isLoading } = trpc.healthAiAgents.fetchAll.useQuery();
+  const agents = data?.agents ?? [];
 
-  const agents = allAgentsQuery.data?.agents || [];
-  const grouped = groupedAgentsQuery.data?.grouped || {};
-  const categories = Object.keys(grouped);
+  const categories = useMemo(() => {
+    const cats = new Set(agents.map((a: any) => a.category));
+    return ["all", ...Array.from(cats)];
+  }, [agents]);
 
-  // Filter agents based on search and category
-  const filteredAgents = agents.filter((agent) => {
-    const matchesSearch =
-      agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || agent.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const isLoading = allAgentsQuery.isLoading || groupedAgentsQuery.isLoading;
+  const filtered = useMemo(() => agents.filter((a: any) => {
+    const matchCat = activeCategory === "all" || a.category === activeCategory;
+    const matchSearch = !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.category.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSearch;
+  }), [agents, activeCategory, search]);
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div style={{minHeight:"100vh", background:"#0f172a", color:"#e5e7eb", fontFamily:"system-ui, sans-serif"}}>
+      {/* Top bar */}
+      <header style={{background:"#020617", padding:"1rem", borderBottom:"1px solid #1e293b", display:"flex", alignItems:"center", gap:"1rem", flexWrap:"wrap"}}>
         <div>
-          <h1 className="text-3xl font-bold text-cyan-400 font-mono">
-            Health AI Agents
-          </h1>
-          <p className="text-slate-400 mt-2">
-            Interactive clinical tools from lwrnckahiga88/health-ai repository
-          </p>
+          <h2 style={{margin:0, color:"#06b6d4", fontSize:"1.1rem", fontWeight:700}}>Health AI Agents</h2>
+          <small style={{color:"#64748b"}}>{agents.length} modules · health-ai repo</small>
         </div>
-        <div className="text-right">
-          <div className="text-sm text-slate-400">Total Agents</div>
-          <div className="text-2xl font-bold text-cyan-400 mt-1">
-            {agents.length}
-          </div>
-        </div>
-      </div>
+        <input
+          value={search} onChange={e=>setSearch(e.target.value)}
+          placeholder="Search agents..."
+          style={{
+            flex:1, minWidth:"200px", background:"#0f172a",
+            border:"1px solid #1e293b", borderRadius:"8px",
+            padding:"0.6rem 1rem", color:"#e5e7eb", fontSize:"0.9rem",
+          }}
+        />
+        {activeAgent && (
+          <button onClick={()=>setActiveAgent(null)} style={btn("#374151")}>✕ Close viewer</button>
+        )}
+      </header>
 
-      {/* Controls */}
-      <Card className="bg-slate-900/50 border-cyan-500/30 p-4">
-        <div className="space-y-4">
-          {/* Search */}
-          <input
-            type="text"
-            placeholder="Search agents..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-          />
+      <div style={{display:"flex", height:"calc(100vh - 65px)"}}>
+        {/* Category sidebar */}
+        <aside style={{width:"180px", background:"#020617", borderRight:"1px solid #1e293b", overflowY:"auto", padding:"0.75rem", flexShrink:0}}>
+          {categories.map(cat => {
+            const meta = CATEGORY_META[cat] ?? { label: cat, icon:"📌", color:"#64748b" };
+            const isAll = cat === "all";
+            const active = activeCategory === cat;
+            return (
+              <button key={cat} onClick={()=>setActiveCategory(cat)} style={{
+                width:"100%", textAlign:"left",
+                background: active ? "#0f172a" : "transparent",
+                border: active ? `1px solid ${isAll ? "#06b6d4" : meta.color}` : "1px solid transparent",
+                borderRadius:"8px", padding:"0.6rem 0.75rem",
+                marginBottom:"0.35rem", cursor:"pointer", color: active ? "#e5e7eb" : "#94a3b8",
+                fontSize:"0.8rem", transition:"all 0.15s",
+              }}>
+                <span>{isAll ? "🗂" : meta.icon}</span>{" "}
+                <span style={{fontWeight: active ? 600 : 400}}>
+                  {isAll ? "All Agents" : meta.label}
+                </span>
+              </button>
+            );
+          })}
+        </aside>
 
-          {/* Category Filter */}
-          {categories.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-sm text-slate-400">Filter by Category</div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={() => setSelectedCategory(null)}
-                  variant={selectedCategory === null ? "default" : "outline"}
-                  size="sm"
-                >
-                  All
-                </Button>
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    variant={
-                      selectedCategory === category ? "default" : "outline"
-                    }
-                    size="sm"
-                  >
-                    {category}
-                    <span className="ml-2 text-xs opacity-75">
-                      ({((grouped as any)[category] || []).length})
-                    </span>
-                  </Button>
-                ))}
+        {/* Main panel */}
+        <main style={{flex:1, display:"flex", overflow:"hidden"}}>
+          {/* Agent grid */}
+          <div style={{
+            width: activeAgent ? "320px" : "100%",
+            overflowY:"auto", padding:"1rem",
+            flexShrink:0, transition:"width 0.2s",
+            borderRight: activeAgent ? "1px solid #1e293b" : "none",
+          }}>
+            {isLoading ? (
+              <div style={{textAlign:"center", padding:"3rem", color:"#64748b"}}>
+                <div style={{fontSize:"2rem", marginBottom:"1rem"}}>⚡</div>
+                Loading agents...
               </div>
+            ) : (
+              <div style={{
+                display:"grid",
+                gridTemplateColumns: activeAgent ? "1fr" : "repeat(auto-fill, minmax(200px, 1fr))",
+                gap:"0.75rem",
+              }}>
+                {filtered.map((agent: any) => {
+                  const meta = CATEGORY_META[agent.category] ?? { color:"#64748b", icon:"📌", label:agent.category };
+                  const isActive = activeAgent?.name === agent.name;
+                  const hasHtml = agent.htmlUrl || agent.htmlFile;
+                  return (
+                    <div
+                      key={agent.id}
+                      onClick={()=> hasHtml && setActiveAgent({
+                        name: agent.name,
+                        url: agent.htmlUrl ?? `${RAW}/${agent.htmlFile}`,
+                      })}
+                      style={{
+                        background:"#020617", borderRadius:"12px", padding:"0.875rem",
+                        border: isActive ? `1px solid ${meta.color}` : "1px solid #1e293b",
+                        cursor: hasHtml ? "pointer" : "default",
+                        transition:"border-color 0.15s",
+                        opacity: hasHtml ? 1 : 0.5,
+                      }}
+                      onMouseEnter={e=>hasHtml && (e.currentTarget.style.borderColor=meta.color)}
+                      onMouseLeave={e=>!isActive && (e.currentTarget.style.borderColor="#1e293b")}
+                    >
+                      <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"0.4rem"}}>
+                        <span style={{fontSize:"1.3rem"}}>{agent.icon ?? meta.icon}</span>
+                        <span style={{
+                          fontSize:"0.65rem", padding:"0.2rem 0.5rem", borderRadius:"99px",
+                          background:`${meta.color}20`, color:meta.color, fontWeight:600,
+                          textTransform:"uppercase", letterSpacing:"0.04em",
+                        }}>{meta.label}</span>
+                      </div>
+                      <div style={{fontWeight:600, fontSize:"0.85rem", marginBottom:"0.2rem", color:"#e5e7eb"}}>{agent.name}</div>
+                      <div style={{color:"#64748b", fontSize:"0.75rem", lineHeight:1.4}}>{agent.description}</div>
+                      {hasHtml && (
+                        <div style={{marginTop:"0.6rem", color:meta.color, fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em"}}>
+                          Launch →
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Iframe viewer */}
+          {activeAgent && (
+            <div style={{flex:1, position:"relative", background:"#020617"}}>
+              <div style={{
+                position:"absolute", top:"0.75rem", right:"0.75rem", zIndex:10,
+                display:"flex", gap:"0.5rem",
+              }}>
+                <a href={activeAgent.url} target="_blank" rel="noopener" style={btn("#2563eb")}>↗ New Tab</a>
+                <button onClick={()=>setActiveAgent(null)} style={btn("#374151")}>✕</button>
+              </div>
+              <iframe
+                key={activeAgent.url}
+                src={activeAgent.url}
+                style={{width:"100%", height:"100%", border:"none"}}
+                title={activeAgent.name}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+              />
             </div>
           )}
-
-          {/* View Mode */}
-          <div className="space-y-2">
-            <div className="text-sm text-slate-400">View Mode</div>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => setViewMode("grouped")}
-                variant={viewMode === "grouped" ? "default" : "outline"}
-                size="sm"
-              >
-                <Grid3x3 className="w-4 h-4 mr-2" />
-                Grouped
-              </Button>
-              <Button
-                onClick={() => setViewMode("grid")}
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
-              >
-                <List className="w-4 h-4 mr-2" />
-                Grid
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-2" />
-            <p className="text-slate-400">Loading agents...</p>
-          </div>
-        </div>
-      )}
-
-      {/* Error State */}
-      {!isLoading && allAgentsQuery.isError && (
-        <Card className="bg-red-500/10 border-red-500/30 p-4">
-          <p className="text-red-400">
-            Failed to load agents. Please try again.
-          </p>
-        </Card>
-      )}
-
-      {/* Detail View */}
-      {selectedAgent && viewMode === "detail" && (
-        <div className="space-y-4">
-          <Button
-            onClick={() => setSelectedAgent(null)}
-            variant="outline"
-            size="sm"
-          >
-            ← Back to List
-          </Button>
-          <HtmlAgentRenderer
-            htmlUrl={selectedAgent.htmlUrl}
-            agentName={selectedAgent.name}
-            agentDescription={selectedAgent.description}
-            category={selectedAgent.category}
-          />
-        </div>
-      )}
-
-      {/* Grid View */}
-      {!isLoading && viewMode === "grid" && filteredAgents.length > 0 && (
-        <AgentListView
-          agents={filteredAgents as any}
-          onSelectAgent={(agent: any) => {
-            const fullAgent = filteredAgents.find((a) => a.id === agent.id);
-            if (fullAgent) {
-              setSelectedAgent(fullAgent);
-              setViewMode("detail");
-            }
-          }}
-        />
-      )}
-
-      {/* Grouped View */}
-      {!isLoading && viewMode === "grouped" && Object.keys(grouped).length > 0 && (
-        <GroupedAgentView
-          grouped={
-            selectedCategory && grouped[selectedCategory as keyof typeof grouped]
-              ? { [selectedCategory]: grouped[selectedCategory as keyof typeof grouped] as any }
-              : (grouped as any)
-          }
-          onSelectAgent={(agent: any) => {
-            const fullAgent = agents.find((a) => a.id === agent.id);
-            if (fullAgent) {
-              setSelectedAgent(fullAgent);
-              setViewMode("detail");
-            }
-          }}
-        />
-      )}
-
-      {/* Empty State */}
-      {!isLoading && filteredAgents.length === 0 && (
-        <Card className="bg-slate-900/50 border-cyan-500/30 p-8 text-center">
-          <p className="text-slate-400">No agents found matching your criteria.</p>
-        </Card>
-      )}
-
-      {/* Statistics */}
-      {!isLoading && agents.length > 0 && (
-        <Card className="bg-slate-900/50 border-cyan-500/30 p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <div className="text-sm text-slate-400">Total Agents</div>
-              <div className="text-2xl font-bold text-cyan-400 mt-1">
-                {agents.length}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-slate-400">Categories</div>
-              <div className="text-2xl font-bold text-cyan-400 mt-1">
-                {categories.length}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-slate-400">Active</div>
-              <div className="text-2xl font-bold text-green-400 mt-1">
-                {agents.filter((a) => a.status === "active").length}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-slate-400">Filtered</div>
-              <div className="text-2xl font-bold text-cyan-400 mt-1">
-                {filteredAgents.length}
-              </div>
-            </div>
-          </div>
-        </Card>
-      )}
+        </main>
+      </div>
     </div>
   );
+}
+
+function btn(bg: string): React.CSSProperties {
+  return {
+    background:bg, border:"none", borderRadius:"8px", padding:"0.5rem 0.875rem",
+    color:"white", fontWeight:600, fontSize:"0.75rem", cursor:"pointer",
+  };
 }
