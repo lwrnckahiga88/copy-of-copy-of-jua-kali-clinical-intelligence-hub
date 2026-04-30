@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/K-EMCI.html";
+const SRC = "/proxy/agent?file=K-EMCI.html";
 
 export default function InterventionPlanner() {
   const [loaded, setLoaded] = useState(false);

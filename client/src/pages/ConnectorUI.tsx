@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/langflowbuildersaas.html";
+const SRC = "/proxy/agent?file=langflowbuildersaas.html";
 
 export default function ConnectorUI() {
   const [loaded, setLoaded] = useState(false);

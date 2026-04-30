@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/QuorumDeep.html";
+const SRC = "/proxy/agent?file=QuorumDeep.html";
 
 export default function AgentDebate() {
   const [loaded, setLoaded] = useState(false);

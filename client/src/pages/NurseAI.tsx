@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/NurseAI.html";
+const SRC = "/proxy/agent?file=NurseAI.html";
 
 export default function NurseAI() {
   const [loaded, setLoaded] = useState(false);

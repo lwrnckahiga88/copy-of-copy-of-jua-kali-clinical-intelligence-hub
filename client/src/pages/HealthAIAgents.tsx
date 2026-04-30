@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 
-const RAW = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public";
+const PROXY = "/proxy/agent";
 
 const CAT_META: Record<string, { label: string; icon: string; color: string }> = {
   "medical-ai":  { label: "Medical AI",       icon: "🧠", color: "#06b6d4" },
@@ -112,13 +112,22 @@ export default function HealthAIAgents() {
               {filtered.map((agent: any) => {
                 const m = CAT_META[agent.category] ?? { color: "#64748b", icon: "📌", label: agent.category };
                 const hasHtml = agent.htmlUrl || agent.htmlFile;
+                // Convert raw GitHub URL or htmlFile to proxy URL
+                function toProxyUrl(a: any): string {
+                  if (a.htmlFile) return `${PROXY}?file=${encodeURIComponent(a.htmlFile)}`;
+                  if (a.htmlUrl) {
+                    const m = a.htmlUrl.match(/public\/(.+)$/);
+                    if (m) return `${PROXY}?file=${encodeURIComponent(m[1])}`;
+                  }
+                  return a.htmlUrl ?? "";
+                }
                 const isActive = viewer?.name === agent.name;
                 return (
                   <button
                     key={agent.id}
                     onClick={() => hasHtml && setViewer({
                       name: agent.name,
-                      url: agent.htmlUrl ?? `${RAW}/${agent.htmlFile}`,
+                      url: toProxyUrl(agent),
                     })}
                     disabled={!hasHtml}
                     className={`text-left rounded-xl p-3 border transition-all ${

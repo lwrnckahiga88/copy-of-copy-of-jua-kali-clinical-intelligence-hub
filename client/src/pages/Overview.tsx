@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { useState } from "react";
 
-const RAW = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public";
+const PROXY = "/proxy/agent";
 
 const QUICK_AGENTS = [
   { id:"nurse-ai",       label:"🩺 NurseAI",        file:"NurseAI.html",             desc:"Patient vitals & triage" },
@@ -81,7 +81,7 @@ export default function Overview() {
                 <span className="text-sm text-slate-300 font-medium truncate">{activeFile}</span>
                 <div className="flex items-center gap-2 flex-shrink-0 ml-3">
                   <a
-                    href={`${RAW}/${activeFile}`}
+                    href={`${PROXY}?file=${activeFile}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs px-3 py-1.5 rounded bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-300 font-semibold transition-all"
@@ -98,7 +98,7 @@ export default function Overview() {
               </div>
               <iframe
                 key={activeFile}
-                src={`${RAW}/${activeFile}`}
+                src={`${PROXY}?file=${activeFile}`}
                 className="flex-1 w-full border-none"
                 title={activeFile}
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"

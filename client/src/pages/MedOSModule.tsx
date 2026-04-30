@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/Chemworkbench.html";
+const SRC = "/proxy/agent?file=Chemworkbench.html";
 
 export default function MedOSModule() {
   const [loaded, setLoaded] = useState(false);

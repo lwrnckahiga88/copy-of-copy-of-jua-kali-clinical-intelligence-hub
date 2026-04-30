@@ -30,6 +30,8 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
+import { registerAgentProxy } from "../agentProxy";
+
 async function startServer() {
   const app = express();
   const server = createServer(app);
@@ -38,6 +40,8 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // Agent HTML proxy — strips X-Frame-Options so iframes work
+  registerAgentProxy(app);
   // SSE endpoint for real-time agent updates
   setupSSEEndpoint(app);
   // tRPC API
