@@ -1,24 +1,8 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
 import { Settings as SettingsIcon } from "lucide-react";
 
 export default function Settings() {
   const { user, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-cyan-300 mb-4">Settings</h1>
-          <p className="text-slate-300 mb-6">Please sign in to access this module</p>
-          <Button onClick={() => (window.location.href = getLoginUrl())}>
-            Sign in with Manus
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen p-6 bg-slate-950">

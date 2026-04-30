@@ -1,6 +1,4 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { useLocation } from "wouter";
@@ -135,27 +133,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (loading) return <DashboardLayoutSkeleton />;
 
   const isAuthenticated = Boolean(user);
-  const isPublicPage = location === "/";
 
-  if (!isAuthenticated && !isPublicPage) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950">
-        <div className="flex flex-col items-center gap-6 p-8 max-w-sm w-full text-center">
-          <h1 className="text-4xl font-bold text-cyan-400 font-mono">juA.kali</h1>
-          <p className="text-sm text-slate-400">
-            Clinical AI intelligence hub — sign in to access agents and modules.
-          </p>
-          <Button
-            onClick={() => { window.location.href = getLoginUrl(); }}
-            size="lg"
-            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
-          >
-            Sign in with Manus
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // All routes are public — no auth required for agent access
 
   return (
     <div className="flex h-screen bg-slate-950 overflow-hidden">

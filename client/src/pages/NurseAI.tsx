@@ -1,139 +1,59 @@
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
-import { trpc } from "@/lib/trpc";
+/**
+ * Nurse A I — renders NurseAI.html from health-ai repo
+ * Auth-free: accessible without OAuth
+ */
 import { useState } from "react";
-import { Heart } from "lucide-react";
+
+const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/NurseAI.html";
 
 export default function NurseAI() {
-  const { user, isAuthenticated } = useAuth();
-  const [vitals, setVitals] = useState({ heartRate: 75, systolicBP: 120, spo2: 98 });
-  const triageMutation = trpc.clinicalGrid.computeTriage.useMutation();
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-cyan-300 mb-4">NurseAI</h1>
-          <p className="text-slate-300 mb-6">Please sign in to access this module</p>
-          <Button onClick={() => (window.location.href = getLoginUrl())}>
-            Sign in with Manus
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const handleComputeTriage = () => {
-    triageMutation.mutate(vitals);
-  };
-
-  const getSeverityColor = (level: string) => {
-    switch (level) {
-      case 'CRITICAL':
-        return 'text-red-300';
-      case 'HIGH':
-        return 'text-orange-300';
-      case 'MODERATE':
-        return 'text-yellow-300';
-      default:
-        return 'text-green-300';
-    }
-  };
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
   return (
-    <div className="min-h-screen p-6 bg-slate-950">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-glow-cyan mb-2">NurseAI</h1>
-          <p className="text-slate-400">Patient vitals assessment and triage engine</p>
+    <div className="flex flex-col" style={{minHeight:"100%", background:"#0f172a"}}>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 flex-shrink-0">
+        <div>
+          <span className="font-semibold text-cyan-400 text-sm">Nurse A I</span>
+          <span className="text-slate-500 text-xs ml-2">health-ai · NurseAI.html</span>
         </div>
-
-        {/* Vitals Input */}
-        <div className="cosmic-panel mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Heart className="h-6 w-6 text-pink-400" />
-            <h2 className="text-2xl font-bold text-pink-300">Vitals Assessment</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div>
-              <label className="block text-sm text-slate-400 mb-2">Heart Rate (bpm)</label>
-              <input
-                type="number"
-                value={vitals.heartRate}
-                onChange={(e) => setVitals({ ...vitals, heartRate: Number(e.target.value) })}
-                className="cosmic-input w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-slate-400 mb-2">Systolic BP (mmHg)</label>
-              <input
-                type="number"
-                value={vitals.systolicBP}
-                onChange={(e) => setVitals({ ...vitals, systolicBP: Number(e.target.value) })}
-                className="cosmic-input w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-slate-400 mb-2">SpO₂ (%)</label>
-              <input
-                type="number"
-                value={vitals.spo2}
-                onChange={(e) => setVitals({ ...vitals, spo2: Number(e.target.value) })}
-                className="cosmic-input w-full"
-              />
-            </div>
-          </div>
-
-          <Button
-            onClick={handleComputeTriage}
-            disabled={triageMutation.isPending}
-            className="cosmic-button-primary w-full"
+        <div className="flex items-center gap-2">
+          {!loaded && !error && (
+            <span className="text-xs text-slate-500 animate-pulse">Loading…</span>
+          )}
+          <a
+            href={SRC}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs px-3 py-1 rounded bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-300 font-semibold transition-all"
           >
-            {triageMutation.isPending ? 'Computing...' : 'Compute Triage Score'}
-          </Button>
+            ↗ Open
+          </a>
         </div>
-
-        {/* Triage Result */}
-        {triageMutation.data && (
-          <div className="cosmic-panel">
-            <h3 className="text-xl font-bold text-cyan-300 mb-6">Triage Result</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <p className="text-slate-400 text-sm mb-2">Severity Score</p>
-                <p className="text-4xl font-bold text-cyan-300">{triageMutation.data.score}</p>
-              </div>
-              <div>
-                <p className="text-slate-400 text-sm mb-2">Severity Level</p>
-                <p className={`text-4xl font-bold ${getSeverityColor(triageMutation.data.level)}`}>
-                  {triageMutation.data.level}
-                </p>
-              </div>
-            </div>
-
-            {triageMutation.data.flags.length > 0 && (
-              <div className="mt-6">
-                <p className="text-slate-400 text-sm mb-3">Clinical Flags</p>
-                <div className="space-y-2">
-                  {triageMutation.data.flags.map((flag, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="h-2 w-2 rounded-full bg-pink-400 mt-1.5 flex-shrink-0"></div>
-                      <p className="text-slate-300">{flag}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="mt-6 p-4 bg-slate-800/50 rounded border border-slate-700/50">
-              <p className="text-slate-400 text-sm mb-2">Recommendation</p>
-              <p className="text-slate-200 font-semibold">{triageMutation.data.recommendation}</p>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Agent iframe */}
+      {error ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-slate-950">
+          <span className="text-3xl">⚠️</span>
+          <p className="text-slate-400 text-sm">Failed to load agent</p>
+          <a href={SRC} target="_blank" rel="noopener noreferrer"
+            className="text-xs px-4 py-2 rounded bg-blue-600/80 text-white font-semibold">
+            Open in new tab →
+          </a>
+        </div>
+      ) : (
+        <iframe
+          src={SRC}
+          className="flex-1 w-full border-none"
+          style={{minHeight:"calc(100vh - 80px)"}}
+          title="Nurse A I"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads"
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+        />
+      )}
     </div>
   );
 }

@@ -1,57 +1,59 @@
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
-import { Cpu } from "lucide-react";
+/**
+ * Med O S Module — renders Chemworkbench.html from health-ai repo
+ * Auth-free: accessible without OAuth
+ */
+import { useState } from "react";
+
+const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/Chemworkbench.html";
 
 export default function MedOSModule() {
-  const { user, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-cyan-300 mb-4">MedOS Module</h1>
-          <p className="text-slate-300 mb-6">Please sign in to access this module</p>
-          <Button onClick={() => (window.location.href = getLoginUrl())}>
-            Sign in with Manus
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
   return (
-    <div className="min-h-screen p-6 bg-slate-950">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-glow-cyan mb-2">MedOS Module</h1>
-          <p className="text-slate-400">Medical operating system and clinical workflows</p>
+    <div className="flex flex-col" style={{minHeight:"100%", background:"#0f172a"}}>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 flex-shrink-0">
+        <div>
+          <span className="font-semibold text-cyan-400 text-sm">Med O S Module</span>
+          <span className="text-slate-500 text-xs ml-2">health-ai · Chemworkbench.html</span>
         </div>
-
-        <div className="cosmic-panel">
-          <div className="flex items-center gap-3 mb-6">
-            <Cpu className="h-6 w-6 text-cyan-400" />
-            <h2 className="text-2xl font-bold text-cyan-300">System Status</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { name: 'Clinical Engine', status: 'Running', uptime: '99.8%' },
-              { name: 'Data Pipeline', status: 'Running', uptime: '99.9%' },
-              { name: 'Alert System', status: 'Running', uptime: '99.7%' },
-              { name: 'Analytics Engine', status: 'Running', uptime: '99.6%' },
-            ].map((sys, i) => (
-              <div key={i} className="p-3 bg-slate-800/50 rounded border border-slate-700/50">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-cyan-300">{sys.name}</span>
-                  <span className="cosmic-badge cosmic-badge-available">{sys.status}</span>
-                </div>
-                <p className="text-xs text-slate-400">Uptime: {sys.uptime}</p>
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center gap-2">
+          {!loaded && !error && (
+            <span className="text-xs text-slate-500 animate-pulse">Loading…</span>
+          )}
+          <a
+            href={SRC}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs px-3 py-1 rounded bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-300 font-semibold transition-all"
+          >
+            ↗ Open
+          </a>
         </div>
       </div>
+
+      {/* Agent iframe */}
+      {error ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-slate-950">
+          <span className="text-3xl">⚠️</span>
+          <p className="text-slate-400 text-sm">Failed to load agent</p>
+          <a href={SRC} target="_blank" rel="noopener noreferrer"
+            className="text-xs px-4 py-2 rounded bg-blue-600/80 text-white font-semibold">
+            Open in new tab →
+          </a>
+        </div>
+      ) : (
+        <iframe
+          src={SRC}
+          className="flex-1 w-full border-none"
+          style={{minHeight:"calc(100vh - 80px)"}}
+          title="Med O S Module"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads"
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+        />
+      )}
     </div>
   );
 }

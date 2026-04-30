@@ -1,64 +1,59 @@
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
-import { MessageSquare } from "lucide-react";
+/**
+ * Agent Debate — renders QuorumDeep.html from health-ai repo
+ * Auth-free: accessible without OAuth
+ */
+import { useState } from "react";
+
+const SRC = "https://raw.githubusercontent.com/lwrnckahiga88/health-ai/main/public/QuorumDeep.html";
 
 export default function AgentDebate() {
-  const { user, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-cyan-300 mb-4">Agent Debate</h1>
-          <p className="text-slate-300 mb-6">Please sign in to access this module</p>
-          <Button onClick={() => (window.location.href = getLoginUrl())}>
-            Sign in with Manus
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
   return (
-    <div className="min-h-screen p-6 bg-slate-950">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-glow-cyan mb-2">Agent Debate</h1>
-          <p className="text-slate-400">Multi-agent clinical decision framework</p>
+    <div className="flex flex-col" style={{minHeight:"100%", background:"#0f172a"}}>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 flex-shrink-0">
+        <div>
+          <span className="font-semibold text-cyan-400 text-sm">Agent Debate</span>
+          <span className="text-slate-500 text-xs ml-2">health-ai · QuorumDeep.html</span>
         </div>
-
-        <div className="cosmic-panel">
-          <div className="flex items-center gap-3 mb-6">
-            <MessageSquare className="h-6 w-6 text-purple-400" />
-            <h2 className="text-2xl font-bold text-purple-300">Active Debates</h2>
-          </div>
-
-          <div className="space-y-4">
-            {[
-              { topic: 'Treatment Protocol Selection', agents: 3, consensus: '67%' },
-              { topic: 'Risk Assessment Methodology', agents: 4, consensus: '82%' },
-              { topic: 'Resource Allocation Strategy', agents: 2, consensus: '91%' },
-            ].map((debate, i) => (
-              <div key={i} className="p-4 bg-slate-800/50 rounded border border-slate-700/50">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-cyan-300">{debate.topic}</h3>
-                  <span className="cosmic-badge cosmic-badge-available">
-                    {debate.agents} agents
-                  </span>
-                </div>
-                <div className="w-full bg-slate-700/50 rounded h-2">
-                  <div
-                    className="h-2 rounded bg-purple-500"
-                    style={{ width: `${debate.consensus}` }}
-                  ></div>
-                </div>
-                <p className="text-xs text-slate-400 mt-2">Consensus: {debate.consensus}</p>
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center gap-2">
+          {!loaded && !error && (
+            <span className="text-xs text-slate-500 animate-pulse">Loading…</span>
+          )}
+          <a
+            href={SRC}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs px-3 py-1 rounded bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-300 font-semibold transition-all"
+          >
+            ↗ Open
+          </a>
         </div>
       </div>
+
+      {/* Agent iframe */}
+      {error ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-slate-950">
+          <span className="text-3xl">⚠️</span>
+          <p className="text-slate-400 text-sm">Failed to load agent</p>
+          <a href={SRC} target="_blank" rel="noopener noreferrer"
+            className="text-xs px-4 py-2 rounded bg-blue-600/80 text-white font-semibold">
+            Open in new tab →
+          </a>
+        </div>
+      ) : (
+        <iframe
+          src={SRC}
+          className="flex-1 w-full border-none"
+          style={{minHeight:"calc(100vh - 80px)"}}
+          title="Agent Debate"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads"
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+        />
+      )}
     </div>
   );
 }
