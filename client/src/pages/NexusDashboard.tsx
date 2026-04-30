@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=index.html";
+const SRC = "/agents/index.html";
 
 export default function NexusDashboard() {
   const [loaded, setLoaded] = useState(false);

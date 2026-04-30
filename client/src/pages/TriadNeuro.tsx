@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=Genomica.html";
+const SRC = "/agents/Genomica.html";
 
 export default function TriadNeuro() {
   const [loaded, setLoaded] = useState(false);

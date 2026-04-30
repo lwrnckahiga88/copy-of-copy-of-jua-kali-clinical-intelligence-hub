@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=Chemworkbench.html";
+const SRC = "/agents/Chemworkbench.html";
 
 export default function MedOSModule() {
   const [loaded, setLoaded] = useState(false);

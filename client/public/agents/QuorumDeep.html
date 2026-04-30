@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuorumED Genomic Analysis Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-bg: #0f0f23;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #b8b9cf;
+            --accent-neon: #00ffff;
+            --purple-neon: #8b5cf6;
+            --pink-neon: #ec4899;
+            --matrix-green: #00ff00;
+            --cyber-orange: #ff5e00;
+            --quantum-purple: #8a2be2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at top, rgba(102, 126, 234, 0.1) 0%, transparent 70%),
+                        radial-gradient(ellipse at bottom right, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 15, 35, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-neon), var(--purple-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-tab:hover::before,
+        .nav-tab.active::before {
+            left: 0;
+        }
+
+        .nav-tab:hover,
+        .nav-tab.active {
+            color: var(--text-primary);
+            border-color: var(--purple-neon);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Main Content Container */
+        .main-container {
+            margin-top: 100px;
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Page Modules */
+        .page-module {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .page-module.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ====================== */
+        /* VARIANT ANALYSIS MODULE */
+        /* ====================== */
+        .analysis-module {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analysis-module::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            animation: rotate 10s linear infinite;
+            z-index: -1;
+        }
+
+        .module-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--accent-neon), var(--purple-neon), var(--pink-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--purple-neon);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .variant-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .variant-input:focus {
+            outline: none;
+            border-color: var(--purple-neon);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .cyber-button {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cyber-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .results-display {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            margin-top: 2rem;
+            min-height: 200px;
+        }
+
+        /* ================== */
+        /* TRAINING MODULE */
+        /* ================== */
+       .training-module {
+    background: linear-gradient(135deg, #f0e68c 0%, #bdb76b 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #556b2f;
+    box-shadow: 0 0 30px rgba(85, 107, 47, 0.3);
+}
+
+.training-module::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(90deg, transparent 79px, rgba(85, 107, 47, 0.1) 81px, rgba(85, 107, 47, 0.1) 82px, transparent 84px),
+        linear-gradient(rgba(85, 107, 47, 0.05) 50%, transparent 50%);
+    background-size: 84px 4px;
+    animation: matrixRain 3s linear infinite;
+    z-index: -1;
+}
+
+@keyframes matrixRain {
+    0% { transform: translateY(-100px); }
+    100% { transform: translateY(100px); }
+}
+
+.matrix-title {
+    font-size: 2.5rem;
+    color: #556b2f;
+    text-shadow: 0 0 10px rgba(85, 107, 47, 0.3);
+    margin-bottom: 2rem;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.training-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.matrix-card {
+    background: rgba(245, 245, 220, 0.9);
+    border-radius: 10px;
+    padding: 2rem;
+    font-family: 'Courier New', monospace;
+    color: #556b2f;
+    border: 2px solid #6b8e23;
+    box-shadow: inset 0 0 15px rgba(107, 142, 35, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.matrix-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 65%, rgba(107, 142, 35, 0.1) 70%, transparent 75%);
+    animation: scanline 6s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+.matrix-input {
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #6b8e23;
+    color: #2f4f4f;
+    padding: 0.75rem;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    width: 100%;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.matrix-input::placeholder {
+    color: rgba(85, 107, 47, 0.5);
+    font-weight: normal;
+}
+
+.matrix-button {
+    background: linear-gradient(45deg, #6b8e23, #556b2f);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 1px solid #2f4f4f;
+}
+
+.matrix-button:hover {
+    box-shadow: 0 0 20px rgba(85, 107, 47, 0.5);
+    transform: translateY(-2px);
+}
+
+.training-progress {
+    margin-top: 2rem;
+    border: 2px solid #6b8e23;
+    padding: 1rem;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.progress-bar {
+    height: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    border: 1px solid #556b2f;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6b8e23, #556b2f);
+    transition: width 0.5s ease;
+}
+
+.training-log {
+    height: 200px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #6b8e23;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    color: #2f4f4f;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+.log-entry {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(85, 107, 47, 0.2);
+    padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.log-entry::before {
+    content: '>';
+    margin-right: 0.5rem;
+    color: #6b8e23;
+    font-weight: bold;
+}
+
+/* Digital clock-like elements */
+.digital-display {
+    font-family: 'Digital-7', 'Courier New', monospace;
+    background: rgba(0, 0, 0, 0.8);
+    color: #32cd32;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-shadow: 0 0 5px #32cd32;
+    border: 1px solid #32cd32;
+    box-shadow: inset 0 0 10px rgba(50, 205, 50, 0.3);
+}
+
+.digital-label {
+    font-family: 'Digital-7', 'Courier New', monospace;
+    color: #2f4f4f;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+}
+
+/* Add this to your head section if using Digital-7 font */
+@font-face {
+    font-family: 'Digital-7';
+    src: url('https://fonts.cdnfonts.com/css/digital-7') format('truetype');
+}
+
+        /* ================== */
+        /* DEPLOYMENT MODULE */
+        /* ================== */
+        .deployment-module {
+            background: linear-gradient(135deg, rgba(255, 94, 0, 0.1) 0%, rgba(255, 30, 0, 0.2) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--cyber-orange);
+            box-shadow: 0 0 40px rgba(255, 94, 0, 0.1);
+        }
+
+        .deployment-module::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 94, 0, 0.05),
+                    rgba(255, 94, 0, 0.05) 1px,
+                    transparent 1px,
+                    transparent 10px
+                );
+            animation: cyberScan 5s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes cyberScan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .cyber-title {
+            font-size: 2.5rem;
+            color: var(--cyber-orange);
+            text-shadow: 0 0 20px rgba(255, 94, 0, 0.5);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .deployment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .cyber-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 2rem;
+            border: 1px solid var(--cyber-orange);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--cyber-orange);
+            box-shadow: 0 0 10px var(--cyber-orange);
+        }
+
+        .cyber-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--cyber-orange);
+            box-shadow: 0 0 10px var(--cyber-orange);
+        }
+
+        .cyber-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--cyber-orange);
+            border-radius: 5px;
+            padding: 1rem;
+            color: var(--cyber-orange);
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .cyber-input::placeholder {
+            color: rgba(255, 94, 0, 0.5);
+        }
+
+        .cyber-button {
+            background: linear-gradient(90deg, var(--cyber-orange), #ff3c00);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 5px;
+            color: black;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .cyber-button:hover {
+            box-shadow: 0 0 30px rgba(255, 94, 0, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .deployment-status {
+            margin-top: 2rem;
+            padding: 1rem;
+            border: 1px solid var(--cyber-orange);
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 94, 0, 0.2);
+        }
+
+        .status-label {
+            color: var(--cyber-orange);
+            font-weight: 600;
+        }
+
+        .status-value {
+            color: white;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ================== */
+        /* MONITORING MODULE */
+        /* ================== */
+        .monitoring-module {
+            background: linear-gradient(135deg, rgba(0, 150, 255, 0.1) 0%, rgba(0, 50, 150, 0.2) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--accent-neon);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
+        }
+
+        .monitoring-module::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 5px,
+                    rgba(0, 255, 255, 0.05) 5px,
+                    rgba(0, 255, 255, 0.05) 10px
+                );
+            animation: hologramShift 15s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes hologramShift {
+            0% { transform: translateX(-100px) translateY(-100px); }
+            100% { transform: translateX(100px) translateY(100px); }
+        }
+
+        .holo-title {
+            font-size: 2.5rem;
+            color: var(--accent-neon);
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .holo-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--accent-neon);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .holo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .holo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .holo-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-neon);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            margin: 1rem 0;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--accent-neon);
+            border-radius: 10px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-neon);
+            font-size: 1.2rem;
+        }
+
+        /* ================== */
+        /* INTEGRATIONS MODULE */
+        /* ================== */
+        .integrations-module {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1) 0%, rgba(75, 0, 130, 0.2) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--quantum-purple);
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.1);
+        }
+
+        .integrations-module::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+            animation: quantumPulse 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes quantumPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .quantum-title {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--quantum-purple), #4b0082, #9932cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .quantum-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--quantum-purple);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .quantum-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
+        }
+
+        .quantum-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: conic-gradient(from 90deg at 40% -25%, var(--quantum-purple), #4b0082, var(--quantum-purple));
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .integration-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--quantum-purple);
+        }
+
+        .integration-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .integration-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .integration-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .status-inactive {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+
+        .connect-button {
+            background: linear-gradient(45deg, var(--quantum-purple), #9932cc);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .connect-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.3);
+        }
+
+        /* Common Elements */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-neon);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .module-title, .matrix-title, .cyber-title, .holo-title, .quantum-title {
+                font-size: 2rem;
+            }
+            
+            .two-column,
+            .training-grid,
+            .deployment-grid,
+            .integrations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .nav-tab {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-dna"></i> QuorumED
+            </div>
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="analysis">
+                    <i class="fas fa-dna"></i> Variant Analysis
+                </div>
+                <div class="nav-tab" data-tab="training">
+                    <i class="fas fa-brain"></i> Model Training
+                </div>
+                <div class="nav-tab" data-tab="deployment">
+                    <i class="fas fa-rocket"></i> Deployment
+                </div>
+                <div class="nav-tab" data-tab="monitoring">
+                    <i class="fas fa-chart-line"></i> Monitoring
+                </div>
+                <div class="nav-tab" data-tab="integrations">
+                    <i class="fas fa-plug"></i> Integrations
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Variant Analysis Module -->
+        <div id="analysis" class="page-module active">
+            <div class="analysis-module">
+                <h1 class="module-title">Genomic Variant Analysis</h1>
+                
+                <div class="two-column">
+                    <div>
+                        <div class="glass-card">
+                            <h3 style="margin-bottom: 1.5rem; color: var(--accent-neon);">
+                                <i class="fas fa-dna"></i> Variant Information
+                            </h3>
+                            <form id="variant-form">
+                                <div class="form-group">
+                                    <label class="form-label">Gene</label>
+                                    <input type="text" class="variant-input" id="gene-input" placeholder="e.g. BRCA1">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Variant ID</label>
+                                    <input type="text" class="variant-input" id="variant-input" placeholder="e.g. chr17:41276045:G>A">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Amino Acid Change</label>
+                                    <input type="text" class="variant-input" id="aa-change-input" placeholder="e.g. p.Arg1443Ter">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">SIFT Score (0-1)</label>
+                                    <input type="number" class="variant-input" id="sift-input" min="0" max="1" step="0.01" placeholder="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">PolyPhen Score (0-1)</label>
+                                    <input type="number" class="variant-input" id="polyphen-input" min="0" max="1" step="0.01" placeholder="0.95">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Allele Frequency (0-1)</label>
+                                    <input type="number" class="variant-input" id="af-input" min="0" max="1" step="0.0001" placeholder="0.0001">
+                                </div>
+                                <button type="button" class="cyber-button" id="analyze-variant-btn">
+                                    <i class="fas fa-search"></i> Analyze Variant
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="glass-card">
+                            <h3 style="margin-bottom: 1.5rem; color: var(--purple-neon);">
+                                <i class="fas fa-history"></i> Analysis History
+                            </h3>
+                            <div id="variant-history" style="max-height: 300px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="glass-card">
+                            <h3 style="margin-bottom: 1.5rem; color: var(--pink-neon);">
+                                <i class="fas fa-chart-bar"></i> Analysis Results
+                            </h3>
+                            <div id="variant-result-container" style="display: none;">
+                                <div id="impact-result" class="results-display"></div>
+                                <div id="therapy-result" class="results-display"></div>
+                                <button class="cyber-button" id="export-results-btn" style="margin-top: 1rem;">
+                                    <i class="fas fa-download"></i> Export Results
+                                </button>
+                            </div>
+                            <div id="no-results" class="results-display" style="text-align: center; color: var(--text-secondary);">
+                                Run an analysis to see results here
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Module -->
+        <div id="training" class="page-module">
+            <div class="training-module">
+                <h1 class="matrix-title">>>> MODEL TRAINING SYSTEM <<<</h1>
+                
+                <div class="training-grid">
+                    <div class="matrix-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--matrix-green);">TRAINING CONFIGURATION</h3>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--matrix-green);">Data Source:</label>
+                            <input type="text" class="matrix-input" id="training-data-source" placeholder="Enter data source path">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--matrix-green);">Target Column:</label>
+                            <input type="text" class="matrix-input" id="target-column" placeholder="therapeutic_response">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--matrix-green);">Model Type:</label>
+                            <select class="matrix-input" id="model-architecture">
+                                <option value="classifier">Neural Classifier</option>
+                                <option value="regressor">Deep Regressor</option>
+                                <option value="llm">LLM Fine-tuning</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--matrix-green);">Epochs:</label>
+                            <input type="number" class="matrix-input" id="epochs" value="100" min="1">
+                        </div>
+                        <button class="matrix-button" id="start-training-btn">
+                            <i class="fas fa-play"></i> INITIATE TRAINING
+                        </button>
+                        <button class="matrix-button" id="stop-training-btn" style="display: none; background: #ff0000;">
+                            <i class="fas fa-stop"></i> ABORT TRAINING
+                        </button>
+                    </div>
+
+                    <div class="matrix-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--matrix-green);">TRAINING PROGRESS</h3>
+                        <div class="training-progress">
+                            <div class="form-group">
+                                <label class="form-label" style="color: var(--matrix-green);">Current Epoch:</label>
+                                <div id="current-epoch" style="color: white;">0/100</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="color: var(--matrix-green);">Progress:</label>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="training-progress-bar"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="color: var(--matrix-green);">Current Loss:</label>
+                                <div id="current-loss" style="color: white;">-</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="color: var(--matrix-green);">Training Log:</label>
+                                <div class="training-log" id="training-log">
+                                    <div class="log-entry">>>> SYSTEM READY <<<</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deployment Module -->
+        <div id="deployment" class="page-module">
+            <div class="deployment-module">
+                <h1 class="cyber-title">MODEL DEPLOYMENT CENTER</h1>
+                
+                <div class="deployment-grid">
+                    <div class="cyber-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--cyber-orange);">DEPLOY NEW MODEL</h3>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--cyber-orange);">Model Path:</label>
+                            <input type="text" class="cyber-input" id="model-path" placeholder="/models/trained_model.h5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--cyber-orange);">Deployment Name:</label>
+                            <input type="text" class="cyber-input" id="deployment-name" placeholder="BRCA1_Predictor_v2">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--cyber-orange);">Compute Type:</label>
+                            <select class="cyber-input" id="compute-type">
+                                <option value="cpu">CPU</option>
+                                <option value="gpu">GPU</option>
+                                <option value="tpu">TPU</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--cyber-orange);">Replicas:</label>
+                            <input type="number" class="cyber-input" id="replicas" value="1" min="1" max="10">
+                        </div>
+                        <button class="cyber-button" id="deploy-model-btn">
+                            <i class="fas fa-rocket"></i> DEPLOY MODEL
+                        </button>
+                    </div>
+
+                    <div class="cyber-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--cyber-orange);">DEPLOYMENT STATUS</h3>
+                        <div class="deployment-status">
+                            <div class="status-item">
+                                <span class="status-label">Active Deployments:</span>
+                                <span class="status-value" id="active-deployments">3</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Pending Deployments:</span>
+                                <span class="status-value" id="pending-deployments">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Failed Deployments:</span>
+                                <span class="status-value" id="failed-deployments">1</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">System Health:</span>
+                                <span class="status-value" id="system-health">Optimal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cyber-card" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--cyber-orange);">ACTIVE DEPLOYMENTS</h3>
+                    <div id="deployments-list" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Deployment items will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring Module -->
+        <div id="monitoring" class="page-module">
+            <div class="monitoring-module">
+                <h1 class="holo-title">PERFORMANCE MONITORING</h1>
+                
+                <div class="metrics-grid">
+                    <div class="holo-card">
+                        <i class="fas fa-tachometer-alt" style="font-size: 2rem; color: var(--accent-neon);"></i>
+                        <div class="metric-value" id="requests-per-minute">1,245</div>
+                        <div class="metric-label">Requests / Minute</div>
+                    </div>
+                    <div class="holo-card">
+                        <i class="fas fa-clock" style="font-size: 2rem; color: var(--accent-neon);"></i>
+                        <div class="metric-value" id="avg-latency">42<span style="font-size: 1rem;">ms</span></div>
+                        <div class="metric-label">Average Latency</div>
+                    </div>
+                    <div class="holo-card">
+                        <i class="fas fa-microchip" style="font-size: 2rem; color: var(--accent-neon);"></i>
+                        <div class="metric-value" id="cpu-usage">68<span style="font-size: 1rem;">%</span></div>
+                        <div class="metric-label">CPU Usage</div>
+                    </div>
+                    <div class="holo-card">
+                        <i class="fas fa-memory" style="font-size: 2rem; color: var(--accent-neon);"></i>
+                        <div class="metric-value" id="memory-usage">4.2<span style="font-size: 1rem;">GB</span></div>
+                        <div class="metric-label">Memory Usage</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-line" style="margin-right: 1rem;"></i>
+                        Performance Metrics Visualization
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrations Module -->
+        <div id="integrations" class="page-module">
+            <div class="integrations-module">
+                <h1 class="quantum-title">SYSTEM INTEGRATIONS</h1>
+                
+                <div class="integrations-grid">
+                    <div class="quantum-card">
+                        <div class="integration-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="integration-name">Genomic Databases</div>
+                        <div class="integration-description">
+                            Connect to public and private genomic databases including ClinVar, gnomAD, and COSMIC for comprehensive variant analysis.
+                        </div>
+                        <div class="integration-status status-active">Active</div>
+                        <button class="connect-button">
+                            <i class="fas fa-sync-alt"></i> Sync Now
+                        </button>
+                    </div>
+
+                    <div class="quantum-card">
+                        <div class="integration-icon">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                        <div class="integration-name">Cloud Storage</div>
+                        <div class="integration-description">
+                            Integrate with AWS S3, Google Cloud Storage, and Azure Blob Storage for seamless data transfer and backup.
+                        </div>
+                        <div class="integration-status status-active">Active</div>
+                        <button class="connect-button">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                    </div>
+
+                    <div class="quantum-card">
+                        <div class="integration-icon">
+                            <i class="fas fa-laptop-medical"></i>
+                        </div>
+                        <div class="integration-name">EHR Systems</div>
+                        <div class="integration-description">
+                            Connect with electronic health record systems like Epic, Cerner, and Allscripts for clinical data integration.
+                        </div>
+                        <div class="integration-status status-inactive">Inactive</div>
+                        <button class="connect-button">
+                            <i class="fas fa-plug"></i> Connect
+                        </button>
+                    </div>
+
+                    <div class="quantum-card">
+                        <div class="integration-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="integration-name">Lab Systems</div>
+                        <div class="integration-description">
+                            Integrate with laboratory information systems (LIS) for automated test ordering and result reporting.
+                        </div>
+                        <div class="integration-status status-inactive">Inactive</div>
+                        <button class="connect-button">
+                            <i class="fas fa-plug"></i> Connect
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and modules
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page-module').forEach(m => m.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding module
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Variant Analysis Demo Functionality
+        document.getElementById('analyze-variant-btn').addEventListener('click', function() {
+            const gene = document.getElementById('gene-input').value || 'BRCA1';
+            const variant = document.getElementById('variant-input').value || 'chr17:41276045:G>A';
+            const aaChange = document.getElementById('aa-change-input').value || 'p.Arg1443Ter';
+            const sift = parseFloat(document.getElementById('sift-input').value) || 0.01;
+            const polyphen = parseFloat(document.getElementById('polyphen-input').value) || 0.95;
+            const af = parseFloat(document.getElementById('af-input').value) || 0.0001;
+            
+            // Show loading state
+            const btn = this;
+            btn.innerHTML = '<span class="loading"></span> Analyzing...';
+            btn.disabled = true;
+            
+            // Simulate analysis delay
+            setTimeout(() => {
+                // Show results
+                document.getElementById('no-results').style.display = 'none';
+                document.getElementById('variant-result-container').style.display = 'block';
+                
+                // Generate mock results based on inputs
+                const pathogenicity = sift < 0.05 && polyphen > 0.9 ? 'Pathogenic' : 
+                                    sift > 0.1 && polyphen < 0.5 ? 'Benign' : 'VUS';
+                
+                const impact = pathogenicity === 'Pathogenic' ? 'High' : 
+                               pathogenicity === 'Benign' ? 'Low' : 'Moderate';
+                
+                const therapies = gene === 'BRCA1' || gene === 'BRCA2' ? 
+                    ['PARP inhibitors (Olaparib, Rucaparib)', 'Platinum-based chemotherapy'] : 
+                    ['Standard chemotherapy', 'Immunotherapy'];
+                
+                // Display results
+                document.getElementById('impact-result').innerHTML = `
+                    <h4 style="margin-bottom: 1rem; color: var(--purple-neon);">
+                        <i class="fas fa-exclamation-triangle"></i> Variant Impact
+                    </h4>
+                    <p><strong>Gene:</strong> ${gene}</p>
+                    <p><strong>Variant:</strong> ${variant}</p>
+                    <p><strong>Amino Acid Change:</strong> ${aaChange}</p>
+                    <p><strong>Predicted Pathogenicity:</strong> <span style="color: ${pathogenicity === 'Pathogenic' ? '#ff5555' : pathogenicity === 'Benign' ? '#55ff55' : '#ffff55'}">${pathogenicity}</span></p>
+                    <p><strong>Clinical Impact:</strong> ${impact}</p>
+                    <p><strong>Population Frequency:</strong> ${(af * 100).toFixed(4)}%</p>
+                `;
+                
+                document.getElementById('therapy-result').innerHTML = `
+                    <h4 style="margin-bottom: 1rem; color: var(--pink-neon);">
+                        <i class="fas fa-pills"></i> Therapeutic Implications
+                    </h4>
+                    <p><strong>Potential Targeted Therapies:</strong></p>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        ${therapies.map(t => `<li>${t}</li>`).join('')}
+                    </ul>
+                    ${gene === 'BRCA1' || gene === 'BRCA2' ? 
+                      '<p style="margin-top: 0.5rem;"><strong>Clinical Trial Eligibility:</strong> PARP inhibitor trials may be appropriate</p>' : ''}
+                `;
+                
+                // Add to history
+                const historyItem = document.createElement('div');
+                historyItem.style.padding = '0.75rem';
+                historyItem.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+                historyItem.style.cursor = 'pointer';
+                historyItem.innerHTML = `
+                    <strong>${gene} ${aaChange}</strong> - ${variant}<br>
+                    <small style="color: var(--text-secondary);">${new Date().toLocaleString()}</small>
+                `;
+                historyItem.addEventListener('click', () => {
+                    document.getElementById('gene-input').value = gene;
+                    document.getElementById('variant-input').value = variant;
+                    document.getElementById('aa-change-input').value = aaChange;
+                    document.getElementById('sift-input').value = sift;
+                    document.getElementById('polyphen-input').value = polyphen;
+                    document.getElementById('af-input').value = af;
+                });
+                document.getElementById('variant-history').prepend(historyItem);
+                
+                // Reset button
+                btn.innerHTML = '<i class="fas fa-search"></i> Analyze Variant';
+                btn.disabled = false;
+            }, 1500);
+        });
+        
+        // Export results button
+        document.getElementById('export-results-btn').addEventListener('click', () => {
+            alert('Results exported to PDF (simulated)');
+        });
+
+        // Training Module Demo Functionality
+        document.getElementById('start-training-btn').addEventListener('click', function() {
+            const startBtn = this;
+            const stopBtn = document.getElementById('stop-training-btn');
+            const progressBar = document.getElementById('training-progress-bar');
+            const currentEpoch = document.getElementById('current-epoch');
+            const currentLoss = document.getElementById('current-loss');
+            const trainingLog = document.getElementById('training-log');
+            
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
+            
+            const epochs = parseInt(document.getElementById('epochs').value) || 100;
+            let currentEpochCount = 0;
+            
+            trainingLog.innerHTML = '<div class="log-entry">>>> TRAINING INITIATED <<<</div>';
+            
+            const trainingInterval = setInterval(() => {
+                if (currentEpochCount >= epochs) {
+                    clearInterval(trainingInterval);
+                    trainingLog.innerHTML += '<div class="log-entry">>>> TRAINING COMPLETED <<<</div>';
+                    startBtn.style.display = 'inline-block';
+                    stopBtn.style.display = 'none';
+                    return;
+                }
+                
+                currentEpochCount++;
+                const progress = (currentEpochCount / epochs) * 100;
+                const loss = (0.5 + Math.random() * 0.5).toFixed(4);
+                
+                progressBar.style.width = `${progress}%`;
+                currentEpoch.textContent = `${currentEpochCount}/${epochs}`;
+                currentLoss.textContent = loss;
+                
+                if (currentEpochCount % 10 === 0) {
+                    trainingLog.innerHTML += `<div class="log-entry">Epoch ${currentEpochCount}/${epochs} - Loss: ${loss}</div>`;
+                    trainingLog.scrollTop = trainingLog.scrollHeight;
+                }
+            }, 100);
+            
+            stopBtn.addEventListener('click', function() {
+                clearInterval(trainingInterval);
+                trainingLog.innerHTML += '<div class="log-entry">>>> TRAINING ABORTED <<<</div>';
+                startBtn.style.display = 'inline-block';
+                stopBtn.style.display = 'none';
+            }, {once: true});
+        });
+
+        // Deployment Module Demo Functionality
+        document.getElementById('deploy-model-btn').addEventListener('click', function() {
+            const modelPath = document.getElementById('model-path').value || '/models/trained_model.h5';
+            const deploymentName = document.getElementById('deployment-name').value || 'BRCA1_Predictor_v2';
+            const computeType = document.getElementById('compute-type').value;
+            const replicas = document.getElementById('replicas').value || 1;
+            
+            const deploymentsList = document.getElementById('deployments-list');
+            const deploymentItem = document.createElement('div');
+            deploymentItem.style.padding = '1rem';
+            deploymentItem.style.borderBottom = '1px solid rgba(255, 94, 0, 0.3)';
+            deploymentItem.style.display = 'flex';
+            deploymentItem.style.justifyContent = 'space-between';
+            deploymentItem.style.alignItems = 'center';
+            
+            deploymentItem.innerHTML = `
+                <div>
+                    <strong style="color: var(--cyber-orange);">${deploymentName}</strong><br>
+                    <small>${modelPath} | ${computeType.toUpperCase()} | ${replicas} replica(s)</small>
+                </div>
+                <div style="background: rgba(0, 255, 0, 0.2); color: #00ff00; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">
+                    Deploying...
+                </div>
+            `;
+            
+            deploymentsList.prepend(deploymentItem);
+            
+            // Update deployment status
+            const pendingDeployments = document.getElementById('pending-deployments');
+            pendingDeployments.textContent = parseInt(pendingDeployments.textContent) + 1;
+            
+            // Simulate deployment completion
+            setTimeout(() => {
+                deploymentItem.innerHTML = `
+                    <div>
+                        <strong style="color: var(--cyber-orange);">${deploymentName}</strong><br>
+                        <small>${modelPath} | ${computeType.toUpperCase()} | ${replicas} replica(s)</small>
+                    </div>
+                    <div style="background: rgba(0, 255, 0, 0.2); color: #00ff00; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">
+                        Active
+                    </div>
+                `;
+                
+                pendingDeployments.textContent = parseInt(pendingDeployments.textContent) - 1;
+                const activeDeployments = document.getElementById('active-deployments');
+                activeDeployments.textContent = parseInt(activeDeployments.textContent) + 1;
+            }, 3000);
+        });
+
+        // Monitoring Module Demo - Simulate changing metrics
+        function updateMonitoringMetrics() {
+            const metrics = [
+                { id: 'requests-per-minute', min: 800, max: 2000 },
+                { id: 'avg-latency', min: 30, max: 80 },
+                { id: 'cpu-usage', min: 40, max: 90 },
+                { id: 'memory-usage', min: 3.5, max: 5.0 }
+            ];
+            
+            metrics.forEach(metric => {
+                const element = document.getElementById(metric.id);
+                const currentValue = parseFloat(element.textContent.replace(/[^0-9.]/g, ''));
+                const newValue = currentValue + (Math.random() * 20 - 10);
+                const clampedValue = Math.min(metric.max, Math.max(metric.min, newValue));
+                
+                if (metric.id === 'memory-usage') {
+                    element.textContent = clampedValue.toFixed(1) + element.textContent.replace(/[0-9.]/g, '');
+                } else {
+                    element.textContent = Math.round(clampedValue) + element.textContent.replace(/[0-9.]/g, '');
+                }
+            });
+            
+            setTimeout(updateMonitoringMetrics, 3000);
+        }
+        
+        // Start updating metrics when monitoring tab is active
+        document.querySelector('.nav-tab[data-tab="monitoring"]').addEventListener('click', function() {
+            setTimeout(updateMonitoringMetrics, 1000);
+        }, {once: true});
+    </script>
+</body>
+</html>

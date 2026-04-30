@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=pandemicseird1.html";
+const SRC = "/agents/pandemicseird1.html";
 
 export default function Analytics() {
   const [loaded, setLoaded] = useState(false);

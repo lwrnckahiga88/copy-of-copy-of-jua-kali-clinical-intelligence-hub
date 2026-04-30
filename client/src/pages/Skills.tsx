@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=techskills.html";
+const SRC = "/agents/techskills.html";
 
 export default function Skills() {
   const [loaded, setLoaded] = useState(false);

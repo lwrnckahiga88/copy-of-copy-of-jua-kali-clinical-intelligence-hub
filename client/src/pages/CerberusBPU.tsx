@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=BpuT1-bioPUsim.html";
+const SRC = "/agents/BpuT1-bioPUsim.html";
 
 export default function CerberusBPU() {
   const [loaded, setLoaded] = useState(false);

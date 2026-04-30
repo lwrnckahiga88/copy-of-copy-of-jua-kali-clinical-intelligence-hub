@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=K-EMCI.html";
+const SRC = "/agents/K-EMCI.html";
 
 export default function InterventionPlanner() {
   const [loaded, setLoaded] = useState(false);

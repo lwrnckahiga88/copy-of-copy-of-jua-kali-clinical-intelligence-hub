@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 
-const SRC = "/proxy/agent?file=langflowbuildersaas.html";
+const SRC = "/agents/langflowbuildersaas.html";
 
 export default function ConnectorUI() {
   const [loaded, setLoaded] = useState(false);

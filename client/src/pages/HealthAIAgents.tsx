@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 
-const PROXY = "/proxy/agent";
+const AGENTS = "/agents";
 
 const CAT_META: Record<string, { label: string; icon: string; color: string }> = {
   "medical-ai":  { label: "Medical AI",       icon: "🧠", color: "#06b6d4" },
@@ -114,10 +114,10 @@ export default function HealthAIAgents() {
                 const hasHtml = agent.htmlUrl || agent.htmlFile;
                 // Convert raw GitHub URL or htmlFile to proxy URL
                 function toProxyUrl(a: any): string {
-                  if (a.htmlFile) return `${PROXY}?file=${encodeURIComponent(a.htmlFile)}`;
+                  if (a.htmlFile) return `${AGENTS}/${encodeURIComponent(a.htmlFile)}`;
                   if (a.htmlUrl) {
                     const m = a.htmlUrl.match(/public\/(.+)$/);
-                    if (m) return `${PROXY}?file=${encodeURIComponent(m[1])}`;
+                    if (m) return `${AGENTS}/${encodeURIComponent(m[1])}`;
                   }
                   return a.htmlUrl ?? "";
                 }
