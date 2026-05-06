@@ -139,6 +139,7 @@
 - [x] Build Analytics agent (React component)
 - [x] Build MedOS Module agent (React component)
 - [x] Update Intervention Planner with enhanced UI
+- [x] Integrate hospital routing and ambulance dispatch into Intervention Planner
 - [x] Update Agent Debate with multi-agent framework
 - [x] Update Nexus Dashboard with real-time grid
 - [ ] Build remaining agents (Triad Neuro, Cerberus BPU, etc.)
