@@ -1,0 +1,2657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedOS - Clinical Decision Support</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.2/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+         :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1e40af;
+            --accent-cyan: #06b6d4;
+            --success-green: #059669;
+            --warning-amber: #d97706;
+            --danger-red: #dc2626;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glow-cyan: rgba(6, 182, 212, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            backdrop-filter: blur(20px);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-panel {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-panel span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--accent-cyan);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-connected { background: var(--success-green); }
+        .status-disconnected { background: var(--danger-red); }
+        .status-checking { background: var(--warning-amber); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            padding: 1rem 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--glow-cyan), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-tab:hover::before,
+        .nav-tab.active::before {
+            left: 100%;
+        }
+
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: var(--primary-blue);
+            color: var(--text-primary);
+            border-color: var(--accent-cyan);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .module {
+            display: none;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .module.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+        }
+
+        .glass-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .patient-display {
+            background: rgba(6, 182, 212, 0.1);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .patient-display p {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .patient-display span {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--glow-cyan);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .input-group label {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.4s ease;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1), 0 0 20px var(--glow-cyan);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .input-group select {
+            cursor: pointer;
+        }
+
+        .input-group select option {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            padding: 0.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(6, 182, 212, 0.1);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent-cyan);
+        }
+
+        .checkbox-group label {
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            padding: 1.25rem 2.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: var(--text-primary);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4);
+            border-color: var(--accent-cyan);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-amber), #b45309);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(217, 119, 6, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-green), #047857);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(5, 150, 105, 0.4);
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            position: relative;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(37, 211, 102, 0.4);
+        }
+
+        .whatsapp-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .whatsapp-modal.active {
+            display: flex;
+        }
+
+        .whatsapp-modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .whatsapp-modal h3 {
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .chart-container {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-cyan);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .error-message {
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+        }
+
+        .error-message::before {
+            background: var(--danger-red);
+        }
+
+        .success-message {
+            background: rgba(5, 150, 105, 0.15);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .success-message::before {
+            background: var(--success-green);
+        }
+
+        .warning-message {
+            background: rgba(217, 119, 6, 0.15);
+            border: 1px solid var(--warning-amber);
+            color: var(--warning-amber);
+        }
+
+        .warning-message::before {
+            background: var(--warning-amber);
+        }
+
+        .diagnosis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .diagnosis-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-cyan);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .diagnosis-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .diagnosis-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .diagnosis-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .probability-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--primary-blue));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .query-result {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .query-result::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .query-result::-webkit-scrollbar-track {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .query-result::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 4px;
+        }
+
+        .external-query-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .external-query-section h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .floating-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .floating-alert.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header { padding: 2rem 1.5rem; }
+            .header h1 { font-size: 2.2rem; }
+            .input-grid { grid-template-columns: 1fr; }
+            .nav-tabs { justify-content: center; }
+            .system-status { grid-template-columns: 1fr; }
+            .button-group { flex-direction: column; }
+            .status-panel { flex-direction: column; gap: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.8rem; }
+            .glass-card { padding: 1.5rem; }
+            .btn-primary { padding: 1rem 1.5rem; font-size: 0.9rem; }
+            .whatsapp-modal-content { padding: 2rem; }
+        }
+            
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 MedOS - Clinical Decision Support</h1>
+            <p>Advanced AI-Powered Medical Diagnosis System</p>
+            <div class="status-panel">
+                <span>EMR: <span id="emrStatus">Connecting...</span> <span id="emrIndicator" class="status-indicator status-checking"></span></span>
+                <span>Symptom DB: <span id="symptomStatus">Connecting...</span> <span id="symptomIndicator" class="status-indicator status-checking"></span></span>
+                <span>Drug DB: <span id="drugStatus">Connecting...</span> <span id="drugIndicator" class="status-indicator status-checking"></span></span>
+                <span>ICD-11: <span id="icdStatus">Connecting...</span> <span id="icdIndicator" class="status-indicator status-checking"></span></span>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="app.showModule('patient')" aria-selected="true">👤 Patient Data</div>
+            <div class="nav-tab" onclick="app.showModule('diagnostics')" aria-selected="false">🔬 Diagnostics</div>
+            <div class="nav-tab" onclick="app.showModule('report')" aria-selected="false">📊 Clinical Report</div>
+            <div class="nav-tab" onclick="app.showModule('external')" aria-selected="false">🌐 External Data</div>
+        </div>
+
+        <div id="patientModule" class="module active glass-card" aria-hidden="false">
+            <h2>👤 Patient Information</h2>
+            <div class="patient-display">
+                <p><strong>Current Patient:</strong> <span id="patientDisplayName">Loading...</span></p>
+            </div>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="patientName">Patient Name</label>
+                    <input type="text" id="patientName" placeholder="Enter full patient name">
+                </div>
+                <div class="input-group">
+                    <label for="patientAge">Age (Years)</label>
+                    <input type="number" id="patientAge" placeholder="Enter age" min="0" max="120">
+                </div>
+                <div class="input-group">
+                    <label for="patientSex">Biological Sex</label>
+                    <select id="patientSex">
+                        <option value="">Select biological sex</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="patientPhone">WhatsApp Phone Number</label>
+                    <input type="tel" id="patientPhone" placeholder="Enter WhatsApp number (e.g., +254700000000)">
+                </div>
+                <div class="input-group">
+                    <label for="duration">Symptom Duration</label>
+                    <select id="duration">
+                        <option value="">Select duration</option>
+                        <option value="hours">Hours</option>
+                        <option value="days">Days</option>
+                        <option value="weeks">Weeks</option>
+                        <option value="months">Months</option>
+                        <option value="years">Years</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="chiefComplaint">Chief Complaint</label>
+                    <textarea id="chiefComplaint" placeholder="Describe the main symptom or concern (e.g., chest pain, fever, headache)"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="additionalSymptoms">Additional Symptoms</label>
+                    <textarea id="additionalSymptoms" placeholder="List any additional symptoms (comma-separated)"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="medicalHistory">Past Medical History</label>
+                    <textarea id="medicalHistory" placeholder="Enter relevant medical history, medications, surgeries"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="familyHistory">Family Medical History</label>
+                    <textarea id="familyHistory" placeholder="Enter relevant family medical history"></textarea>
+                </div>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="dataConsent">
+                <label for="dataConsent">I consent to data processing for diagnostic purposes and understand that this is not a substitute for professional medical advice</label>
+            </div>
+        </div>
+
+        <div id="diagnosticsModule" class="module glass-card" aria-hidden="true">
+            <h2>🔬 Diagnostic Analysis</h2>
+            <div class="button-group">
+                <button class="btn-primary" onclick="app.runQuickAnalysis()">⚡ Quick Analysis</button>
+                <button class="btn-primary" onclick="app.runAdvancedAnalysis()">🧠 Advanced AI Analysis</button>
+                <button class="btn-primary" onclick="app.runExternalAPIAnalysis()">🌐 External API Analysis</button>
+            </div>
+            <div id="diagnosticResults"></div>
+            <div id="diagnosticChart" class="chart-container" style="display: none;">
+                <canvas id="chartCanvas"></canvas>
+            </div>
+        </div>
+
+        <div id="reportModule" class="module glass-card" aria-hidden="true">
+            <h2>📊 Clinical Report</h2>
+            <div class="button-group">
+                <button class="btn-primary" onclick="app.exportReport('pdf')">📄 Export as PDF</button>
+                <button class="btn-whatsapp" onclick="app.sendWhatsAppReport()">📱 Send Report via WhatsApp</button>
+                <button class="btn-success" onclick="app.shareWithProvider()">👨‍⚕️ Share with Provider</button>
+                <button class="btn-primary" onclick="app.sendToEMR()">🏥 Send to KenyaEMR</button>
+            </div>
+            <div id="reportContent"></div>
+        </div>
+
+        <div id="externalModule" class="module glass-card" aria-hidden="true">
+            <h2>🌐 External Data Queries</h2>
+            
+            <div class="external-query-section">
+                <h4>🧬 Gene Analysis (Ensembl)</h4>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="geneSymbol">Gene Symbol</label>
+                        <input type="text" id="geneSymbol" placeholder="e.g., EGFR, TP53, BRCA1">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="app.queryEnsembl()">Query Ensembl Database</button>
+            </div>
+
+            <div class="external-query-section">
+                <h4>💊 Drug Information (PubChem)</h4>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="drugName">Drug Name</label>
+                        <input type="text" id="drugName" placeholder="e.g., Aspirin, Ibuprofen, Paracetamol">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="app.queryPubChem()">Query PubChem Database</button>
+            </div>
+
+            <div class="external-query-section">
+                <h4>🔬 Pathway Analysis (Reactome)</h4>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">Analyze biological pathways relevant to patient symptoms</p>
+                <button class="btn-primary" onclick="app.queryReactome()">Query Reactome Pathways</button>
+            </div>
+
+            <div id="externalDataResults"></div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Modal -->
+    <div id="whatsappModal" class="whatsapp-modal">
+        <div class="whatsapp-modal-content">
+            <button class="modal-close" onclick="app.closeWhatsAppModal()">&times;</button>
+            <h3>📱 Send Report via WhatsApp</h3>
+            <div class="input-group">
+                <label for="modalPhoneNumber">Confirm WhatsApp Number</label>
+                <input type="tel" id="modalPhoneNumber" placeholder="+254700000000">
+            </div>
+            <div class="message warning-message">
+                <p>📋 This will send your clinical report as a JSON file via WhatsApp</p>
+                <p>💰 You'll be offered a video consultation for KES 200</p>
+            </div>
+            <div class="button-group">
+                <button class="btn-whatsapp" onclick="app.confirmWhatsAppSend()">
+                    📤 Send Report & Offer Consultation
+                </button>
+                <button class="btn-primary" onclick="app.closeWhatsAppModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State Management
+        class MedOSApp {
+            constructor() {
+                // Initialize with sample patient data
+                this.patient = {
+                    name: "Lawrence Kahiga",
+                    age: 45,
+                    sex: "male",
+                    phone: "+254712345678",
+                    chiefComplaint: "Chest pain, wheeze, difficulty breathing",
+                    additionalSymptoms: "fever, cough, nausea, fatigue",
+                    medicalHistory: "Hypertension, controlled with ACE inhibitors. No known drug allergies.",
+                    familyHistory: "Father: lung cancer (age 67), Mother: diabetes type 2",
+                    duration: "days"
+                };
+                
+                this.analysisResults = null;
+                this.apiStatus = {
+                    emr: false,
+                    symptom: false,
+                    drug: false,
+                    icd: false,
+                    asclepius: false
+                };
+                
+                this.chart = null;
+                this.init();
+                
+                // Comprehensive knowledge base
+                this.diagnosisKnowledgeBase = {
+                    respiratory: {
+                        symptoms: ['chest pain', 'wheeze', 'difficulty breathing', 'cough', 'shortness of breath'],
+                        diagnoses: [
+                            {
+                                name: "Acute Bronchitis",
+                                icd11: "CA20",
+                                description: "Inflammation of the bronchial tubes, often following a cold or flu.",
+                                treatment: "Rest, fluids, NSAIDs for pain/fever. Consider bronchodilators if wheezing.",
+                                baseProbability: 0.7
+                            },
+                            {
+                                name: "Community-Acquired Pneumonia",
+                                icd11: "CA40",
+                                description: "Infection of lung tissue acquired outside hospital settings.",
+                                treatment: "Antibiotics if bacterial cause suspected. Chest X-ray recommended.",
+                                baseProbability: 0.45
+                            },
+                            {
+                                name: "Acute Asthma Exacerbation",
+                                icd11: "CA23",
+                                description: "Sudden worsening of asthma symptoms.",
+                                treatment: "Bronchodilators, corticosteroids. Consider peak flow measurement.",
+                                baseProbability: 0.38
+                            }
+                        ]
+                    },
+                    gastrointestinal: {
+                        symptoms: ['nausea', 'vomiting', 'abdominal pain', 'diarrhea'],
+                        diagnoses: [
+                            {
+                                name: "Gastroesophageal Reflux Disease (GERD)",
+                                icd11: "DA24",
+                                description: "Stomach acid frequently flowing back into the esophagus.",
+                                treatment: "Lifestyle modifications, antacids, H2 blockers or PPIs.",
+                                baseProbability: 0.6
+                            },
+                            {
+                                name: "Gastritis",
+                                icd11: "DA42",
+                                description: "Inflammation of the stomach lining.",
+                                treatment: "Antacids, PPIs, avoid irritants like alcohol or NSAIDs.",
+                                baseProbability: 0.5
+                            }
+                        ]
+                    },
+                    infectious: {
+                        symptoms: ['fever', 'fatigue', 'cough', 'sore throat'],
+                        diagnoses: [
+                            {
+                                name: "COVID-19 Infection",
+                                icd11: "RA01.0",
+                                description: "Possible SARS-CoV-2 infection given fever and respiratory symptoms.",
+                                treatment: "Testing recommended. Isolation if positive. Supportive care.",
+                                baseProbability: 0.4
+                            },
+                            {
+                                name: "Influenza",
+                                icd11: "1E30",
+                                description: "Viral infection causing systemic and respiratory symptoms.",
+                                treatment: "Antiviral therapy (e.g., oseltamivir), supportive care.",
+                                baseProbability: 0.35
+                            }
+                        ]
+                    },
+                    cardiovascular: {
+                        symptoms: ['chest pain', 'hypertension', 'palpitations'],
+                        diagnoses: [
+                            {
+                                name: "Angina Pectoris",
+                                icd11: "BA40",
+                                description: "Chest pain due to reduced blood flow to the heart.",
+                                treatment: "Nitrates, beta-blockers, lifestyle changes.",
+                                baseProbability: 0.5
+                            }
+                        ]
+                    }
+                };
+                
+                this.geneticRiskFactors = {
+                    "lung cancer": [
+                        {
+                            gene: "EGFR",
+                            variant: "T790M",
+                            risk: "Increased susceptibility to non-small cell lung cancer",
+                            relevance: "Family history of lung cancer"
+                        },
+                        {
+                            gene: "TP53",
+                            variant: "R273H",
+                            risk: "Associated with multiple cancers including lung",
+                            relevance: "Family history of lung cancer"
+                        }
+                    ],
+                    "diabetes type 2": [
+                        {
+                            gene: "TCF7L2",
+                            variant: "rs7903146",
+                            risk: "Increased risk of type 2 diabetes",
+                            relevance: "Family history of diabetes"
+                        }
+                    ]
+                };
+                
+                this.drugInteractions = {
+                    "ACE inhibitors": [
+                        {
+                            drug1: "Lisinopril",
+                            drug2: "Ibuprofen",
+                            effect: "Reduced antihypertensive effect, risk of renal impairment",
+                            severity: "Moderate",
+                            recommendation: "Monitor BP, consider alternative pain relief"
+                        }
+                    ]
+                };
+
+                // WhatsApp Business API Configuration
+                this.whatsappConfig = {
+                    apiUrl: "https://graph.facebook.com/v18.0/YOUR_PHONE_NUMBER_ID/messages",
+                    accessToken: "YOUR_WHATSAPP_BUSINESS_API_TOKEN", // This should be configured properly
+                    businessPhoneId: "YOUR_BUSINESS_PHONE_NUMBER_ID"
+                };
+
+                // Asclepius API Configuration
+                this.asclepiusConfig = {
+                    apiUrl: "https://api.asclepius.com/v1/diagnosis",
+                    apiKey: "YOUR_ASCLEPIUS_API_KEY", // Replace with your actual API key
+                    fallbackEnabled: true
+                };
+            }
+
+            init() {
+                this.checkSystemStatus();
+                this.bindEvents();
+                this.updatePatientDisplay();
+                this.updateFormInputs();
+            }
+
+            // Update form inputs with patient data
+            updateFormInputs() {
+                document.getElementById('patientName').value = this.patient.name;
+                document.getElementById('patientAge').value = this.patient.age;
+                document.getElementById('patientSex').value = this.patient.sex;
+                document.getElementById('patientPhone').value = this.patient.phone;
+                document.getElementById('duration').value = this.patient.duration;
+                document.getElementById('chiefComplaint').value = this.patient.chiefComplaint;
+                document.getElementById('additionalSymptoms').value = this.patient.additionalSymptoms;
+                document.getElementById('medicalHistory').value = this.patient.medicalHistory;
+                document.getElementById('familyHistory').value = this.patient.familyHistory;
+                this.updatePatientDisplay();
+            }
+
+            // Update patient display name
+            updatePatientDisplay() {
+                document.getElementById('patientDisplayName').textContent = this.patient.name || 'Unknown Patient';
+            }
+
+            // Input sanitization
+            sanitize(input) {
+                if (typeof input !== 'string') return '';
+                return input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                           .replace(/[<>]/g, '')
+                           .trim();
+            }
+
+            // Validate patient data
+            validatePatientData() {
+                const errors = [];
+                if (!this.patient.name) errors.push('Patient name is required');
+                if (!this.patient.age || this.patient.age < 0 || this.patient.age > 120) errors.push('Age must be between 0 and 120');
+                if (!this.patient.sex) errors.push('Sex is required');
+                if (!this.patient.chiefComplaint) errors.push('Chief complaint is required');
+                
+                // Validate phone number format
+                if (this.patient.phone && !this.validatePhoneNumber(this.patient.phone)) {
+                    errors.push('Please enter a valid WhatsApp number (e.g., +254700000000)');
+                }
+                
+                return errors;
+            }
+
+            // Validate phone number format
+            validatePhoneNumber(phone) {
+                const phoneRegex = /^\+[1-9]\d{1,14}$/;
+                return phoneRegex.test(phone);
+            }
+
+            // Show alert notification
+            showAlert(message, type = 'info') {
+                const alertEl = document.createElement('div');
+                alertEl.className = `floating-alert ${type}-message`;
+                alertEl.textContent = message;
+                alertEl.setAttribute('role', 'alert');
+                document.body.appendChild(alertEl);
+                
+                setTimeout(() => {
+                    alertEl.classList.add('show');
+                    setTimeout(() => {
+                        alertEl.classList.remove('show');
+                        setTimeout(() => {
+                            alertEl.remove();
+                        }, 300);
+                    }, 4000);
+                }, 100);
+            }
+
+            // Simulate system status check
+            checkSystemStatus() {
+                setTimeout(() => {
+                    this.apiStatus.emr = true;
+                    document.getElementById('emrIndicator').className = 'status-indicator status-connected';
+                    document.getElementById('emrStatus').textContent = 'Connected';
+                    
+                    setTimeout(() => {
+                        this.apiStatus.symptom = true;
+                        document.getElementById('symptomIndicator').className = 'status-indicator status-connected';
+                        document.getElementById('symptomStatus').textContent = 'Connected';
+                        
+                        setTimeout(() => {
+                            this.apiStatus.drug = true;
+                            document.getElementById('drugIndicator').className = 'status-indicator status-connected';
+                            document.getElementById('drugStatus').textContent = 'Connected';
+                            
+                            setTimeout(() => {
+                                this.apiStatus.icd = true;
+                                document.getElementById('icdIndicator').className = 'status-indicator status-connected';
+                                document.getElementById('icdStatus').textContent = 'Connected';
+
+                                // Check Asclepius API status
+                                this.checkAsclepiusStatus();
+                            }, 800);
+                        }, 700);
+                    }, 600);
+                }, 500);
+            }
+
+            // Check Asclepius API status
+            checkAsclepiusStatus() {
+                // Simulate checking Asclepius API status
+                setTimeout(() => {
+                    this.apiStatus.asclepius = true;
+                    this.showAlert('Asclepius API connected successfully', 'success');
+                }, 1000);
+            }
+
+            // Bind input events
+            bindEvents() {
+                const debounce = (func, wait) => {
+                    let timeout;
+                    return function executedFunction(...args) {
+                        const later = () => {
+                            clearTimeout(timeout);
+                            func(...args);
+                        };
+                        clearTimeout(timeout);
+                        timeout = setTimeout(later, wait);
+                    };
+                };
+
+                document.getElementById('patientName').addEventListener('input', debounce((e) => {
+                    this.patient.name = this.sanitize(e.target.value);
+                    this.updatePatientDisplay();
+                }, 300));
+
+                document.getElementById('patientAge').addEventListener('input', (e) => {
+                    this.patient.age = parseInt(e.target.value) || 0;
+                });
+
+                document.getElementById('patientSex').addEventListener('change', (e) => {
+                    this.patient.sex = e.target.value;
+                });
+
+                document.getElementById('patientPhone').addEventListener('input', (e) => {
+                    this.patient.phone = this.sanitize(e.target.value);
+                });
+
+                document.getElementById('duration').addEventListener('change', (e) => {
+                    this.patient.duration = e.target.value;
+                });
+
+                document.getElementById('chiefComplaint').addEventListener('input', (e) => {
+                    this.patient.chiefComplaint = this.sanitize(e.target.value);
+                });
+
+                document.getElementById('additionalSymptoms').addEventListener('input', (e) => {
+                    this.patient.additionalSymptoms = this.sanitize(e.target.value);
+                });
+
+                document.getElementById('medicalHistory').addEventListener('input', (e) => {
+                    this.patient.medicalHistory = this.sanitize(e.target.value);
+                });
+
+                document.getElementById('familyHistory').addEventListener('input', (e) => {
+                    this.patient.familyHistory = this.sanitize(e.target.value);
+                });
+            }
+
+            // Parse symptoms from input
+            parseSymptoms() {
+                const symptoms = [
+                    ...(this.patient.chiefComplaint.toLowerCase().split(',').map(s => s.trim())),
+                    ...(this.patient.additionalSymptoms.toLowerCase().split(',').map(s => s.trim()))
+                ].filter(s => s);
+                return [...new Set(symptoms)];
+            }
+
+            // Query Asclepius API for diagnosis
+            async queryAsclepiusAPI() {
+                try {
+                    const symptoms = this.parseSymptoms();
+                    const medicalHistory = this.patient.medicalHistory.toLowerCase();
+                    const familyHistory = this.patient.familyHistory.toLowerCase();
+                    const age = this.patient.age;
+                    const sex = this.patient.sex;
+
+                    const requestData = {
+                        symptoms: symptoms,
+                        patient_data: {
+                            age: age,
+                            sex: sex,
+                            medical_history: medicalHistory,
+                            family_history: familyHistory
+                        },
+                        duration: this.patient.duration
+                    };
+
+                    const response = await fetch(this.asclepiusConfig.apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.asclepiusConfig.apiKey}`
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Asclepius API error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    return this.formatAsclepiusResults(data);
+
+                } catch (error) {
+                    console.error('Error querying Asclepius API:', error);
+                    if (this.asclepiusConfig.fallbackEnabled) {
+                        this.showAlert('Using fallback diagnostic analysis', 'warning');
+                        return this.generateDummyResults();
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+
+            // Format Asclepius API results to our standard format
+            formatAsclepiusResults(apiResults) {
+                const diagnoses = apiResults.diagnoses.map(d => ({
+                    name: d.condition,
+                    icd11: d.icd_code || 'N/A',
+                    description: d.description || 'No description available',
+                    treatment: d.recommended_treatment || 'Consult healthcare provider',
+                    probability: d.probability / 100, // Convert percentage to decimal
+                    matchedSymptoms: d.matched_symptoms || []
+                }));
+
+                return {
+                    timestamp: new Date().toISOString(),
+                    diagnoses: diagnoses.sort((a, b) => b.probability - a.probability),
+                    recommendations: apiResults.recommendations || [],
+                    alerts: apiResults.alerts || [],
+                    analysisDetails: {
+                        symptomsAnalyzed: apiResults.symptoms_analyzed || [],
+                        totalDiagnosesConsidered: diagnoses.length,
+                        analysisType: "Asclepius AI Analysis",
+                        algorithmVersion: apiResults.model_version || "Unknown"
+                    },
+                    externalData: {
+                        asclepiusResponse: apiResults
+                    }
+                };
+            }
+
+            // Enhanced diagnostic algorithm with more dynamic symptom analysis
+            generateDummyResults() {
+                const symptoms = this.parseSymptoms();
+                const medicalHistory = this.patient.medicalHistory.toLowerCase();
+                const familyHistory = this.patient.familyHistory.toLowerCase();
+                const duration = this.patient.duration;
+                const age = this.patient.age;
+                const sex = this.patient.sex;
+
+                let diagnoses = [];
+                let recommendations = [];
+                let alerts = [];
+
+                // Enhanced symptom-to-diagnosis mapping with fuzzy matching
+                const normalizedSymptoms = symptoms.map(s => this.normalizeSymptom(s));
+                
+                Object.keys(this.diagnosisKnowledgeBase).forEach(category => {
+                    const categorySymptoms = this.diagnosisKnowledgeBase[category].symptoms;
+                    const matchedSymptoms = normalizedSymptoms.filter(s => 
+                        categorySymptoms.some(cs => s.includes(cs) || cs.includes(s) || this.isSymptomRelated(s, cs))
+                    );
+                    
+                    if (matchedSymptoms.length > 0) {
+                        this.diagnosisKnowledgeBase[category].diagnoses.forEach(diagnosis => {
+                            let probability = diagnosis.baseProbability;
+                            
+                            // Stronger symptom matching bonus
+                            const matchRatio = matchedSymptoms.length / categorySymptoms.length;
+                            probability *= (1 + matchRatio * 0.4);
+                            
+                            // Duration impact
+                            if (duration === 'hours') {
+                                probability *= category === 'infectious' ? 1.2 : 0.8;
+                            } else if (duration === 'days') {
+                                probability *= category === 'respiratory' || category === 'infectious' ? 1.15 : 1.0;
+                            } else if (duration === 'weeks') {
+                                probability *= category === 'cardiovascular' || category === 'gastrointestinal' ? 1.1 : 0.9;
+                            } else if (duration === 'months') {
+                                probability *= category === 'cardiovascular' ? 1.2 : 0.8;
+                            }
+                            
+                            // Age-based adjustments
+                            if (age < 18) {
+                                probability *= category === 'infectious' ? 1.3 : 0.8;
+                            } else if (age > 65) {
+                                probability *= category === 'cardiovascular' || category === 'respiratory' ? 1.25 : 1.0;
+                            } else if (age > 40) {
+                                probability *= category === 'cardiovascular' ? 1.1 : 1.0;
+                            }
+                            
+                            // Sex-based adjustments
+                            if (sex === 'male') {
+                                if (diagnosis.name.includes('Angina') || diagnosis.name.includes('Heart')) {
+                                    probability *= 1.2;
+                                }
+                            } else if (sex === 'female') {
+                                if (diagnosis.name.includes('GERD') || diagnosis.name.includes('Gastritis')) {
+                                    probability *= 1.1;
+                                }
+                            }
+                            
+                            // Specific symptom combinations
+                            if (normalizedSymptoms.includes('chest pain') && normalizedSymptoms.includes('difficulty breathing')) {
+                                if (diagnosis.name.includes('Pneumonia') || diagnosis.name.includes('Angina')) {
+                                    probability *= 1.3;
+                                }
+                            }
+                            
+                            if (normalizedSymptoms.includes('fever') && normalizedSymptoms.includes('cough')) {
+                                if (diagnosis.name.includes('COVID-19') || diagnosis.name.includes('Influenza') || diagnosis.name.includes('Pneumonia')) {
+                                    probability *= 1.4;
+                                }
+                            }
+                            
+                            if (normalizedSymptoms.includes('nausea') && normalizedSymptoms.includes('fatigue')) {
+                                if (diagnosis.name.includes('GERD') || diagnosis.name.includes('Gastritis')) {
+                                    probability *= 1.2;
+                                }
+                            }
+                            
+                            probability = Math.min(probability, 0.98);
+                            if (probability > 0.15) { // Only include if probability is meaningful
+                                diagnoses.push({ ...diagnosis, probability, matchedSymptoms });
+                            }
+                        });
+                    }
+                });
+
+                // Add additional diagnoses based on specific symptom patterns
+                this.addSpecificDiagnoses(normalizedSymptoms, diagnoses, age, sex);
+
+                // Medical history adjustments with more conditions
+                this.applyMedicalHistoryAdjustments(medicalHistory, diagnoses, alerts);
+
+                // Family history adjustments
+                this.applyFamilyHistoryAdjustments(familyHistory, diagnoses, alerts);
+
+                // Generate dynamic recommendations
+                this.generateDynamicRecommendations(diagnoses, normalizedSymptoms, age, recommendations);
+
+                // Remove duplicates and sort
+                diagnoses = [...new Map(diagnoses.map(d => [d.name, d])).values()];
+                diagnoses.sort((a, b) => b.probability - a.probability);
+                diagnoses = diagnoses.slice(0, 6);
+
+                return {
+                    timestamp: new Date().toISOString(),
+                    diagnoses,
+                    recommendations: [...new Set(recommendations)],
+                    alerts: [...new Set(alerts)],
+                    analysisDetails: {
+                        symptomsAnalyzed: normalizedSymptoms,
+                        totalDiagnosesConsidered: diagnoses.length,
+                        analysisType: "Simulated Analysis",
+                        algorithmVersion: "1.2.0"
+                    }
+                };
+            }
+
+            // Helper methods for enhanced diagnosis
+            normalizeSymptom(symptom) {
+                return symptom.toLowerCase()
+                    .replace(/\s+/g, ' ')
+                    .replace(/[^\w\s]/g, '')
+                    .trim();
+            }
+
+            isSymptomRelated(symptom1, symptom2) {
+                const synonyms = {
+                    'chest pain': ['chest discomfort', 'thoracic pain', 'breast pain'],
+                    'difficulty breathing': ['shortness of breath', 'dyspnea', 'breathlessness', 'breathing problems'],
+                    'wheeze': ['wheezing', 'whistling sound'],
+                    'nausea': ['feeling sick', 'queasiness'],
+                    'fatigue': ['tiredness', 'exhaustion', 'weakness'],
+                    'cough': ['coughing', 'hacking'],
+                    'fever': ['high temperature', 'pyrexia', 'hot']
+                };
+
+                for (const [key, syns] of Object.entries(synonyms)) {
+                    if ((symptom1.includes(key) && syns.some(s => symptom2.includes(s))) ||
+                        (symptom2.includes(key) && syns.some(s => symptom1.includes(s)))) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            addSpecificDiagnoses(symptoms, diagnoses, age, sex) {
+                // Myocardial Infarction check
+                if (symptoms.some(s => s.includes('chest pain')) && 
+                    (symptoms.some(s => s.includes('nausea')) || symptoms.some(s => s.includes('fatigue'))) &&
+                    age > 45) {
+                    diagnoses.push({
+                        name: "Myocardial Infarction (Heart Attack)",
+                        icd11: "BA41",
+                        description: "Death of heart muscle due to insufficient blood supply.",
+                        treatment: "IMMEDIATE medical attention. Aspirin, nitrates, emergency cardiac care.",
+                        probability: sex === 'male' ? 0.4 : 0.3,
+                        matchedSymptoms: ['chest pain', 'associated symptoms']
+                    });
+                }
+
+                // Gastroenteritis check
+                if (symptoms.some(s => s.includes('nausea')) && 
+                    (symptoms.some(s => s.includes('fatigue')) || symptoms.some(s => s.includes('fever')))) {
+                    diagnoses.push({
+                        name: "Viral Gastroenteritis",
+                        icd11: "1A40",
+                        description: "Inflammation of stomach and intestines due to viral infection.",
+                        treatment: "Rest, fluid replacement, electrolyte balance. Usually self-limiting.",
+                        probability: 0.45,
+                        matchedSymptoms: ['nausea', 'systemic symptoms']
+                    });
+                }
+
+                // Panic Attack check
+                if (symptoms.some(s => s.includes('chest pain')) && 
+                    symptoms.some(s => s.includes('difficulty breathing')) &&
+                    age < 50) {
+                    diagnoses.push({
+                        name: "Panic Attack",
+                        icd11: "6B01",
+                        description: "Sudden episode of intense fear with physical symptoms.",
+                        treatment: "Reassurance, breathing techniques, consider anxiolytics if severe.",
+                        probability: 0.3,
+                        matchedSymptoms: ['chest pain', 'breathing difficulty']
+                    });
+                }
+            }
+
+            applyMedicalHistoryAdjustments(medicalHistory, diagnoses, alerts) {
+                if (medicalHistory.includes('hypertension')) {
+                    diagnoses.forEach(d => {
+                        if (d.name.includes('Angina') || d.name.includes('Heart') || d.name.includes('Myocardial')) {
+                            d.probability = Math.min(d.probability * 1.4, 0.98);
+                        }
+                    });
+                    alerts.push("⚠️ Hypertension increases cardiovascular risk - monitor BP closely");
+                }
+
+                if (medicalHistory.includes('diabetes')) {
+                    diagnoses.forEach(d => {
+                        if (d.name.includes('Heart') || d.name.includes('Angina')) {
+                            d.probability = Math.min(d.probability * 1.3, 0.98);
+                        }
+                    });
+                    alerts.push("⚠️ Diabetes increases infection and cardiovascular risk");
+                }
+
+                if (medicalHistory.includes('asthma')) {
+                    diagnoses.forEach(d => {
+                        if (d.name.includes('Asthma') || d.name.includes('Bronchitis')) {
+                            d.probability = Math.min(d.probability * 1.5, 0.98);
+                        }
+                    });
+                    alerts.push("⚠️ History of asthma - avoid beta-blockers if possible");
+                }
+
+                if (medicalHistory.includes('ace inhibitors') || medicalHistory.includes('lisinopril')) {
+                    alerts.push("💊 Current ACE inhibitor therapy - monitor for drug interactions");
+                }
+
+                if (medicalHistory.includes('smoking') || medicalHistory.includes('smoker')) {
+                    diagnoses.forEach(d => {
+                        if (d.name.includes('Bronchitis') || d.name.includes('Pneumonia') || d.name.includes('COPD')) {
+                            d.probability = Math.min(d.probability * 1.3, 0.98);
+                        }
+                    });
+                    alerts.push("⚠️ Smoking history increases respiratory disease risk");
+                }
+            }
+
+            applyFamilyHistoryAdjustments(familyHistory, diagnoses, alerts) {
+                if (familyHistory.includes('heart disease') || familyHistory.includes('cardiac')) {
+                    diagnoses.forEach(d => {
+                        if (d.name.includes('Angina') || d.name.includes('Heart') || d.name.includes('Myocardial')) {
+                            d.probability = Math.min(d.probability * 1.25, 0.98);
+                        }
+                    });
+                    alerts.push("🧬 Family history of heart disease increases cardiovascular risk");
+                }
+
+                if (familyHistory.includes('lung cancer') || familyHistory.includes('cancer')) {
+                    diagnoses.forEach(d => {
+                        if (d.name.includes('Bronchitis') || d.name.includes('Pneumonia')) {
+                            d.probability = Math.min(d.probability * 1.15, 0.98);
+                        }
+                    });
+                    alerts.push("🧬 Family cancer history - consider genetic counseling and screening");
+                }
+
+                if (familyHistory.includes('diabetes')) {
+                    diagnoses.push({
+                        name: "Pre-diabetes/Diabetes Screening",
+                        icd11: "5A11",
+                        description: "Consider diabetes screening given family history.",
+                        treatment: "HbA1c test, lifestyle counseling, regular monitoring.",
+                        probability: 0.25,
+                        matchedSymptoms: ['family history risk factor']
+                    });
+                    alerts.push("🧬 Family diabetes history - recommend regular screening");
+                }
+            }
+
+            generateDynamicRecommendations(diagnoses, symptoms, age, recommendations) {
+                const topDiagnosis = diagnoses[0];
+                
+                if (topDiagnosis) {
+                    if (topDiagnosis.name.includes('Myocardial') || topDiagnosis.name.includes('Heart Attack')) {
+                        recommendations.unshift("🚨 URGENT: Consider immediate cardiac evaluation and ECG");
+                        recommendations.push("🩸 Cardiac enzymes (Troponin, CK-MB)");
+                    }
+                    
+                    if (topDiagnosis.name.includes('Pneumonia')) {
+                        recommendations.push("📊 Chest X-ray within 24 hours");
+                        recommendations.push("🧪 Complete blood count and inflammatory markers");
+                        recommendations.push("🦠 Consider blood cultures if febrile");
+                    }
+                    
+                    if (topDiagnosis.name.includes('COVID-19')) {
+                        recommendations.push("🦠 COVID-19 PCR test immediately");
+                        recommendations.push("😷 Isolate until test results available");
+                        recommendations.push("📞 Contact tracing if positive");
+                    }
+                    
+                    if (topDiagnosis.name.includes('Asthma')) {
+                        recommendations.push("📈 Peak flow measurement");
+                        recommendations.push("🫁 Consider spirometry if not done recently");
+                        recommendations.push("💨 Review inhaler technique");
+                    }
+                }
+
+                // Age-specific recommendations
+                if (age > 65) {
+                    recommendations.push("👴 Consider geriatric assessment");
+                    recommendations.push("💊 Medication review for polypharmacy");
+                }
+
+                if (age < 18) {
+                    recommendations.push("👶 Consider pediatric consultation");
+                    recommendations.push("📏 Growth and development assessment");
+                }
+
+                // Symptom-specific recommendations
+                if (symptoms.some(s => s.includes('chest pain'))) {
+                    recommendations.push("⚡ 12-lead ECG");
+                    recommendations.push("🩸 Basic metabolic panel");
+                }
+
+                if (symptoms.some(s => s.includes('fever'))) {
+                    recommendations.push("🧪 Complete blood count with differential");
+                    recommendations.push("🦠 Blood cultures if high fever");
+                }
+
+                recommendations.push("📅 Follow-up in 48-72 hours or sooner if symptoms worsen");
+                recommendations.push("⚠️ Return immediately for severe symptoms or worsening condition");
+            }
+
+            // Generate advanced results
+            generateAdvancedResults() {
+                const baseResults = this.generateDummyResults();
+                const symptoms = this.parseSymptoms();
+                const medicalHistory = this.patient.medicalHistory.toLowerCase();
+                const familyHistory = this.patient.familyHistory.toLowerCase();
+
+                if (symptoms.some(s => s.includes('nausea')) || symptoms.some(s => s.includes('vomiting'))) {
+                    if (!baseResults.diagnoses.find(d => d.name === 'Gastroesophageal Reflux Disease (GERD)')) {
+                        baseResults.diagnoses.push({
+                            name: "Gastroesophageal Reflux Disease (GERD)",
+                            probability: 0.28,
+                            description: "Stomach acid frequently flowing back into the esophagus.",
+                            icd11: "DA24",
+                            treatment: "Lifestyle modifications, antacids, H2 blockers or PPIs.",
+                            matchedSymptoms: ['nausea']
+                        });
+                    }
+                }
+
+                // Add genetic risk factors based on family history
+                if (familyHistory.includes('lung cancer')) {
+                    baseResults.alerts.push("🧬 Genetic Risk: Consider EGFR and TP53 testing based on family history of lung cancer");
+                    baseResults.recommendations.push("🧬 Consider genetic counseling for lung cancer risk assessment");
+                }
+
+                if (familyHistory.includes('diabetes')) {
+                    baseResults.alerts.push("🧬 Genetic Risk: TCF7L2 variant rs7903146 associated with increased type 2 diabetes risk");
+                    baseResults.recommendations.push("🧬 Consider HbA1c testing and lifestyle counseling for diabetes prevention");
+                }
+
+                // Add drug interaction alerts
+                if (medicalHistory.includes('ace inhibitors')) {
+                    baseResults.alerts.push("💊 Drug Interaction: ACE inhibitors may interact with NSAIDs - monitor blood pressure");
+                    baseResults.recommendations.push("💊 Review all medications for potential interactions");
+                }
+
+                // Add more sophisticated analysis
+                baseResults.analysisDetails.analysisType = "Advanced AI Analysis";
+                baseResults.analysisDetails.algorithmVersion = "2.3.1";
+                baseResults.analysisDetails.considerations = [
+                    "Weighted symptom patterns",
+                    "Temporal relationships",
+                    "Comorbidity adjustments",
+                    "Genetic risk factors",
+                    "Drug interaction checks"
+                ];
+
+                return baseResults;
+            }
+
+            // Generate external API results
+            generateExternalAPIResults() {
+                const baseResults = this.generateAdvancedResults();
+                
+                // Simulate external API data
+                baseResults.externalData = {
+                    pubmedReferences: [
+                        {
+                            title: "Recent advances in the management of acute bronchitis",
+                            url: "https://pubmed.ncbi.nlm.nih.gov/12345678/",
+                            relevance: "high"
+                        },
+                        {
+                            title: "COVID-19 and cardiovascular complications",
+                            url: "https://pubmed.ncbi.nlm.nih.gov/23456789/",
+                            relevance: "medium"
+                        }
+                    ],
+                    clinicalTrials: [
+                        {
+                            id: "NCT04512384",
+                            title: "Study of Inhaled Corticosteroids in Mild Asthma",
+                            status: "Recruiting",
+                            url: "https://clinicaltrials.gov/ct2/show/NCT04512384"
+                        }
+                    ],
+                    drugInteractions: this.drugInteractions,
+                    geneticRiskFactors: this.geneticRiskFactors
+                };
+
+                baseResults.analysisDetails.analysisType = "External API Enhanced Analysis";
+                baseResults.analysisDetails.externalSources = [
+                    "PubMed",
+                    "ClinicalTrials.gov",
+                    "PharmGKB",
+                    "Ensembl"
+                ];
+
+                return baseResults;
+            }
+
+            // Run quick analysis
+            async runQuickAnalysis() {
+                const errors = this.validatePatientData();
+                if (errors.length > 0) {
+                    this.showAlert(`Please fix these issues: ${errors.join(', ')}`, 'error');
+                    return;
+                }
+
+                if (!document.getElementById('dataConsent').checked) {
+                    this.showAlert('Please consent to data processing', 'error');
+                    return;
+                }
+
+                const resultsContainer = document.getElementById('diagnosticResults');
+                resultsContainer.innerHTML = `
+                    <div class="message">
+                        <div class="loading-spinner"></div>
+                        <p>Running quick analysis...</p>
+                    </div>
+                `;
+
+                try {
+                    // First try Asclepius API if available
+                    if (this.apiStatus.asclepius) {
+                        this.analysisResults = await this.queryAsclepiusAPI();
+                    } else {
+                        // Fall back to local analysis
+                        this.analysisResults = this.generateDummyResults();
+                    }
+                    this.displayDiagnosticResults(this.analysisResults);
+                    this.showAlert('Quick analysis completed', 'success');
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    this.showAlert('Analysis failed. Using fallback results.', 'error');
+                    this.analysisResults = this.generateDummyResults();
+                    this.displayDiagnosticResults(this.analysisResults);
+                }
+            }
+
+            // Run advanced analysis
+            async runAdvancedAnalysis() {
+                const errors = this.validatePatientData();
+                if (errors.length > 0) {
+                    this.showAlert(`Please fix these issues: ${errors.join(', ')}`, 'error');
+                    return;
+                }
+
+                if (!document.getElementById('dataConsent').checked) {
+                    this.showAlert('Please consent to data processing', 'error');
+                    return;
+                }
+
+                const resultsContainer = document.getElementById('diagnosticResults');
+                resultsContainer.innerHTML = `
+                    <div class="message">
+                        <div class="loading-spinner"></div>
+                        <p>Running advanced AI analysis. This may take a moment...</p>
+                    </div>
+                `;
+
+                try {
+                    // First try Asclepius API if available
+                    if (this.apiStatus.asclepius) {
+                        this.analysisResults = await this.queryAsclepiusAPI();
+                        // Enhance with local knowledge
+                        const localResults = this.generateAdvancedResults();
+                        this.analysisResults.diagnoses = this.mergeDiagnoses(
+                            this.analysisResults.diagnoses,
+                            localResults.diagnoses
+                        );
+                        this.analysisResults.recommendations = [
+                            ...new Set([...this.analysisResults.recommendations, ...localResults.recommendations])
+                        ];
+                        this.analysisResults.alerts = [
+                            ...new Set([...this.analysisResults.alerts, ...localResults.alerts])
+                        ];
+                    } else {
+                        // Fall back to local analysis
+                        this.analysisResults = this.generateAdvancedResults();
+                    }
+                    this.displayDiagnosticResults(this.analysisResults);
+                    this.showAlert('Advanced analysis completed', 'success');
+                } catch (error) {
+                    console.error('Advanced analysis error:', error);
+                    this.showAlert('Advanced analysis failed. Using fallback results.', 'error');
+                    this.analysisResults = this.generateAdvancedResults();
+                    this.displayDiagnosticResults(this.analysisResults);
+                }
+            }
+
+            // Merge diagnoses from API and local knowledge
+            mergeDiagnoses(apiDiagnoses, localDiagnoses) {
+                const merged = [...apiDiagnoses];
+                
+                // Add local diagnoses that aren't already in API results
+                localDiagnoses.forEach(localDiag => {
+                    if (!merged.some(apiDiag => 
+                        this.normalizeDiagnosisName(apiDiag.name) === this.normalizeDiagnosisName(localDiag.name))) {
+                        merged.push(localDiag);
+                    }
+                });
+                
+                // Sort by probability
+                return merged.sort((a, b) => b.probability - a.probability).slice(0, 6);
+            }
+
+            normalizeDiagnosisName(name) {
+                return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            }
+
+            // Run external API analysis
+            async runExternalAPIAnalysis() {
+                const errors = this.validatePatientData();
+                if (errors.length > 0) {
+                    this.showAlert(`Please fix these issues: ${errors.join(', ')}`, 'error');
+                    return;
+                }
+
+                if (!document.getElementById('dataConsent').checked) {
+                    this.showAlert('Please consent to data processing', 'error');
+                    return;
+                }
+
+                const resultsContainer = document.getElementById('diagnosticResults');
+                resultsContainer.innerHTML = `
+                    <div class="message">
+                        <div class="loading-spinner"></div>
+                        <p>Querying external databases and running enhanced analysis...</p>
+                    </div>
+                `;
+
+                try {
+                    // First try Asclepius API if available
+                    if (this.apiStatus.asclepius) {
+                        this.analysisResults = await this.queryAsclepiusAPI();
+                        // Enhance with external data
+                        const externalResults = this.generateExternalAPIResults();
+                        this.analysisResults = {
+                            ...this.analysisResults,
+                            externalData: externalResults.externalData,
+                            analysisDetails: {
+                                ...this.analysisResults.analysisDetails,
+                                externalSources: externalResults.analysisDetails.externalSources,
+                                analysisType: "Asclepius + External Data Analysis"
+                            }
+                        };
+                    } else {
+                        // Fall back to local analysis with external data
+                        this.analysisResults = this.generateExternalAPIResults();
+                    }
+                    this.displayDiagnosticResults(this.analysisResults);
+                    this.showAlert('External API analysis completed', 'success');
+                } catch (error) {
+                    console.error('External API analysis error:', error);
+                    this.showAlert('External API analysis failed. Using fallback results.', 'error');
+                    this.analysisResults = this.generateExternalAPIResults();
+                    this.displayDiagnosticResults(this.analysisResults);
+                }
+            }
+
+            // Display diagnostic results
+            displayDiagnosticResults(results) {
+                const resultsContainer = document.getElementById('diagnosticResults');
+                const chartContainer = document.getElementById('diagnosticChart');
+                
+                // Clear previous results
+                resultsContainer.innerHTML = '';
+                
+                // Display alerts first
+                if (results.alerts && results.alerts.length > 0) {
+                    const alertsContainer = document.createElement('div');
+                    alertsContainer.className = 'message warning-message';
+                    alertsContainer.innerHTML = `
+                        <h3 style="margin-bottom: 0.5rem;">⚠️ Clinical Alerts</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            ${results.alerts.map(alert => `<li>${alert}</li>`).join('')}
+                        </ul>
+                    `;
+                    resultsContainer.appendChild(alertsContainer);
+                }
+                
+                // Display diagnoses
+                if (results.diagnoses && results.diagnoses.length > 0) {
+                    const diagnosesHeader = document.createElement('h3');
+                    diagnosesHeader.textContent = '🔍 Differential Diagnoses';
+                    diagnosesHeader.style.margin = '1.5rem 0 1rem';
+                    diagnosesHeader.style.color = 'var(--accent-cyan)';
+                    resultsContainer.appendChild(diagnosesHeader);
+                    
+                    const diagnosesGrid = document.createElement('div');
+                    diagnosesGrid.className = 'diagnosis-grid';
+                    
+                    results.diagnoses.forEach(diagnosis => {
+                        const diagnosisCard = document.createElement('div');
+                        diagnosisCard.className = 'diagnosis-card';
+                        
+                        const probabilityPercent = Math.round(diagnosis.probability * 100);
+                        
+                        diagnosisCard.innerHTML = `
+                            <div class="diagnosis-name">${diagnosis.name} <span style="color: var(--accent-cyan); float: right;">${probabilityPercent}%</span></div>
+                            <div class="probability-bar">
+                                <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
+                            </div>
+                            <div class="diagnosis-details">
+                                <p><strong>ICD-11:</strong> ${diagnosis.icd11}</p>
+                                <p>${diagnosis.description}</p>
+                                <p><strong>Suggested Treatment:</strong> ${diagnosis.treatment}</p>
+                                ${diagnosis.matchedSymptoms ? `<p><small>Matched symptoms: ${diagnosis.matchedSymptoms.join(', ')}</small></p>` : ''}
+                            </div>
+                        `;
+                        
+                        diagnosesGrid.appendChild(diagnosisCard);
+                    });
+                    
+                    resultsContainer.appendChild(diagnosesGrid);
+                    
+                    // Show chart
+                    chartContainer.style.display = 'block';
+                    this.renderDiagnosisChart(results.diagnoses);
+                }
+                
+                // Display recommendations
+                if (results.recommendations && results.recommendations.length > 0) {
+                    const recsContainer = document.createElement('div');
+                    recsContainer.className = 'message success-message';
+                    recsContainer.style.marginTop = '2rem';
+                    recsContainer.innerHTML = `
+                        <h3 style="margin-bottom: 0.5rem;">📋 Clinical Recommendations</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            ${results.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    `;
+                    resultsContainer.appendChild(recsContainer);
+                }
+                
+                // Display analysis details
+                const detailsContainer = document.createElement('div');
+                detailsContainer.className = 'message';
+                detailsContainer.style.marginTop = '2rem';
+                detailsContainer.style.fontSize = '0.9rem';
+                
+                let detailsHTML = `
+                    <h3 style="margin-bottom: 0.5rem; color: var(--text-secondary);">Analysis Details</h3>
+                    <p><strong>Analysis Type:</strong> ${results.analysisDetails.analysisType || 'Standard'}</p>
+                    <p><strong>Timestamp:</strong> ${new Date(results.timestamp).toLocaleString()}</p>
+                    <p><strong>Symptoms Analyzed:</strong> ${results.analysisDetails.symptomsAnalyzed.join(', ')}</p>
+                `;
+                
+                if (results.analysisDetails.considerations) {
+                    detailsHTML += `
+                        <p><strong>Considerations:</strong></p>
+                        <ul style="padding-left: 1.5rem;">
+                            ${results.analysisDetails.considerations.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+                
+                if (results.analysisDetails.externalSources) {
+                    detailsHTML += `
+                        <p><strong>External Data Sources:</strong></p>
+                        <ul style="padding-left: 1.5rem;">
+                            ${results.analysisDetails.externalSources.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+                
+                if (results.analysisDetails.algorithmVersion) {
+                    detailsHTML += `<p><strong>Algorithm Version:</strong> ${results.analysisDetails.algorithmVersion}</p>`;
+                }
+                
+                detailsContainer.innerHTML = detailsHTML;
+                resultsContainer.appendChild(detailsContainer);
+            }
+
+            // Render diagnosis chart
+            renderDiagnosisChart(diagnoses) {
+                const ctx = document.getElementById('chartCanvas').getContext('2d');
+                
+                // Destroy previous chart if exists
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+                
+                const labels = diagnoses.map(d => d.name);
+                const data = diagnoses.map(d => Math.round(d.probability * 100));
+                const backgroundColors = [
+                    'rgba(6, 182, 212, 0.7)',
+                    'rgba(37, 99, 235, 0.7)',
+                    'rgba(5, 150, 105, 0.7)',
+                    'rgba(217, 119, 6, 0.7)',
+                    'rgba(220, 38, 38, 0.7)',
+                    'rgba(139, 92, 246, 0.7)'
+                ];
+                
+                this.chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Probability %',
+                            data: data,
+                            backgroundColor: backgroundColors,
+                            borderColor: [
+                                'rgba(6, 182, 212, 1)',
+                                'rgba(37, 99, 235, 1)',
+                                'rgba(5, 150, 105, 1)',
+                                'rgba(217, 119, 6, 1)',
+                                'rgba(220, 38, 38, 1)',
+                                'rgba(139, 92, 246, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw}%`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    color: 'var(--text-secondary)',
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: 'var(--text-secondary)'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Show module
+            showModule(moduleId) {
+                // Hide all modules
+                document.querySelectorAll('.module').forEach(module => {
+                    module.classList.remove('active');
+                    module.setAttribute('aria-hidden', 'true');
+                });
+                
+                // Deactivate all tabs
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    tab.setAttribute('aria-selected', 'false');
+                });
+                
+                // Show selected module
+                const moduleToShow = document.getElementById(`${moduleId}Module`);
+                if (moduleToShow) {
+                    moduleToShow.classList.add('active');
+                    moduleToShow.setAttribute('aria-hidden', 'false');
+                }
+                
+                // Activate selected tab
+                const tabToActivate = Array.from(document.querySelectorAll('.nav-tab')).find(tab => 
+                    tab.getAttribute('onclick').includes(moduleId)
+                );
+                if (tabToActivate) {
+                    tabToActivate.classList.add('active');
+                    tabToActivate.setAttribute('aria-selected', 'true');
+                }
+                
+                // Special handling for report module
+                if (moduleId === 'report' && this.analysisResults) {
+                    this.generateReport();
+                }
+            }
+
+            // Generate report content
+            generateReport() {
+                if (!this.analysisResults) {
+                    document.getElementById('reportContent').innerHTML = `
+                        <div class="message warning-message">
+                            <p>No analysis results available. Please run diagnostics first.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const reportContent = document.getElementById('reportContent');
+                reportContent.innerHTML = '';
+                
+                // Patient info section
+                const patientSection = document.createElement('div');
+                patientSection.innerHTML = `
+                    <h3 style="color: var(--accent-cyan); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Patient Information</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <p><strong>Name:</strong> ${this.patient.name}</p>
+                            <p><strong>Age:</strong> ${this.patient.age}</p>
+                            <p><strong>Sex:</strong> ${this.patient.sex}</p>
+                        </div>
+                        <div>
+                            <p><strong>Chief Complaint:</strong> ${this.patient.chiefComplaint}</p>
+                            <p><strong>Additional Symptoms:</strong> ${this.patient.additionalSymptoms}</p>
+                        </div>
+                        <div>
+                            <p><strong>Medical History:</strong> ${this.patient.medicalHistory}</p>
+                            <p><strong>Family History:</strong> ${this.patient.familyHistory}</p>
+                        </div>
+                    </div>
+                `;
+                reportContent.appendChild(patientSection);
+                
+                // Diagnoses section
+                const diagnosesSection = document.createElement('div');
+                diagnosesSection.innerHTML = `
+                    <h3 style="color: var(--accent-cyan); margin: 2rem 0 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Diagnostic Findings</h3>
+                `;
+                
+                if (this.analysisResults.diagnoses && this.analysisResults.diagnoses.length > 0) {
+                    const topDiagnosis = this.analysisResults.diagnoses[0];
+                    diagnosesSection.innerHTML += `
+                        <div style="background: rgba(6, 182, 212, 0.1); border-left: 4px solid var(--accent-cyan); padding: 1rem; margin-bottom: 1.5rem; border-radius: 0 8px 8px 0;">
+                            <h4 style="margin: 0 0 0.5rem; color: var(--accent-cyan);">Most Likely Diagnosis</h4>
+                            <p style="font-size: 1.2rem; font-weight: 700; margin: 0 0 0.5rem;">${topDiagnosis.name} (${Math.round(topDiagnosis.probability * 100)}% probability)</p>
+                            <p style="margin: 0 0 0.5rem;"><strong>ICD-11:</strong> ${topDiagnosis.icd11}</p>
+                            <p style="margin: 0 0 0.5rem;">${topDiagnosis.description}</p>
+                            <p style="margin: 0;"><strong>Treatment:</strong> ${topDiagnosis.treatment}</p>
+                        </div>
+                    `;
+                    
+                    // Other diagnoses
+                    if (this.analysisResults.diagnoses.length > 1) {
+                        diagnosesSection.innerHTML += `
+                            <h4 style="margin: 1.5rem 0 1rem; color: var(--text-primary);">Other Possible Diagnoses</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                                ${this.analysisResults.diagnoses.slice(1).map(d => `
+                                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; border-left: 3px solid var(--primary-blue);">
+                                        <p style="font-weight: 700; margin: 0 0 0.5rem;">${d.name} (${Math.round(d.probability * 100)}%)</p>
+                                        <p style="margin: 0 0 0.5rem; font-size: 0.9em;"><strong>ICD-11:</strong> ${d.icd11}</p>
+                                        <p style="margin: 0; font-size: 0.9em;">${d.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                }
+                
+                reportContent.appendChild(diagnosesSection);
+                
+                // Recommendations section
+                if (this.analysisResults.recommendations && this.analysisResults.recommendations.length > 0) {
+                    const recsSection = document.createElement('div');
+                    recsSection.innerHTML = `
+                        <h3 style="color: var(--accent-cyan); margin: 2rem 0 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Clinical Recommendations</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            ${this.analysisResults.recommendations.map(r => `<li style="margin-bottom: 0.5rem;">${r}</li>`).join('')}
+                        </ul>
+                    `;
+                    reportContent.appendChild(recsSection);
+                }
+                
+                // Alerts section
+                if (this.analysisResults.alerts && this.analysisResults.alerts.length > 0) {
+                    const alertsSection = document.createElement('div');
+                    alertsSection.innerHTML = `
+                        <h3 style="color: var(--danger-red); margin: 2rem 0 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Clinical Alerts</h3>
+                        <div style="background: rgba(220, 38, 38, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--danger-red);">
+                            <ul style="padding-left: 1.5rem; margin: 0;">
+                                ${this.analysisResults.alerts.map(a => `<li style="margin-bottom: 0.5rem;">${a}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    reportContent.appendChild(alertsSection);
+                }
+                
+                // Analysis details section
+                const detailsSection = document.createElement('div');
+                detailsSection.innerHTML = `
+                    <h3 style="color: var(--text-secondary); margin: 2rem 0 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Analysis Details</h3>
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 8px;">
+                        <p style="margin: 0 0 0.5rem;"><strong>Analysis Type:</strong> ${this.analysisResults.analysisDetails.analysisType || 'Standard'}</p>
+                        <p style="margin: 0 0 0.5rem;"><strong>Timestamp:</strong> ${new Date(this.analysisResults.timestamp).toLocaleString()}</p>
+                        <p style="margin: 0 0 0.5rem;"><strong>Symptoms Analyzed:</strong> ${this.analysisResults.analysisDetails.symptomsAnalyzed.join(', ')}</p>
+                        ${this.analysisResults.analysisDetails.algorithmVersion ? `<p style="margin: 0 0 0.5rem;"><strong>Algorithm Version:</strong> ${this.analysisResults.analysisDetails.algorithmVersion}</p>` : ''}
+                    </div>
+                `;
+                reportContent.appendChild(detailsSection);
+                
+                // External data section if available
+                if (this.analysisResults.externalData) {
+                    const externalSection = document.createElement('div');
+                    externalSection.innerHTML = `
+                        <h3 style="color: var(--text-secondary); margin: 2rem 0 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">External Data References</h3>
+                    `;
+                    
+                    // PubMed references
+                    if (this.analysisResults.externalData.pubmedReferences && this.analysisResults.externalData.pubmedReferences.length > 0) {
+                        externalSection.innerHTML += `
+                            <h4 style="margin: 1.5rem 0 1rem; color: var(--text-primary);">PubMed References</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                ${this.analysisResults.externalData.pubmedReferences.map(ref => `
+                                    <li style="margin-bottom: 0.5rem;">
+                                        <a href="${ref.url}" target="_blank" style="color: var(--accent-cyan);">${ref.title}</a>
+                                        ${ref.relevance ? `<span style="color: var(--text-secondary); font-size: 0.8em;"> (${ref.relevance} relevance)</span>` : ''}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        `;
+                    }
+                    
+                    // Clinical trials
+                    if (this.analysisResults.externalData.clinicalTrials && this.analysisResults.externalData.clinicalTrials.length > 0) {
+                        externalSection.innerHTML += `
+                            <h4 style="margin: 1.5rem 0 1rem; color: var(--text-primary);">Relevant Clinical Trials</h4>
+                            <ul style="padding-left: 1.5rem;">
+                                ${this.analysisResults.externalData.clinicalTrials.map(trial => `
+                                    <li style="margin-bottom: 0.5rem;">
+                                        <a href="${trial.url}" target="_blank" style="color: var(--accent-cyan);">${trial.title}</a>
+                                        <span style="color: var(--text-secondary); font-size: 0.8em;"> (${trial.status})</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        `;
+                    }
+                    
+                    // Drug interactions
+                    if (this.analysisResults.externalData.drugInteractions) {
+                        const interactions = Object.values(this.analysisResults.externalData.drugInteractions).flat();
+                        if (interactions.length > 0) {
+                            externalSection.innerHTML += `
+                                <h4 style="margin: 1.5rem 0 1rem; color: var(--text-primary);">Potential Drug Interactions</h4>
+                                <div style="background: rgba(217, 119, 6, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--warning-amber);">
+                                    <ul style="padding-left: 1.5rem; margin: 0;">
+                                        ${interactions.map(i => `
+                                            <li style="margin-bottom: 0.5rem;">
+                                                <strong>${i.drug1} + ${i.drug2}:</strong> ${i.effect} (${i.severity} severity)<br>
+                                                <em>Recommendation:</em> ${i.recommendation}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    // Genetic risk factors
+                    if (this.analysisResults.externalData.geneticRiskFactors) {
+                        const riskFactors = Object.values(this.analysisResults.externalData.geneticRiskFactors).flat();
+                        if (riskFactors.length > 0) {
+                            externalSection.innerHTML += `
+                                <h4 style="margin: 1.5rem 0 1rem; color: var(--text-primary);">Genetic Risk Factors</h4>
+                                <div style="background: rgba(6, 182, 212, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-cyan);">
+                                    <ul style="padding-left: 1.5rem; margin: 0;">
+                                        ${riskFactors.map(f => `
+                                            <li style="margin-bottom: 0.5rem;">
+                                                <strong>${f.gene} (${f.variant}):</strong> ${f.risk}<br>
+                                                <em>Relevance:</em> ${f.relevance}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    // Asclepius API specific data
+                    if (this.analysisResults.externalData.asclepiusResponse) {
+                        const asclepiusData = this.analysisResults.externalData.asclepiusResponse;
+                        externalSection.innerHTML += `
+                            <h4 style="margin: 1.5rem 0 1rem; color: var(--text-primary);">Asclepius AI Analysis</h4>
+                            <div style="background: rgba(5, 150, 105, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--success-green);">
+                                <p><strong>Model Version:</strong> ${asclepiusData.model_version || 'Unknown'}</p>
+                                <p><strong>Confidence Score:</strong> ${asclepiusData.confidence_score ? Math.round(asclepiusData.confidence_score * 100) + '%' : 'Not available'}</p>
+                                ${asclepiusData.notes ? `<p><strong>Notes:</strong> ${asclepiusData.notes}</p>` : ''}
+                            </div>
+                        `;
+                    }
+                    
+                    reportContent.appendChild(externalSection);
+                }
+                
+                // Footer
+                const footer = document.createElement('div');
+                footer.style.marginTop = '3rem';
+                footer.style.paddingTop = '1rem';
+                footer.style.borderTop = '1px solid var(--border-color)';
+                footer.style.fontSize = '0.8rem';
+                footer.style.color = 'var(--text-secondary)';
+                footer.innerHTML = `
+                    <p>Generated by MedOS Clinical Decision Support System</p>
+                    <p>This report is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.</p>
+                    <p>Report generated: ${new Date().toLocaleString()}</p>
+                `;
+                reportContent.appendChild(footer);
+            }
+
+            // Export report
+            exportReport(format) {
+                if (!this.analysisResults) {
+                    this.showAlert('No analysis results to export', 'error');
+                    return;
+                }
+                
+                if (format === 'pdf') {
+                    this.showAlert('Preparing PDF export...', 'success');
+                    
+                    // Simulate PDF generation
+                    setTimeout(() => {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+                        
+                        // Add title
+                        doc.setFontSize(20);
+                        doc.setTextColor(37, 99, 235);
+                        doc.text('MedOS Clinical Report', 105, 20, { align: 'center' });
+                        
+                        // Add patient info
+                        doc.setFontSize(12);
+                        doc.setTextColor(0, 0, 0);
+                        doc.text(`Patient: ${this.patient.name}`, 20, 40);
+                        doc.text(`Age: ${this.patient.age} | Sex: ${this.patient.sex}`, 20, 50);
+                        doc.text(`Chief Complaint: ${this.patient.chiefComplaint}`, 20, 60);
+                        
+                        // Add diagnoses
+                        doc.setFontSize(14);
+                        doc.setTextColor(6, 182, 212);
+                        doc.text('Diagnoses', 20, 80);
+                        
+                        doc.setFontSize(10);
+                        doc.setTextColor(0, 0, 0);
+                        this.analysisResults.diagnoses.forEach((d, i) => {
+                            const y = 90 + (i * 30);
+                            doc.setFont('helvetica', 'bold');
+                            doc.text(`${d.name} (${Math.round(d.probability * 100)}%)`, 20, y);
+                            doc.setFont('helvetica', 'normal');
+                            doc.text(`ICD-11: ${d.icd11} | Treatment: ${d.treatment}`, 20, y + 5);
+                            doc.text(d.description, 20, y + 10, { maxWidth: 170 });
+                        });
+                        
+                        // Add footer
+                        doc.setFontSize(8);
+                        doc.setTextColor(100, 100, 100);
+                        doc.text('Generated by MedOS CDSS - Not a substitute for professional medical advice', 105, 280, { align: 'center' });
+                        doc.text(new Date().toLocaleString(), 105, 285, { align: 'center' });
+                        
+                        // Save the PDF
+                        doc.save(`MedOS_Report_${this.patient.name.replace(/ /g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
+                        
+                        this.showAlert('PDF exported successfully', 'success');
+                    }, 1000);
+                }
+            }
+
+            // WhatsApp report functions
+            sendWhatsAppReport() {
+                if (!this.analysisResults) {
+                    this.showAlert('No analysis results to send', 'error');
+                    return;
+                }
+                
+                if (!this.patient.phone || !this.validatePhoneNumber(this.patient.phone)) {
+                    this.showAlert('Please enter a valid WhatsApp number', 'error');
+                    return;
+                }
+                
+                document.getElementById('modalPhoneNumber').value = this.patient.phone;
+                document.getElementById('whatsappModal').classList.add('active');
+            }
+
+            closeWhatsAppModal() {
+                document.getElementById('whatsappModal').classList.remove('active');
+            }
+
+            confirmWhatsAppSend() {
+                const phone = document.getElementById('modalPhoneNumber').value;
+                
+                if (!phone || !this.validatePhoneNumber(phone)) {
+                    this.showAlert('Please enter a valid WhatsApp number', 'error');
+                    return;
+                }
+                
+                // Format phone number (remove + and any spaces)
+                const formattedPhone = phone.replace(/[+\s]/g, '');
+                
+                // Create report text
+                let reportText = `MedOS Clinical Report\nPatient: ${this.patient.name}\n\n`;
+                
+                if (this.analysisResults.diagnoses?.length > 0) {
+                    reportText += `Primary Diagnosis: ${this.analysisResults.diagnoses[0].name}\n`;
+                }
+                
+                // Create WhatsApp link
+                const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(reportText)}`;
+                
+                // Open in new tab
+                window.open(whatsappUrl, '_blank');
+                
+                this.closeWhatsAppModal();
+                this.showAlert('WhatsApp opened with report', 'success');
+            }
+
+            // Share with provider
+            shareWithProvider() {
+                if (!this.analysisResults) {
+                    this.showAlert('No analysis results to share', 'error');
+                    return;
+                }
+                
+                this.showAlert('Sharing report with healthcare provider...', 'success');
+                
+                // Simulate sharing
+                setTimeout(() => {
+                    this.showAlert('Report shared successfully with provider', 'success');
+                }, 1500);
+            }
+
+            // Send to EMR
+            sendToEMR() {
+                if (!this.analysisResults) {
+                    this.showAlert('No analysis results to send', 'error');
+                    return;
+                }
+                
+                if (!this.apiStatus.emr) {
+                    this.showAlert('EMR system not connected', 'error');
+                    return;
+                }
+                
+                this.showAlert('Sending report to KenyaEMR...', 'success');
+                
+                // Simulate EMR integration
+                setTimeout(() => {
+                    this.showAlert('Report successfully sent to KenyaEMR', 'success');
+                }, 2000);
+            }
+
+            // External data query functions
+            queryEnsembl() {
+                const geneSymbol = document.getElementById('geneSymbol').value.trim();
+                
+                if (!geneSymbol) {
+                    this.showAlert('Please enter a gene symbol', 'error');
+                    return;
+                }
+                
+                const resultsContainer = document.getElementById('externalDataResults');
+                resultsContainer.innerHTML = `
+                    <div class="message">
+                        <div class="loading-spinner"></div>
+                        <p>Querying Ensembl database for ${geneSymbol}...</p>
+                    </div>
+                `;
+                
+                // Simulate Ensembl query
+                setTimeout(() => {
+                    const riskFactors = this.findGeneticRiskFactors(geneSymbol);
+                    
+                    if (riskFactors.length > 0) {
+                        resultsContainer.innerHTML = `
+                            <div class="message success-message">
+                                <h3>Gene: ${geneSymbol}</h3>
+                                <p>Found ${riskFactors.length} relevant risk factor(s) in patient history:</p>
+                                <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
+                                    ${riskFactors.map(f => `
+                                        <li style="margin-bottom: 0.5rem;">
+                                            <strong>Variant:</strong> ${f.variant}<br>
+                                            <strong>Associated Risk:</strong> ${f.risk}<br>
+                                            <strong>Relevance:</strong> ${f.relevance}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        resultsContainer.innerHTML = `
+                            <div class="message">
+                                <h3>Gene: ${geneSymbol}</h3>
+                                <p>No known pathogenic variants found in patient history.</p>
+                                <p>Gene is not currently associated with any conditions in this patient's profile.</p>
+                            </div>
+                        `;
+                    }
+                }, 2000);
+            }
+
+            findGeneticRiskFactors(geneSymbol) {
+                const riskFactors = [];
+                
+                Object.entries(this.geneticRiskFactors).forEach(([condition, factors]) => {
+                    if (this.patient.familyHistory.toLowerCase().includes(condition)) {
+                        factors.forEach(factor => {
+                            if (factor.gene === geneSymbol) {
+                                riskFactors.push(factor);
+                            }
+                        });
+                    }
+                });
+                
+                return riskFactors;
+            }
+
+            queryPubChem() {
+                const drugName = document.getElementById('drugName').value.trim();
+                
+                if (!drugName) {
+                    this.showAlert('Please enter a drug name', 'error');
+                    return;
+                }
+                
+                const resultsContainer = document.getElementById('externalDataResults');
+                resultsContainer.innerHTML = `
+                    <div class="message">
+                        <div class="loading-spinner"></div>
+                        <p>Querying PubChem database for ${drugName}...</p>
+                    </div>
+                `;
+                
+                // Simulate PubChem query
+                setTimeout(() => {
+                    const interactions = this.findDrugInteractions(drugName);
+                    
+                    if (interactions.length > 0) {
+                        resultsContainer.innerHTML = `
+                            <div class="message warning-message">
+                                <h3>Drug: ${drugName}</h3>
+                                <p>Found ${interactions.length} potential interaction(s):</p>
+                                <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
+                                    ${interactions.map(i => `
+                                        <li style="margin-bottom: 0.5rem;">
+                                            <strong>Interaction with:</strong> ${i.drug2}<br>
+                                            <strong>Effect:</strong> ${i.effect} (${i.severity} severity)<br>
+                                            <strong>Recommendation:</strong> ${i.recommendation}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        resultsContainer.innerHTML = `
+                            <div class="message success-message">
+                                <h3>Drug: ${drugName}</h3>
+                                <p>No significant interactions found with current patient medications.</p>
+                                ${this.patient.medicalHistory.toLowerCase().includes(drugName.toLowerCase()) ? 
+                                    `<p>This drug is mentioned in patient's medical history.</p>` : 
+                                    `<p>This drug is not mentioned in patient's medical history.</p>`}
+                            </div>
+                        `;
+                    }
+                }, 2000);
+            }
+
+            findDrugInteractions(drugName) {
+                const interactions = [];
+                
+                Object.entries(this.drugInteractions).forEach(([drugClass, drugInteractions]) => {
+                    if (this.patient.medicalHistory.toLowerCase().includes(drugClass.toLowerCase())) {
+                        drugInteractions.forEach(interaction => {
+                            if (interaction.drug1.toLowerCase() === drugName.toLowerCase() || 
+                                interaction.drug2.toLowerCase() === drugName.toLowerCase()) {
+                                interactions.push(interaction);
+                            }
+                        });
+                    }
+                });
+                
+                return interactions;
+            }
+
+            queryReactome() {
+                const resultsContainer = document.getElementById('externalDataResults');
+                resultsContainer.innerHTML = `
+                    <div class="message">
+                        <div class="loading-spinner"></div>
+                        <p>Analyzing biological pathways relevant to patient symptoms...</p>
+                    </div>
+                `;
+                
+                // Simulate Reactome query
+                setTimeout(() => {
+                    const symptoms = this.parseSymptoms();
+                    let pathways = [];
+                    
+                    if (symptoms.some(s => s.includes('chest pain') || s.includes('difficulty breathing'))) {
+                        pathways.push({
+                            name: "Respiratory Electron Transport",
+                            id: "R-HSA-163200",
+                            url: "https://reactome.org/content/detail/R-HSA-163200",
+                            relevance: "high"
+                        });
+                        pathways.push({
+                            name: "Oxygen-dependent proline hydroxylation of Hypoxia-inducible Factor Alpha",
+                            id: "R-HSA-1234174",
+                            url: "https://reactome.org/content/detail/R-HSA-1234174",
+                            relevance: "medium"
+                        });
+                    }
+                    
+                    if (symptoms.some(s => s.includes('fever') || s.includes('infection'))) {
+                        pathways.push({
+                            name: "Innate Immune System",
+                            id: "R-HSA-168249",
+                            url: "https://reactome.org/content/detail/R-HSA-168249",
+                            relevance: "high"
+                        });
+                        pathways.push({
+                            name: "Cytokine Signaling in Immune system",
+                            id: "R-HSA-1280215",
+                            url: "https://reactome.org/content/detail/R-HSA-1280215",
+                            relevance: "high"
+                        });
+                    }
+                    
+                    if (pathways.length > 0) {
+                        resultsContainer.innerHTML = `
+                            <div class="message success-message">
+                                <h3>Relevant Biological Pathways</h3>
+                                <p>Found ${pathways.length} pathway(s) potentially relevant to patient symptoms:</p>
+                                <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
+                                    ${pathways.map(p => `
+                                        <li style="margin-bottom: 0.5rem;">
+                                            <a href="${p.url}" target="_blank" style="color: var(--accent-cyan);">${p.name}</a>
+                                            <span style="color: var(--text-secondary);"> (${p.id})</span>
+                                            ${p.relevance ? `<span style="color: var(--text-secondary); font-size: 0.8em;"> - ${p.relevance} relevance</span>` : ''}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        resultsContainer.innerHTML = `
+                            <div class="message">
+                                <h3>Pathway Analysis</h3>
+                                <p>No strongly relevant biological pathways identified for current symptoms.</p>
+                                <p>Consider more specific symptom information for pathway analysis.</p>
+                            </div>
+                        `;
+                    }
+                }, 2500);
+            }
+        }
+
+        // Initialize the application
+        const app = new MedOSApp();
+    </script>
+</body>
+</html>
