@@ -1,0 +1,292 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --primary: var(--color-cyan-500);
+  --primary-foreground: var(--color-slate-950);
+  --sidebar-primary: var(--color-purple-600);
+  --sidebar-primary-foreground: var(--color-slate-100);
+  --chart-1: var(--color-cyan-400);
+  --chart-2: var(--color-purple-400);
+  --chart-3: var(--color-pink-400);
+  --chart-4: var(--color-cyan-500);
+  --chart-5: var(--color-purple-500);
+  --radius: 0.65rem;
+  --background: oklch(0.08 0.01 280);
+  --foreground: oklch(0.95 0.01 280);
+  --card: oklch(0.12 0.01 280);
+  --card-foreground: oklch(0.95 0.01 280);
+  --popover: oklch(0.12 0.01 280);
+  --popover-foreground: oklch(0.95 0.01 280);
+  --secondary: oklch(0.15 0.02 280);
+  --secondary-foreground: oklch(0.9 0.01 280);
+  --muted: oklch(0.2 0.02 280);
+  --muted-foreground: oklch(0.7 0.01 280);
+  --accent: oklch(0.5 0.3 280);
+  --accent-foreground: oklch(0.95 0.01 280);
+  --destructive: oklch(0.6 0.25 25);
+  --destructive-foreground: oklch(0.98 0.01 280);
+  --border: oklch(0.2 0.02 280);
+  --input: oklch(0.15 0.02 280);
+  --ring: oklch(0.5 0.3 280);
+  --sidebar: oklch(0.1 0.01 280);
+  --sidebar-foreground: oklch(0.95 0.01 280);
+  --sidebar-accent: oklch(0.3 0.15 280);
+  --sidebar-accent-foreground: oklch(0.98 0.01 280);
+  --sidebar-border: oklch(0.2 0.02 280);
+  --sidebar-ring: oklch(0.5 0.3 280);
+}
+
+.dark {
+  --primary: var(--color-cyan-500);
+  --primary-foreground: var(--color-slate-950);
+  --sidebar-primary: var(--color-purple-600);
+  --sidebar-primary-foreground: var(--color-slate-100);
+  --background: oklch(0.08 0.01 280);
+  --foreground: oklch(0.95 0.01 280);
+  --card: oklch(0.12 0.01 280);
+  --card-foreground: oklch(0.95 0.01 280);
+  --popover: oklch(0.12 0.01 280);
+  --popover-foreground: oklch(0.95 0.01 280);
+  --secondary: oklch(0.15 0.02 280);
+  --secondary-foreground: oklch(0.9 0.01 280);
+  --muted: oklch(0.2 0.02 280);
+  --muted-foreground: oklch(0.7 0.01 280);
+  --accent: oklch(0.5 0.3 280);
+  --accent-foreground: oklch(0.95 0.01 280);
+  --destructive: oklch(0.6 0.25 25);
+  --destructive-foreground: oklch(0.98 0.01 280);
+  --border: oklch(0.2 0.02 280);
+  --input: oklch(0.15 0.02 280);
+  --ring: oklch(0.5 0.3 280);
+  --chart-1: var(--color-cyan-400);
+  --chart-2: var(--color-purple-400);
+  --chart-3: var(--color-pink-400);
+  --chart-4: var(--color-cyan-500);
+  --chart-5: var(--color-purple-500);
+  --sidebar: oklch(0.1 0.01 280);
+  --sidebar-foreground: oklch(0.95 0.01 280);
+  --sidebar-accent: oklch(0.3 0.15 280);
+  --sidebar-accent-foreground: oklch(0.98 0.01 280);
+  --sidebar-border: oklch(0.2 0.02 280);
+  --sidebar-ring: oklch(0.5 0.3 280);
+}
+
+@layer base {
+  * {
+    @apply font-mono border-border outline-ring/50;
+  }
+
+  html {
+    @apply bg-slate-950 text-slate-100;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100 overflow-x-hidden;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Animated star background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(2px 2px at 20px 30px, #00d9ff, rgba(0, 217, 255, 0.2)),
+      radial-gradient(2px 2px at 60px 70px, #ff00ff, rgba(255, 0, 255, 0.2)),
+      radial-gradient(1px 1px at 50px 50px, #00d9ff, rgba(0, 217, 255, 0.1)),
+      radial-gradient(1px 1px at 130px 80px, #ff1493, rgba(255, 20, 147, 0.1)),
+      radial-gradient(2px 2px at 90px 10px, #00d9ff, rgba(0, 217, 255, 0.2));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: twinkle 20s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes twinkle {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.3; }
+  }
+
+  /* Ensure content sits above background */
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  /* Cosmic UI Components */
+  .cosmic-badge {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono;
+  }
+
+  .cosmic-badge-critical {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-red-900/40 text-red-300 border border-red-500/50;
+  }
+
+  .cosmic-badge-high {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-orange-900/40 text-orange-300 border border-orange-500/50;
+  }
+
+  .cosmic-badge-moderate {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-yellow-900/40 text-yellow-300 border border-yellow-500/50;
+  }
+
+  .cosmic-badge-low {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-green-900/40 text-green-300 border border-green-500/50;
+  }
+
+  .cosmic-badge-available {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-cyan-900/40 text-cyan-300 border border-cyan-500/50;
+  }
+
+  .cosmic-badge-busy {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-purple-900/40 text-purple-300 border border-purple-500/50;
+  }
+
+  .cosmic-badge-critical-status {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-red-900/40 text-red-300 border border-red-500/50;
+  }
+
+  .cosmic-badge-critical {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold font-mono bg-red-900/40 text-red-300 border border-red-500/50;
+  }
+
+  .cosmic-panel {
+    @apply bg-slate-900/60 border border-slate-700/50 rounded-lg p-4 backdrop-blur-sm;
+  }
+
+  .cosmic-input {
+    @apply bg-slate-800/50 border border-slate-600/50 rounded px-3 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30;
+  }
+
+  .cosmic-button {
+    @apply px-4 py-2 rounded font-mono font-semibold transition-all duration-200;
+  }
+
+  .cosmic-button-primary {
+    @apply px-4 py-2 rounded font-mono font-semibold transition-all duration-200 bg-cyan-600/80 hover:bg-cyan-500 text-slate-950 border border-cyan-400/50;
+  }
+
+  .cosmic-button-secondary {
+    @apply px-4 py-2 rounded font-mono font-semibold transition-all duration-200 bg-purple-600/60 hover:bg-purple-500 text-slate-100 border border-purple-400/50;
+  }
+
+  .cosmic-button-accent {
+    @apply px-4 py-2 rounded font-mono font-semibold transition-all duration-200 bg-pink-600/60 hover:bg-pink-500 text-slate-100 border border-pink-400/50;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+}
+
+@layer utilities {
+  .text-glow-cyan {
+    @apply text-cyan-300 drop-shadow-lg drop-shadow-cyan-500/50;
+  }
+
+  .text-glow-purple {
+    @apply text-purple-300 drop-shadow-lg drop-shadow-purple-500/50;
+  }
+
+  .text-glow-pink {
+    @apply text-pink-300 drop-shadow-lg drop-shadow-pink-500/50;
+  }
+
+  .border-glow-cyan {
+    @apply border-cyan-500/50 shadow-lg shadow-cyan-500/20;
+  }
+
+  .border-glow-purple {
+    @apply border-purple-500/50 shadow-lg shadow-purple-500/20;
+  }
+
+  .border-glow-pink {
+    @apply border-pink-500/50 shadow-lg shadow-pink-500/20;
+  }
+}

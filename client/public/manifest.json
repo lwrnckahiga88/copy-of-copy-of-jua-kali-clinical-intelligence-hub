@@ -1,0 +1,20 @@
+{
+  "name": "Jua Kali Clinical Intelligence Hub",
+  "short_name": "Jua Kali",
+  "description": "AI-powered clinical intelligence platform with OncoAI PWA v3, Neuro-Sync, Skills Campus, and EHR integration.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["medical", "health", "education"],
+  "lang": "en",
+  "scope": "/"
+}
