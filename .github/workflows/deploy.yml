@@ -1,4 +1,81 @@
 
-git add .github/workflows/deploy.yml
-git commit -m "fix: add db migrations step to deploy workflow"
-git push
+name: Deploy to Railway
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+        continue-on-error: true
+
+      - name: Build frontend (Vite)
+        run: pnpm exec vite build
+        env:
+          NODE_ENV: production
+
+      - name: Build server (esbuild)
+        run: |
+          pnpm exec esbuild server/_core/index.ts \
+            --platform=node \
+            --packages=external \
+            --bundle \
+            --format=esm \
+            --outdir=dist
+
+      - name: Generate Workbox service worker precache manifest
+        run: |
+          if [ -f workbox-config.js ]; then
+            npx workbox-cli generateSW workbox-config.js
+          else
+            echo "No workbox-config.js found, skipping SW generation"
+          fi
+        continue-on-error: true
+
+      - name: Deploy to Railway
+        run: |
+          npm install -g @railway/cli
+          railway up --detach --service juakali
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Run database migrations
+        run: |
+          npm install -g @railway/cli
+          railway run --service juakali pnpm db:push
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
