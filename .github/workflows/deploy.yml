@@ -1,4 +1,3 @@
-
 name: Deploy to Railway
 on:
   push:
@@ -11,22 +10,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-
-     - name: Install pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           run_install: false
-
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
       - name: Cache pnpm store
         uses: actions/cache@v4
         with:
@@ -34,19 +29,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Type check
         run: pnpm exec tsc --noEmit
         continue-on-error: true
-
       - name: Build frontend (Vite)
         run: pnpm exec vite build
         env:
           NODE_ENV: production
-
       - name: Build server (esbuild)
         run: |
           pnpm exec esbuild server/_core/index.ts \
@@ -55,7 +46,6 @@ jobs:
             --bundle \
             --format=esm \
             --outdir=dist
-
       - name: Generate Workbox service worker precache manifest
         run: |
           if [ -f workbox-config.js ]; then
@@ -64,14 +54,12 @@ jobs:
             echo "No workbox-config.js found, skipping SW generation"
           fi
         continue-on-error: true
-
       - name: Deploy to Railway
         run: |
           npm install -g @railway/cli
           railway up --detach --service juakali
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
       - name: Run database migrations
         run: |
           npm install -g @railway/cli
