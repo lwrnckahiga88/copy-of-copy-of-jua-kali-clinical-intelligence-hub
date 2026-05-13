@@ -2,7 +2,7 @@
 // Generates a service worker with precache manifest for all static assets.
 // Used by GitHub Actions during Railway deployment.
 
-module.exports = {
+export default {
   // Root of the built static assets
   globDirectory: "dist/public",
 
