@@ -57,12 +57,12 @@ jobs:
       - name: Deploy to Railway
         run: |
           npm install -g @railway/cli
-          railway up --detach --service juakali
+          railway up --detach --service "juakali-clinical-hub"
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       - name: Run database migrations
         run: |
           npm install -g @railway/cli
-          railway run --service juakali pnpm db:push
+          railway run --service "juakali-clinical-hub" pnpm db:push
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
