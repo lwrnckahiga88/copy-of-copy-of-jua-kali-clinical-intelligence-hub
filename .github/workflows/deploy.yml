@@ -66,3 +66,4 @@ jobs:
           railway run --service "juakali-clinical-hub" pnpm db:push
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
