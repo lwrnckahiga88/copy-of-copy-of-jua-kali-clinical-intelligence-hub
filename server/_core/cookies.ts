@@ -9,40 +9,45 @@ function isIpAddress(host: string) {
 }
 
 function isSecureRequest(req: Request) {
+  // Check if the request is already HTTPS
   if (req.protocol === "https") return true;
 
+  // Check x-forwarded-proto header (set by Railway, Vercel, etc.)
   const forwardedProto = req.headers["x-forwarded-proto"];
-  if (!forwardedProto) return false;
+  if (forwardedProto) {
+    const protoList = Array.isArray(forwardedProto)
+      ? forwardedProto
+      : forwardedProto.split(",");
+    if (protoList.some(proto => proto.trim().toLowerCase() === "https")) {
+      return true;
+    }
+  }
 
-  const protoList = Array.isArray(forwardedProto)
-    ? forwardedProto
-    : forwardedProto.split(",");
+  // Check x-forwarded-proto-version header (some proxies use this)
+  const forwardedProtoVersion = req.headers["x-forwarded-proto-version"];
+  if (forwardedProtoVersion === "https") return true;
 
-  return protoList.some(proto => proto.trim().toLowerCase() === "https");
+  // In production, assume HTTPS if not explicitly HTTP
+  if (process.env.NODE_ENV === "production") {
+    return true;
+  }
+
+  return false;
 }
 
 export function getSessionCookieOptions(
   req: Request
 ): Pick<CookieOptions, "domain" | "httpOnly" | "path" | "sameSite" | "secure"> {
-  // const hostname = req.hostname;
-  // const shouldSetDomain =
-  //   hostname &&
-  //   !LOCAL_HOSTS.has(hostname) &&
-  //   !isIpAddress(hostname) &&
-  //   hostname !== "127.0.0.1" &&
-  //   hostname !== "::1";
-
-  // const domain =
-  //   shouldSetDomain && !hostname.startsWith(".")
-  //     ? `.${hostname}`
-  //     : shouldSetDomain
-  //       ? hostname
-  //       : undefined;
+  const secure = isSecureRequest(req);
+  
+  // In production (Railway, etc.), use sameSite: "lax" with secure: true
+  // In development, use sameSite: "lax" without secure requirement
+  const sameSite = secure ? "lax" : "lax";
 
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "none",
-    secure: isSecureRequest(req),
+    sameSite,
+    secure,
   };
 }
