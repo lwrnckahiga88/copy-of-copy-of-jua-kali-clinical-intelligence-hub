@@ -14,8 +14,8 @@ import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 
 const mainNavItems = [
   { icon: "📊", label: "Overview", path: "/" },
-  { icon: "🧾", label: "Clinical Workspace", path: "/clinical-workspace" },
-  { icon: "⚠️", label: "Issues & Alerts", path: "/issues-alerts" },
+  
+  
   { icon: "🔌", label: "Connector UI", path: "/connector-ui" },
   { icon: "💡", label: "Skills & Suggestions", path: "/skills" },
 ];
