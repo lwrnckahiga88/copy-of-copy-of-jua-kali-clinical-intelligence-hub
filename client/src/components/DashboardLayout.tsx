@@ -13,36 +13,36 @@ import CosmicBackground from "./CosmicBackground";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 
 const mainNavItems = [
-  { icon: "📊", label: "Overview", path: "/" },
-  
-  
-  { icon: "🔌", label: "Connector UI", path: "/connector-ui" },
-  { icon: "💡", label: "Skills & Suggestions", path: "/skills" },
+  { icon: "ðŸ“Š", label: "Overview", path: "/" },
+  { icon: "ðŸ§¾", label: "Clinical Workspace", path: "/clinical-workspace" },
+  { icon: "âš ï¸", label: "Issues & Alerts", path: "/issues-alerts" },
+  { icon: "ðŸ”Œ", label: "Connector UI", path: "/connector-ui" },
+  { icon: "ðŸ’¡", label: "Skills & Suggestions", path: "/skills" },
 ];
 
 const jarvisAgents = [
-  { icon: "🎯", label: "Nexus Dashboard", path: "/nexus-dashboard" },
-  { icon: "📈", label: "Analytics", path: "/analytics" },
-  { icon: "⚙️", label: "MedOS Module", path: "/medos-module" },
-  { icon: "🎬", label: "Intervention Planner", path: "/intervention-planner" },
-  { icon: "💬", label: "Agent Debate", path: "/agent-debate" },
-  { icon: "🏥", label: "NurseAI", path: "/nurse-ai" },
-  { icon: "🔬", label: "Health AI Agents", path: "/health-ai-agents" },
+  { icon: "ðŸŽ¯", label: "Nexus Dashboard", path: "/nexus-dashboard" },
+  { icon: "ðŸ“ˆ", label: "Analytics", path: "/analytics" },
+  { icon: "âš™ï¸", label: "MedOS Module", path: "/medos-module" },
+  { icon: "ðŸŽ¬", label: "Intervention Planner", path: "/intervention-planner" },
+  { icon: "ðŸ’¬", label: "Agent Debate", path: "/agent-debate" },
+  { icon: "ðŸ¥", label: "NurseAI", path: "/nurse-ai" },
+  { icon: "ðŸ”¬", label: "Health AI Agents", path: "/health-ai-agents" },
 ];
 
 const additionalAgents = [
-  { icon: "🧠", label: "Triad Neuro", path: "/triad-neuro" },
-  { icon: "🐕", label: "Cerberus BPU", path: "/cerberus-bpu" },
-  { icon: "🤖", label: "Jarvis", path: "/jarvis" },
-  { icon: "🗺️", label: "Roadmap", path: "/roadmap" },
-  { icon: "⚕️", label: "Settings", path: "/settings" },
+  { icon: "ðŸ§ ", label: "Triad Neuro", path: "/triad-neuro" },
+  { icon: "ðŸ•", label: "Cerberus BPU", path: "/cerberus-bpu" },
+  { icon: "ðŸ¤–", label: "Jarvis", path: "/jarvis" },
+  { icon: "ðŸ—ºï¸", label: "Roadmap", path: "/roadmap" },
+  { icon: "âš•ï¸", label: "Settings", path: "/settings" },
 ];
 
-// Guest user — no auth required
+// Guest user â€” no auth required
 const GUEST_USER = { id: 0, name: "Clinician", email: null, role: "user" as const };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  // Auth removed — app is publicly accessible
+  // Auth removed â€” app is publicly accessible
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <CosmicBackground />
@@ -145,7 +145,7 @@ function Sidebar({ user }: { user: User }) {
               onClick={() => setIsAgentsExpanded(!isAgentsExpanded)}
               className="w-full text-left px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/50 transition-all flex items-center justify-between"
             >
-              <span><span className="mr-2">🤖</span>Jarvis Agents</span>
+              <span><span className="mr-2">ðŸ¤–</span>Jarvis Agents</span>
               <ChevronDown className={`w-4 h-4 transition-transform ${isAgentsExpanded ? "" : "rotate-180"}`} />
             </button>
 
@@ -183,7 +183,7 @@ function Sidebar({ user }: { user: User }) {
             <div className="text-slate-500 text-xs mt-2">
               Cost per run: <span className="text-cyan-400">15 credits</span>
             </div>
-            {credits < 100 && <div className="text-xs text-red-400 mt-1 font-mono">⚠ Low credits</div>}
+            {credits < 100 && <div className="text-xs text-red-400 mt-1 font-mono">âš  Low credits</div>}
           </div>
 
           <div className="flex items-center justify-between text-sm">
