@@ -4,42 +4,36 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import DashboardLayout from "./components/DashboardLayout";
-import Overview from "./pages/Overview";
-import NexusDashboard from "./pages/NexusDashboard";
-import NurseAI from "./pages/NurseAI";
-import InterventionPlanner from "./pages/InterventionPlanner";
-import TriadNeuro from "./pages/TriadNeuro";
-import CerberusBPU from "./pages/CerberusBPU";
-import AgentDebate from "./pages/AgentDebate";
-import MedOSModule from "./pages/MedOSModule";
-import Analytics from "./pages/Analytics";
-import ConnectorUI from "./pages/ConnectorUI";
-import Jarvis from "./pages/Jarvis";
-import Roadmap from "./pages/Roadmap";
-import Skills from "./pages/Skills";
-import Settings from "./pages/Settings";
-import HealthAIAgents from "./pages/HealthAIAgents";
+import Landing from "./pages/Landing";
+import Dashboard from "./pages/Dashboard";
+import { useAuth } from "./_core/hooks/useAuth";
+import { getLoginUrl } from "./const";
+
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-accent"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    window.location.href = getLoginUrl();
+    return null;
+  }
+
+  return <Component />;
+}
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Overview} />
-      <Route path="/nexus-dashboard" component={NexusDashboard} />
-      <Route path="/nurse-ai" component={NurseAI} />
-      <Route path="/intervention-planner" component={InterventionPlanner} />
-      <Route path="/triad-neuro" component={TriadNeuro} />
-      <Route path="/cerberus-bpu" component={CerberusBPU} />
-      <Route path="/agent-debate" component={AgentDebate} />
-      <Route path="/medos-module" component={MedOSModule} />
-      <Route path="/analytics" component={Analytics} />
-      <Route path="/connector-ui" component={ConnectorUI} />
-      <Route path="/jarvis" component={Jarvis} />
-      <Route path="/roadmap" component={Roadmap} />
-      <Route path="/skills" component={Skills} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/health-ai-agents" component={HealthAIAgents} />
-      <Route path="/404" component={NotFound} />
+      <Route path={"/"} component={Landing} />
+      <Route path={"/dashboard"} component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -48,12 +42,12 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider
+        defaultTheme="dark"
+      >
         <TooltipProvider>
           <Toaster />
-          <DashboardLayout>
-            <Router />
-          </DashboardLayout>
+          <Router />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

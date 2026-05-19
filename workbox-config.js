@@ -1,81 +1,79 @@
-// workbox-config.js
-// Generates a service worker with precache manifest for all static assets.
-// Used by GitHub Actions during Railway deployment.
-
-export default {
-  // Root of the built static assets
-  globDirectory: "dist/public",
-
-  // Patterns to precache — all HTML, JS, CSS, images, fonts, and JSON
+module.exports = {
+  globDirectory: 'client/dist/',
   globPatterns: [
-    "**/*.{html,js,css,png,svg,jpg,jpeg,webp,ico,woff,woff2,ttf,json}",
+    '**/*.{html,js,css,png,svg,json,woff,woff2,ttf,eot}',
   ],
-
-  // Output service worker file location
-  swDest: "dist/public/sw.js",
-
-  // Runtime caching rules
+  globIgnores: [
+    '**/node_modules/**/*',
+    '**/*.map',
+  ],
+  swDest: 'client/dist/sw.js',
+  clientsClaim: true,
+  skipWaiting: true,
+  maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
   runtimeCaching: [
+    // API calls - Network First with timeout
     {
-      // Cache-first for all HTML pages (module pages served from Railway)
-      urlPattern: /\.html$/,
-      handler: "CacheFirst",
+      urlPattern: /^https:\/\/.*\/api\/trpc\//,
+      handler: 'NetworkFirst',
       options: {
-        cacheName: "html-cache",
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
-        },
-      },
-    },
-    {
-      // Stale-while-revalidate for JS/CSS bundles
-      urlPattern: /\.(js|css)$/,
-      handler: "StaleWhileRevalidate",
-      options: {
-        cacheName: "static-resources",
-        expiration: {
-          maxEntries: 100,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-        },
-      },
-    },
-    {
-      // Cache-first for images
-      urlPattern: /\.(png|svg|jpg|jpeg|webp|ico)$/,
-      handler: "CacheFirst",
-      options: {
-        cacheName: "image-cache",
-        expiration: {
-          maxEntries: 60,
-          maxAgeSeconds: 30 * 24 * 60 * 60,
-        },
-      },
-    },
-    {
-      // Network-first for API calls (tRPC)
-      urlPattern: /\/api\/trpc\//,
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "api-cache",
-        networkTimeoutSeconds: 10,
+        cacheName: 'api-cache',
+        networkTimeoutSeconds: 5,
         expiration: {
           maxEntries: 50,
           maxAgeSeconds: 5 * 60, // 5 minutes
         },
       },
     },
+    // HTML agent modules - Cache First
     {
-      // Network-first for SSE endpoint
-      urlPattern: /\/api\/sse/,
-      handler: "NetworkOnly",
+      urlPattern: /^\/agents\/.*\.html$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'agent-modules',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+        },
+      },
+    },
+    // Images - Cache First
+    {
+      urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'images',
+        expiration: {
+          maxEntries: 200,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+        },
+      },
+    },
+    // Fonts - Cache First (long expiration)
+    {
+      urlPattern: /\.(?:woff|woff2|ttf|eot)$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'fonts',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+        },
+      },
+    },
+    // CDN libraries - Stale While Revalidate
+    {
+      urlPattern: /^https:\/\/(cdn|unpkg|cdnjs)\..*\//,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'cdn-cache',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+        },
+      },
     },
   ],
-
-  // Skip waiting and claim clients immediately
-  skipWaiting: true,
-  clientsClaim: true,
-
-  // Inline the Workbox runtime for offline capability
-  inlineWorkboxRuntime: false,
+  navigateFallback: 'index.html',
+  navigateFallbackDenylist: [/^\/api\//],
 };

@@ -1,12 +1,7 @@
 import { defineConfig } from "vitest/config";
 import path from "path";
-import { fileURLToPath } from "url";
 
-// Node 18-compatible __dirname polyfill
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const templateRoot = path.resolve(__dirname);
+const templateRoot = path.resolve(import.meta.dirname);
 
 export default defineConfig({
   root: templateRoot,
@@ -18,7 +13,7 @@ export default defineConfig({
     },
   },
   test: {
-    environment: "node",
-    include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
+    environment: "jsdom",
+    include: ["server/**/*.test.ts", "server/**/*.spec.ts", "client/**/*.test.ts", "client/**/*.spec.ts"],
   },
 });
