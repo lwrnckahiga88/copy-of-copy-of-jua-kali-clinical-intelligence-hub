@@ -280,6 +280,7 @@ export default function Landing() {
                 <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
                 <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
                 <li><a href="/showcase" className="hover:text-foreground transition-colors">Agents Showcase</a></li>
+                <li><a href="/agents" className="hover:text-foreground transition-colors">Agent Directory</a></li>
               </ul>
             </div>
             <div>
