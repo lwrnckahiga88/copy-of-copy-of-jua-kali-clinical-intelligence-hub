@@ -31,6 +31,62 @@ export const AGENT_CATEGORIES = [
 ] as const;
 
 export const pageMapping: AgentConfig[] = [
+  {
+    id: "pandemicintelligence",
+    name: "Pandemic Intelligence",
+    description: "Real-time pandemic monitoring and predictive intelligence",
+    category: "Epidemiology",
+    htmlFile: "pandemic intelligence.html",
+    creditCost: 15,
+  },
+  {
+    id: "pandemicseird",
+    name: "Pandemic SEIRD",
+    description: "Advanced SEIRD modeling for infectious disease dynamics",
+    category: "Epidemiology",
+    htmlFile: "pandemic seird.html",
+    creditCost: 12,
+  },
+  {
+    id: "epidemiologyagent",
+    name: "Epidemiology Agent",
+    description: "Comprehensive epidemiological analysis and outbreak detection",
+    category: "Epidemiology",
+    htmlFile: "epidemiology.html",
+    creditCost: 10,
+  },
+  {
+    id: "genomica",
+    name: "Genomica",
+    description: "Advanced genomic sequencing and variant analysis platform",
+    category: "Genomics",
+    htmlFile: "Genomica.html",
+    creditCost: 20,
+  },
+  {
+    id: "oncoaipwav3",
+    name: "OncoAI PWA v3",
+    description: "Next-generation oncology imaging and diagnostic platform",
+    category: "Imaging Analysis",
+    htmlFile: "oncoai_pwa_v3.html",
+    creditCost: 18,
+  },
+  {
+    id: "clinicalvalidatorpro",
+    name: "Clinical Validator Pro",
+    description: "Professional clinical validation workflow builder",
+    category: "Clinical Validation",
+    htmlFile: "clinical_validator_pro.html",
+    creditCost: 15,
+  },
+  {
+    id: "studioosadmin",
+    name: "StudioOS Admin",
+    description: "Complete TPA administrative dashboard for StudioOS",
+    category: "Administrative",
+    htmlFile: "studio_os_admin.html",
+    creditCost: 25,
+  },
   // Medical AI Category
   {
     id: "nursai",

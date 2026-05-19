@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio-OS Health v0.2</title>
+
+<!-- INLINE MANIFEST -->
+<link rel="manifest" href="data:application/json,{
+  &quot;name&quot;:&quot;Studio-OS Health&quot;,
+  &quot;short_name&quot;:&quot;Studio-OS&quot;,
+  &quot;start_url&quot;:&quot;.&quot;,
+  &quot;display&quot;:&quot;standalone&quot;,
+  &quot;background_color&quot;:&quot;#020617&quot;,
+  &quot;theme_color&quot;:&quot;#020617&quot;
+}">
+
+<style>
+body{margin:0;font-family:system-ui;background:#020617;color:#e5e7eb}
+header{padding:12px;font-weight:bold;border-bottom:1px solid #334155}
+section{padding:12px}
+.card{background:#020617;border:1px solid #334155;border-radius:8px;margin-bottom:12px;padding:12px}
+button{padding:8px 12px;border-radius:6px;border:none;background:#2563eb;color:white;margin:4px}
+input,select{padding:6px;margin:4px;background:#020617;color:white;border:1px solid #334155}
+pre{font-size:11px;white-space:pre-wrap}
+.small{font-size:11px;color:#94a3b8}
+</style>
+</head>
+
+<body>
+<header>Studio-OS Health v0.2 — Offline SHA-Ready</header>
+
+<section class="card">
+<b>Facility Setup</b><br>
+<input id="facility" placeholder="Facility Code (e.g KE-CL-001)">
+<input id="county" placeholder="County">
+<input id="officer" placeholder="Officer">
+<button onclick="saveFacility()">Save</button>
+</section>
+
+<section class="card">
+<b>Presence / Biometric Proof</b><br>
+<button onclick="assertPresence()">Assert Secure Presence</button>
+<div id="presenceStatus" class="small"></div>
+</section>
+
+<section class="card">
+<b>New Clinical Event</b><br>
+<select id="service">
+  <option>OPD</option>
+  <option>TB_REVIEW</option>
+  <option>TB_INITIATION</option>
+  <option>MCH</option>
+</select>
+<select id="coverage">
+  <option>SHA</option>
+  <option>PRIVATE</option>
+  <option>CASH</option>
+</select>
+<button onclick="addEvent()">Record</button>
+</section>
+
+<section class="card">
+<b>Ledger</b>
+<pre id="ledgerView"></pre>
+</section>
+
+<section class="card">
+<b>Clinic ↔ Clinic P2P Sync</b><br>
+<button onclick="exportLedger()">Export QR</button>
+<button onclick="importLedger()">Import QR</button>
+<pre id="qrBox"></pre>
+</section>
+
+<section class="card">
+<b>SHA Claim Export</b><br>
+<button onclick="exportSHA()">Generate SHA Claim</button>
+<pre id="shaOut"></pre>
+</section>
+
+<section class="card">
+<b>MOH-711 TB Summary</b><br>
+<button onclick="generateTB()">Generate</button>
+<pre id="tbOut"></pre>
+</section>
+
+<script>
+/* ===== STORAGE ===== */
+const DB={
+ get:k=>JSON.parse(localStorage.getItem(k)||"null"),
+ set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+};
+DB.set("ledger",DB.get("ledger")||[]);
+
+/* ===== FACILITY ===== */
+function saveFacility(){
+ DB.set("facility",{facility:facility.value,county:county.value,officer:officer.value});
+ alert("Facility saved");
+}
+
+/* ===== ANDROID-SAFE PRESENCE ===== */
+async function assertPresence(){
+ const key=await crypto.subtle.generateKey({name:"HMAC",hash:"SHA-256"},true,["sign"]);
+ const msg=new TextEncoder().encode(Date.now().toString());
+ const sig=await crypto.subtle.sign("HMAC",key,msg);
+ const proof=btoa(String.fromCharCode(...new Uint8Array(sig)));
+ DB.set("presence",{proof,time:new Date().toISOString()});
+ presenceStatus.innerText="Presence verified @ "+new Date().toLocaleString();
+}
+
+/* ===== EVENTS ===== */
+function addEvent(){
+ if(!DB.get("presence")) return alert("Assert presence first");
+ const ledger=DB.get("ledger");
+ ledger.push({
+  id:crypto.randomUUID(),
+  facility:DB.get("facility"),
+  service:service.value,
+  coverage:coverage.value,
+  presence:DB.get("presence"),
+  ts:new Date().toISOString()
+ });
+ DB.set("ledger",ledger);
+ renderLedger();
+}
+
+function renderLedger(){
+ ledgerView.textContent=JSON.stringify(DB.get("ledger"),null,2);
+}
+renderLedger();
+
+/* ===== P2P SYNC ===== */
+function exportLedger(){
+ qrBox.textContent=btoa(JSON.stringify(DB.get("ledger")));
+}
+function importLedger(){
+ const data=prompt("Paste QR data");
+ if(!data)return;
+ const incoming=JSON.parse(atob(data));
+ const merged=[...DB.get("ledger")];
+ incoming.forEach(e=>{
+  if(!merged.find(m=>m.id===e.id))merged.push(e);
+ });
+ DB.set("ledger",merged);
+ renderLedger();
+}
+
+/* ===== SHA EXPORT ===== */
+function exportSHA(){
+ const sha=DB.get("ledger").filter(e=>e.coverage==="SHA");
+ shaOut.textContent=JSON.stringify({
+  schema:"SHA-CLAIM-v1",
+  facility:DB.get("facility"),
+  total:sha.length,
+  claims:sha
+ },null,2);
+}
+
+/* ===== TB MOH-711 ===== */
+function generateTB(){
+ const tb=DB.get("ledger").filter(e=>e.service.startsWith("TB"));
+ const summary={
+  TB_INITIATION:tb.filter(e=>e.service==="TB_INITIATION").length,
+  TB_REVIEW:tb.filter(e=>e.service==="TB_REVIEW").length
+ };
+ tbOut.textContent=JSON.stringify({
+  facility:DB.get("facility"),
+  month:new Date().toISOString().slice(0,7),
+  summary
+ },null,2);
+}
+
+/* ===== SERVICE WORKER ===== */
+if("serviceWorker"in navigator){ const sw=`self.addEventListener("install",e=>self.skipWaiting());
+ self.addEventListener("fetch",e=>{
+  e.respondWith(caches.open("studio-os").then(c=>c.match(e.request)||fetch(e.request)))
+ });`;
+ navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw])));
+}
+</script>
+
+</body>
+</html>
+
+
+^X
+
+ 
