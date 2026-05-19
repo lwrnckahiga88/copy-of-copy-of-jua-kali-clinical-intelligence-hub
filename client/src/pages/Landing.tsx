@@ -103,7 +103,7 @@ export default function Landing() {
                     <a href={getLoginUrl()}>Get Started Free</a>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <a href="#pricing">View Pricing</a>
+                    <a href="/showcase">Explore Agents</a>
                   </Button>
                 </>
               )}
@@ -279,7 +279,7 @@ export default function Landing() {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
                 <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Agents</a></li>
+                <li><a href="/showcase" className="hover:text-foreground transition-colors">Agents Showcase</a></li>
               </ul>
             </div>
             <div>

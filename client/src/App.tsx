@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Landing from "./pages/Landing";
+import FeaturesShowcase from "./pages/FeaturesShowcase";
 import Dashboard from "./pages/Dashboard";
 import { useAuth } from "./_core/hooks/useAuth";
 import { getLoginUrl } from "./const";
@@ -32,6 +33,7 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Landing} />
+      <Route path={"/showcase"} component={FeaturesShowcase} />
       <Route path={"/dashboard"} component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
