@@ -6,8 +6,8 @@ import { paymentRouter } from "./paymentRouter";
 import { genomicsRouter } from "./genomicsRouter";
 import { adminRouter } from "./adminRouter";
 import { agentRouter } from "./agentRouter";
-import { clinicalGridRouter } from "./clinicalGridRouter";
-import { imagingRouter } from "./imagingRouter";
+// import { clinicalGridRouter } from "./clinicalGridRouter";
+// import { imagingRouter } from "./imagingRouter";
 import { consensusRouter } from "./consensusRouter";
 import { bioinformaticsRouter } from "./bioinformaticsRouter";
 
@@ -28,8 +28,8 @@ export const appRouter = router({
   genomics: genomicsRouter,
   admin: adminRouter,
   agent: agentRouter,
-  clinicalGrid: clinicalGridRouter,
-  imaging: imagingRouter,
+  // clinicalGrid: clinicalGridRouter,
+  // imaging: imagingRouter,
   consensus: consensusRouter,
   bioinformatics: bioinformaticsRouter,
 });

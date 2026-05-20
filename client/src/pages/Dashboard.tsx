@@ -238,8 +238,7 @@ export default function Dashboard() {
                   </p>
                   <div className="space-y-4">
                     <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg h-12" onClick={() => window.location.href = "/#pricing"}>
-            )
-          ) : (
+                      Upgrade to Enterprise
                     </Button>
                     <Button variant="outline" className="w-full h-12" onClick={() => setSelectedAgent(null)}>
                       Back to Directory
@@ -248,18 +247,19 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : (
-            <div className="w-full h-full">
-              <iframe
-                ref={iframeRef}
-                key={selectedAgentData.id}
-                src={selectedAgentData.externalUrl || `/agents/${selectedAgentData.htmlFile}`}
-                className="w-full h-full border-none"
-                title={selectedAgentData.name}
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-presentation"
-                allow="geolocation; microphone; camera; payment; usb"
-                onLoad={syncIframeWithState}
-              />
-            </div>
+              <div className="w-full h-full">
+                <iframe
+                  ref={iframeRef}
+                  key={selectedAgentData.id}
+                  src={selectedAgentData.externalUrl || `/agents/${selectedAgentData.htmlFile}`}
+                  className="w-full h-full border-none"
+                  title={selectedAgentData.name}
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-presentation"
+                  allow="geolocation; microphone; camera; payment; usb"
+                  onLoad={syncIframeWithState}
+                />
+              </div>
+            )
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center space-y-4 max-w-md">
