@@ -149,6 +149,14 @@ export const pageMapping: AgentConfig[] = [
     htmlFile: "pandemic seird.html",
     creditCost: 12,
   },
+  {
+    id: "epidemiologyagent",
+    name: "Epidemiology Agent",
+    description: "Specialized agent for population health and disease tracking",
+    category: "Epidemiology",
+    htmlFile: "epidemiology.html",
+    creditCost: 14,
+  },
 
   // --- GENOMICS ---
   {
@@ -168,6 +176,25 @@ export const pageMapping: AgentConfig[] = [
     category: "Imaging Analysis",
     htmlFile: "oncoai_pwa_v3.html",
     creditCost: 18,
+  },
+
+  // --- CLINICAL VALIDATION ---
+  {
+    id: "clinvalidai",
+    name: "ClinValid AI",
+    description: "AI-driven clinical validation and evidence-based assessment",
+    category: "Clinical Validation",
+    htmlFile: "clinValidAi.html",
+    creditCost: 16,
+  },
+  {
+    id: "clinicalvalidatorpro",
+    name: "Clinical Validator Pro",
+    description: "Professional workflow builder for clinical validation",
+    category: "Clinical Validation",
+    htmlFile: "clinical_validator_pro.html",
+    creditCost: 22,
+    isEnterprise: true,
   },
   {
     id: "pulmonix",

@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
-import { Check, Zap, Shield, Microscope } from "lucide-react";
+import { Check, Zap, Shield, Microscope, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
@@ -64,13 +65,18 @@ export default function Landing() {
             <Microscope className="w-8 h-8 text-accent" />
             <span className="text-xl font-bold gradient-text">Jua Kali Hub</span>
           </div>
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
+            <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+            <Link href="/showcase" className="hover:text-foreground transition-colors">Agents Showcase</Link>
+            <Link href="/agents" className="hover:text-foreground transition-colors">Agent Directory</Link>
+          </div>
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
-              <Button asChild variant="default">
-                <a href="/dashboard">Dashboard</a>
+              <Button asChild variant="default" className="bg-accent hover:bg-accent/90">
+                <Link href="/dashboard">Dashboard</Link>
               </Button>
             ) : (
-              <Button asChild variant="default">
+              <Button asChild variant="default" className="bg-accent hover:bg-accent/90">
                 <a href={getLoginUrl()}>Sign In</a>
               </Button>
             )}
@@ -94,16 +100,16 @@ export default function Landing() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               {isAuthenticated ? (
-                <Button asChild size="lg" className="bg-accent hover:bg-accent/90">
-                  <a href="/dashboard">Go to Dashboard</a>
+                <Button asChild size="lg" className="bg-accent hover:bg-accent/90 h-12 px-8">
+                  <Link href="/dashboard">Go to Dashboard</Link>
                 </Button>
               ) : (
                 <>
-                  <Button asChild size="lg" className="bg-accent hover:bg-accent/90">
+                  <Button asChild size="lg" className="bg-accent hover:bg-accent/90 h-12 px-8">
                     <a href={getLoginUrl()}>Get Started Free</a>
                   </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <a href="/showcase">Explore Agents</a>
+                  <Button asChild size="lg" variant="outline" className="h-12 px-8">
+                    <Link href="/showcase">Explore Agents</Link>
                   </Button>
                 </>
               )}
@@ -156,8 +162,8 @@ export default function Landing() {
                 description: "Validated AI models built with clinical expertise",
               },
             ].map((feature, i) => (
-              <div key={i} className="card-premium">
-                <feature.icon className="w-12 h-12 text-accent mb-4" />
+              <div key={i} className="card-premium group hover:border-accent/50 transition-all duration-300">
+                <feature.icon className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p className="text-muted-foreground">{feature.description}</p>
               </div>
@@ -182,8 +188,8 @@ export default function Landing() {
                 key={i}
                 className={`relative flex flex-col p-8 transition-all duration-300 ${
                   tier.highlighted
-                    ? "border-accent/50 ring-1 ring-accent/20 md:scale-105"
-                    : "border-border/50"
+                    ? "border-accent/50 ring-1 ring-accent/20 md:scale-105 bg-accent/5"
+                    : "border-border/50 bg-card"
                 }`}
               >
                 {tier.highlighted && (
@@ -206,10 +212,10 @@ export default function Landing() {
 
                 <Button
                   asChild
-                  className={`mb-8 ${
+                  className={`mb-8 h-11 ${
                     tier.highlighted
                       ? "bg-accent hover:bg-accent/90 text-accent-foreground"
-                      : "border border-border hover:bg-card"
+                      : "border border-border hover:bg-accent/10"
                   }`}
                   variant={tier.highlighted ? "default" : "outline"}
                 >
@@ -233,7 +239,7 @@ export default function Landing() {
             <p className="text-muted-foreground mb-4">
               Contact our sales team for enterprise solutions tailored to your organization
             </p>
-            <Button variant="outline">Contact Sales</Button>
+            <Button variant="outline" className="h-11 px-8">Contact Sales</Button>
           </div>
         </div>
       </section>
@@ -241,7 +247,7 @@ export default function Landing() {
       {/* CTA Section */}
       <section className="py-16 md:py-24 border-t border-border/50">
         <div className="container">
-          <div className="max-w-2xl mx-auto text-center space-y-8 bg-gradient-to-r from-accent/10 to-accent/5 rounded-2xl p-12">
+          <div className="max-w-2xl mx-auto text-center space-y-8 bg-gradient-to-r from-accent/10 to-accent/5 rounded-2xl p-12 border border-accent/20">
             <div>
               <h2 className="text-4xl font-bold mb-4">Ready to Transform Healthcare?</h2>
               <p className="text-lg text-muted-foreground">
@@ -249,12 +255,12 @@ export default function Landing() {
               </p>
             </div>
             {isAuthenticated ? (
-              <Button asChild size="lg" className="bg-accent hover:bg-accent/90">
-                <a href="/dashboard">Go to Dashboard</a>
+              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 h-12 px-8">
+                <Link href="/dashboard">Go to Dashboard <ArrowRight className="ml-2 w-5 h-5" /></Link>
               </Button>
             ) : (
-              <Button asChild size="lg" className="bg-accent hover:bg-accent/90">
-                <a href={getLoginUrl()}>Start Free Trial</a>
+              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 h-12 px-8">
+                <a href={getLoginUrl()}>Start Free Trial <ArrowRight className="ml-2 w-5 h-5" /></a>
               </Button>
             )}
           </div>
@@ -262,25 +268,25 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-12">
+      <footer className="border-t border-border/50 py-12 bg-card/50">
         <div className="container">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Microscope className="w-6 h-6 text-accent" />
-                <span className="font-bold">Jua Kali Hub</span>
+                <span className="font-bold text-lg">Jua Kali Hub</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                AI-powered healthcare intelligence platform
+                AI-powered healthcare intelligence platform for clinical decision support and research.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
+                <li><Link href="/" className="hover:text-foreground transition-colors">Features</Link></li>
                 <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="/showcase" className="hover:text-foreground transition-colors">Agents Showcase</a></li>
-                <li><a href="/agents" className="hover:text-foreground transition-colors">Agent Directory</a></li>
+                <li><Link href="/showcase" className="hover:text-foreground transition-colors">Agents Showcase</Link></li>
+                <li><Link href="/agents" className="hover:text-foreground transition-colors">Agent Directory</Link></li>
               </ul>
             </div>
             <div>
