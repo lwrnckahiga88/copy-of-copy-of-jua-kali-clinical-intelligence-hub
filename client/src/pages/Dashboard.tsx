@@ -226,7 +226,7 @@ export default function Dashboard() {
         {/* Content Area */}
         <div className="flex-1 overflow-hidden">
           {selectedAgentData ? (
-            selectedAgentData.isEnterprise && user?.plan !== "enterprise" ? (
+            false ? (
               <div className="w-full h-full flex items-center justify-center bg-background/50 backdrop-blur-sm">
                 <div className="text-center space-y-6 max-w-lg p-8 border border-accent/20 rounded-2xl bg-card shadow-2xl">
                   <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
