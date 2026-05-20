@@ -19,6 +19,7 @@ export const users = mysqlTable("users", {
   email:         varchar("email", { length: 255 }),
   loginMethod:   varchar("login_method", { length: 64 }),
   role:          varchar("role", { length: 64 }).default("user"),
+  plan:          varchar("plan", { length: 64 }).default("free"),
   lastSignedIn:  timestamp("last_signed_in"),
   createdAt:     timestamp("created_at").defaultNow(),
   updatedAt:     timestamp("updated_at").defaultNow().onUpdateNow(),

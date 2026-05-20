@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { pageMapping, getAgentsByCategory, searchAgents, getAllCategories } from "@/lib/pageMapping";
-import { LogOut, Search, ChevronDown, Zap, Menu, X } from "lucide-react";
+import { LogOut, Search, ChevronDown, Zap, Menu, X, Shield } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { MpesaPaymentModal } from "@/components/MpesaPaymentModal";
 import { useNurseAISync } from "@/hooks/useNurseAISync";
@@ -226,6 +226,28 @@ export default function Dashboard() {
         {/* Content Area */}
         <div className="flex-1 overflow-hidden">
           {selectedAgentData ? (
+            selectedAgentData.isEnterprise && user?.plan !== "enterprise" ? (
+              <div className="w-full h-full flex items-center justify-center bg-background/50 backdrop-blur-sm">
+                <div className="text-center space-y-6 max-w-lg p-8 border border-accent/20 rounded-2xl bg-card shadow-2xl">
+                  <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                    <Shield className="w-10 h-10 text-accent animate-pulse" />
+                  </div>
+                  <h2 className="text-3xl font-bold gradient-text">Enterprise Access Required</h2>
+                  <p className="text-muted-foreground text-lg">
+                    The <span className="text-foreground font-semibold">{selectedAgentData.name}</span> agent is a premium module reserved for our Enterprise partners.
+                  </p>
+                  <div className="space-y-4">
+                    <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg h-12" onClick={() => window.location.href = "/#pricing"}>
+            )
+          ) : (
+                    </Button>
+                    <Button variant="outline" className="w-full h-12" onClick={() => setSelectedAgent(null)}>
+                      Back to Directory
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div className="w-full h-full">
               <iframe
                 ref={iframeRef}
