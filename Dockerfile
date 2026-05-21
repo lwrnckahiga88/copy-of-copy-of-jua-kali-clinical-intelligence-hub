@@ -36,9 +36,6 @@ COPY --from=builder /app/dist ./dist
 # so client build must live at /app/dist/public
 COPY --from=builder /app/client/dist ./dist/public
 
-# Copy workbox-generated service worker assets
-COPY --from=builder /app/public ./dist/public
-
 EXPOSE 3000
 
 # ESM-safe health check using fetch (Node 22 built-in)
