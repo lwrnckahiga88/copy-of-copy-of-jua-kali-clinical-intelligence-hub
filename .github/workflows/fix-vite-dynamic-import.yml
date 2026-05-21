@@ -22,8 +22,8 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Create fix branch
-        run: git checkout -b "$BRANCH"
+      - name: Create or reset fix branch
+        run: git checkout -B "$BRANCH"
 
       - name: Replace vite.ts with dynamic-import version
         run: |
@@ -34,7 +34,6 @@ jobs:
           import path from "path";
 
           export async function setupVite(app: Express, server: Server) {
-            // Dynamic imports so vite is never resolved in production
             const { createServer: createViteServer } = await import("vite");
             const { default: viteConfig } = await import("../../vite.config.js");
 
@@ -103,19 +102,28 @@ jobs:
           git commit -m "fix: use dynamic imports for vite in server/_core/vite.ts
 
           Static top-level imports of 'vite' and 'vite.config' caused
-          ERR_MODULE_NOT_FOUND at production startup because esbuild bundles
-          the server with --packages=external, leaving vite unresolved, and
-          vite is a devDependency not installed in the production container.
+          ERR_MODULE_NOT_FOUND at production startup. esbuild bundles the
+          server with --packages=external so vite stays unresolved in
+          dist/index.js, and vite is a devDependency absent in production.
 
-          Even though setupVite() is guarded behind NODE_ENV=development, Node.js
-          resolves all static imports at startup before any code runs.
+          Node.js resolves all static imports at startup before any
+          if (NODE_ENV) branch runs, so the server crashed immediately.
 
-          Fix: convert the vite and vite.config imports inside setupVite() to
-          dynamic import() calls. They now only execute when setupVite() is
-          actually called (i.e. in development), so production never touches them."
+          Fix: dynamic import() inside setupVite() so production never
+          touches vite at all."
 
-      - name: Push branch
-        run: git push origin "$BRANCH"
+      - name: Push branch (force to overwrite stale remote)
+        run: git push origin "$BRANCH" --force
+
+      - name: Close existing PR if any
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number // empty')
+          if [ -n "$PR" ]; then
+            echo "Closing stale PR #$PR"
+            gh pr close "$PR" --comment "Superseded by re-run of fix workflow."
+          fi
 
       - name: Create Pull Request
         env:
@@ -125,23 +133,20 @@ jobs:
             --title "fix: dynamic import vite in server/_core/vite.ts (ERR_MODULE_NOT_FOUND)" \
             --body "## Problem
 
-          Production startup crashes with:
-          \`\`\`
-          Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite'
-          \`\`\`
+          Production startup crashes with \`ERR_MODULE_NOT_FOUND: Cannot find package 'vite'\`.
 
-          **Root cause:** \`server/_core/vite.ts\` has static top-level imports of \`vite\` and \`vite.config\`. The esbuild step bundles the server with \`--packages=external\`, leaving these imports unresolved in \`dist/index.js\`. Since \`vite\` is a \`devDependency\`, it is not installed in the production container. Node.js resolves **all** static imports at startup â€” before any \`if (NODE_ENV)\` branch runs â€” so the server crashes immediately even though \`setupVite()\` is correctly guarded.
+          **Root cause:** \`server/_core/vite.ts\` has static top-level imports of \`vite\` and \`vite.config\`. esbuild bundles the server with \`--packages=external\`, leaving them unresolved in \`dist/index.js\`. Since \`vite\` is a \`devDependency\` it is not installed in the production container. Node.js resolves all static imports at startup â€” before any \`if (NODE_ENV)\` branch runs â€” so the server crashes immediately even though \`setupVite()\` is correctly guarded.
 
           ## Fix
 
-          Convert the \`vite\` and \`vite.config\` imports inside \`setupVite()\` to dynamic \`import()\` calls. They now only execute when \`setupVite()\` is actually invoked (development only), so production startup never touches them.
+          Convert the \`vite\` and \`vite.config\` imports inside \`setupVite()\` to dynamic \`import()\` calls. They now only execute when \`setupVite()\` is actually invoked (dev only).
 
           ## Files changed
-          - \`server/_core/vite.ts\` â€” static imports â†’ dynamic imports inside \`setupVite()\`
+          - \`server/_core/vite.ts\`
 
           ## Checklist
           - [ ] Production server starts without ERR_MODULE_NOT_FOUND
-          - [ ] Dev server HMR still works (\`pnpm dev\`)
+          - [ ] Dev HMR still works
           - [ ] Static files served correctly in production" \
             --base main \
             --head "$BRANCH"
