@@ -1,0 +1,99 @@
+name: fix/workbox-config-cjs
+
+on:
+  workflow_dispatch:   # run manually from the Actions tab
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  fix-workbox-cjs:
+    runs-on: ubuntu-latest
+
+    env:
+      BRANCH: fix/workbox-config-cjs
+      OLD_FILE: workbox-config.js
+      NEW_FILE: workbox-config.cjs
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify required files exist
+        run: |
+          if [ ! -f "$OLD_FILE" ]; then
+            echo "::error::$OLD_FILE not found in repo root â€” nothing to rename."
+            exit 1
+          fi
+          if [ ! -f "Dockerfile" ]; then
+            echo "::error::Dockerfile not found in repo root."
+            exit 1
+          fi
+
+      - name: Create fix branch
+        run: |
+          git checkout -b "$BRANCH"
+
+      - name: Rename workbox-config.js â†’ workbox-config.cjs
+        run: |
+          git mv "$OLD_FILE" "$NEW_FILE"
+          echo "Renamed $OLD_FILE â†’ $NEW_FILE"
+
+      - name: Patch Dockerfile reference
+        run: |
+          if grep -q "$OLD_FILE" Dockerfile; then
+            sed -i "s/${OLD_FILE}/${NEW_FILE}/g" Dockerfile
+            echo "Dockerfile patched."
+          else
+            echo "::warning::$OLD_FILE not referenced in Dockerfile â€” skipping patch."
+          fi
+
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$NEW_FILE" Dockerfile
+          git commit -m "fix: rename workbox-config.js to .cjs (ESM/CJS conflict)
+
+          package.json sets \"type\": \"module\", which causes Node.js to treat
+          all .js files as ES modules. workbox-config.js uses CommonJS syntax
+          (module.exports), so the workbox-cli step fails at build time.
+
+          Renaming to .cjs forces Node.js to parse it as CommonJS regardless
+          of the package type field. Dockerfile updated to match.
+
+          Fixes deployment build failure."
+
+      - name: Push branch
+        run: |
+          git push origin "$BRANCH"
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "fix: rename workbox-config.js â†’ .cjs (ESM/CJS conflict)" \
+            --body "## Problem
+
+          \`package.json\` sets \`\"type\": \"module\"\`, which tells Node.js to treat every \`.js\` file as an ES module. \`workbox-config.js\` uses CommonJS syntax (\`module.exports\`), so the \`workbox-cli\` build step fails with a module-parse error on every deployment.
+
+          ## Changes
+
+          | File | Change |
+          |---|---|
+          | \`workbox-config.js\` | Renamed to \`workbox-config.cjs\` |
+          | \`Dockerfile\` | Reference updated to \`workbox-config.cjs\` |
+
+          Renaming to \`.cjs\` forces Node.js to parse the file as CommonJS regardless of the package \`type\` field â€” no source changes required.
+
+          ## Checklist
+          - [ ] Docker build completes without module errors
+          - [ ] Service worker generated correctly by workbox-cli
+          - [ ] PWA offline behaviour unchanged" \
+            --base main \
+            --head "$BRANCH"
