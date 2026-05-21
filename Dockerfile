@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm build
 
 # Generate service worker
-RUN npx workbox-cli generateSW workbox-config.js
+RUN npx workbox-cli generateSW workbox-config.cjs
 
 # Production stage
 FROM node:22-alpine
