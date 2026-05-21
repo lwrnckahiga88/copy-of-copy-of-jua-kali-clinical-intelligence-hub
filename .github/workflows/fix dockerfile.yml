@@ -1,0 +1,214 @@
+name: fix/dockerfile-and-vite
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+
+    env:
+      BRANCH: fix/dockerfile-and-vite
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Create or reset fix branch
+        run: git checkout -B "$BRANCH"
+
+      # â”€â”€ Fix 1: Dockerfile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      - name: Patch Dockerfile
+        run: |
+          cat > Dockerfile << 'EOF'
+          # Build stage
+          FROM node:22-alpine AS builder
+
+          WORKDIR /app
+
+          RUN npm install -g pnpm@10
+
+          COPY pnpm-lock.yaml package.json ./
+          COPY patches ./patches
+
+          RUN pnpm install --no-frozen-lockfile
+
+          COPY . .
+
+          RUN pnpm build
+
+          RUN npx workbox-cli generateSW workbox-config.cjs
+
+          # Production stage
+          FROM node:22-alpine
+
+          WORKDIR /app
+
+          RUN npm install -g pnpm@10
+
+          COPY pnpm-lock.yaml package.json ./
+          COPY patches ./patches
+
+          RUN pnpm install --no-frozen-lockfile --prod
+
+          # Copy server bundle
+          COPY --from=builder /app/dist ./dist
+
+          # serveStatic resolves path.resolve(import.meta.dirname, "public")
+          # import.meta.dirname of /app/dist/index.js = /app/dist
+          # so client build must live at /app/dist/public
+          COPY --from=builder /app/client/dist ./dist/public
+
+          # Copy workbox-generated service worker assets
+          COPY --from=builder /app/public ./dist/public
+
+          EXPOSE 3000
+
+          # ESM-safe health check using fetch (Node 22 built-in)
+          HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+            CMD node --input-type=module --eval "const r=await fetch('http://localhost:3000/');if(!r.ok)process.exit(1);"
+
+          CMD ["node", "dist/index.js"]
+          EOF
+
+      # â”€â”€ Fix 2: server/_core/vite.ts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      - name: Patch server/_core/vite.ts
+        run: |
+          cat > server/_core/vite.ts << 'EOF'
+          import express, { type Express } from "express";
+          import fs from "fs";
+          import { type Server } from "http";
+          import path from "path";
+
+          export async function setupVite(app: Express, server: Server) {
+            // Dynamic imports â€” vite is never resolved in production
+            const { createServer: createViteServer } = await import("vite");
+            const { default: viteConfig } = await import("../../vite.config.js");
+
+            const vite = await createViteServer({
+              ...viteConfig,
+              configFile: false,
+              server: {
+                middlewareMode: true,
+                hmr: { server },
+                allowedHosts: true as const,
+              },
+              appType: "custom",
+            });
+
+            app.use(vite.middlewares);
+
+            app.use("*", async (req, res, next) => {
+              const url = req.originalUrl;
+              try {
+                const clientTemplate = path.resolve(
+                  import.meta.dirname,
+                  "../..",
+                  "client",
+                  "index.html"
+                );
+                let template = await fs.promises.readFile(clientTemplate, "utf-8");
+                const { nanoid } = await import("nanoid");
+                template = template.replace(
+                  `src="/src/main.tsx"`,
+                  `src="/src/main.tsx?v=${nanoid()}"`
+                );
+                const page = await vite.transformIndexHtml(url, template);
+                res.status(200).set({ "Content-Type": "text/html" }).end(page);
+              } catch (e) {
+                vite.ssrFixStacktrace(e as Error);
+                next(e);
+              }
+            });
+          }
+
+          export function serveStatic(app: Express) {
+            // In production, import.meta.dirname = /app/dist
+            // Client build is copied to /app/dist/public by Dockerfile
+            const distPath = path.resolve(import.meta.dirname, "public");
+
+            if (!fs.existsSync(distPath)) {
+              console.error(
+                `Could not find the build directory: ${distPath}, make sure to build the client first`
+              );
+            }
+
+            app.use(express.static(distPath));
+
+            app.use("*", (_req, res) => {
+              res.sendFile(path.resolve(distPath, "index.html"));
+            });
+          }
+          EOF
+
+      - name: Commit all changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Dockerfile server/_core/vite.ts
+          git commit -m "fix: correct static path, ESM healthcheck, dynamic vite imports
+
+          Three production issues fixed:
+
+          1. Static files path mismatch
+             Dockerfile copied client/dist to /app/client/dist but serveStatic
+             resolves path.resolve(import.meta.dirname, 'public') which is
+             /app/dist/public. Fixed by copying client/dist â†’ dist/public.
+
+          2. HEALTHCHECK used require() in an ESM package
+             package.json has type:module so require is not defined. Replaced
+             with node --input-type=module --eval using fetch() (Node 22 built-in).
+
+          3. Static vite imports caused ERR_MODULE_NOT_FOUND at startup
+             Converted to dynamic import() inside setupVite() so production
+             never resolves vite, which is a devDependency."
+
+      - name: Push branch
+        run: git push origin "$BRANCH" --force
+
+      - name: Close existing PR if any
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number // empty')
+          if [ -n "$PR" ]; then
+            gh pr close "$PR" --comment "Superseded by updated fix."
+          fi
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "fix: static path + ESM healthcheck + dynamic vite imports" \
+            --body "## Three production fixes
+
+          ### 1. Static files path mismatch
+          \`serveStatic()\` resolves \`path.resolve(import.meta.dirname, 'public')\`.
+          Since \`import.meta.dirname\` of \`dist/index.js\` is \`/app/dist\`, the client build must live at \`/app/dist/public\`.
+          The old Dockerfile copied it to \`/app/client/dist\` â€” wrong location.
+          **Fix:** \`COPY --from=builder /app/client/dist ./dist/public\`
+
+          ### 2. HEALTHCHECK used \`require()\` in ESM package
+          \`package.json\` sets \`\"type\": \"module\"\` so \`require\` is not defined.
+          The health check was killing the container on every probe.
+          **Fix:** \`node --input-type=module --eval\` using \`fetch()\` (built into Node 22).
+
+          ### 3. Static vite imports â†’ \`ERR_MODULE_NOT_FOUND\`
+          \`server/_core/vite.ts\` had top-level static imports of \`vite\` and \`vite.config\`.
+          esbuild bundles with \`--packages=external\` so they stay unresolved in \`dist/index.js\`.
+          Node resolves all static imports at startup â€” before any \`NODE_ENV\` check runs.
+          **Fix:** dynamic \`import()\` inside \`setupVite()\` only.
+
+          ## Files changed
+          - \`Dockerfile\`
+          - \`server/_core/vite.ts\`" \
+            --base main \
+            --head "$BRANCH"
