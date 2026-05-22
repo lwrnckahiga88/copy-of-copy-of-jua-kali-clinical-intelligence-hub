@@ -1,5 +1,5 @@
 module.exports = {
-  globDirectory: 'client/dist/',
+  globDirectory: 'dist/public/',
   globPatterns: [
     '**/*.{html,js,css,png,svg,json,woff,woff2,ttf,eot}',
   ],
@@ -7,7 +7,7 @@ module.exports = {
     '**/node_modules/**/*',
     '**/*.map',
   ],
-  swDest: 'client/dist/sw.js',
+  swDest: 'dist/public/sw.js',
   clientsClaim: true,
   skipWaiting: true,
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
