@@ -1,0 +1,55 @@
+name: fix/dockerfile-final
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: fix/dockerfile-final
+      DOCKERFILE_B64: IyBCdWlsZCBzdGFnZQpGUk9NIG5vZGU6MjItYWxwaW5lIEFTIGJ1aWxkZXIKCldPUktESVIgL2FwcAoKUlVOIG5wbSBpbnN0YWxsIC1nIHBucG1AMTAKCkNPUFkgcG5wbS1sb2NrLnlhbWwgcGFja2FnZS5qc29uIC4vCkNPUFkgcGF0Y2hlcyAuL3BhdGNoZXMKClJVTiBwbnBtIGluc3RhbGwgLS1uby1mcm96ZW4tbG9ja2ZpbGUKCkNPUFkgLiAuCgpSVU4gcG5wbSBidWlsZAoKUlVOIG5weCB3b3JrYm94LWNsaSBnZW5lcmF0ZVNXIHdvcmtib3gtY29uZmlnLmNqcwoKIyBQcm9kdWN0aW9uIHN0YWdlCkZST00gbm9kZToyMi1hbHBpbmUKCldPUktESVIgL2FwcAoKUlVOIG5wbSBpbnN0YWxsIC1nIHBucG1AMTAKCkNPUFkgcG5wbS1sb2NrLnlhbWwgcGFja2FnZS5qc29uIC4vCkNPUFkgcGF0Y2hlcyAuL3BhdGNoZXMKClJVTiBwbnBtIGluc3RhbGwgLS1uby1mcm96ZW4tbG9ja2ZpbGUgLS1wcm9kCgpDT1BZIC0tZnJvbT1idWlsZGVyIC9hcHAvZGlzdCAuL2Rpc3QKCkNPUFkgLS1mcm9tPWJ1aWxkZXIgL2FwcC9jbGllbnQvZGlzdCAuL2Rpc3QvcHVibGljCgpFWFBPU0UgMzAwMAoKSEVBTFRIQ0hFQ0sgLS1pbnRlcnZhbD0zMHMgLS10aW1lb3V0PTEwcyAtLXN0YXJ0LXBlcmlvZD0xNXMgLS1yZXRyaWVzPTMgXAogIENNRCBub2RlIC0taW5wdXQtdHlwZT1tb2R1bGUgLS1ldmFsICJjb25zdCByPWF3YWl0IGZldGNoKCdodHRwOi8vbG9jYWxob3N0OjMwMDAvJyk7aWYoIXIub2spcHJvY2Vzcy5leGl0KDEpOyIKCkNNRCBbIm5vZGUiLCAiZGlzdC9pbmRleC5qcyJdCg==
+      VITETS_B64: aW1wb3J0IGV4cHJlc3MsIHsgdHlwZSBFeHByZXNzIH0gZnJvbSAiZXhwcmVzcyI7CmltcG9ydCBmcyBmcm9tICJmcyI7CmltcG9ydCB7IHR5cGUgU2VydmVyIH0gZnJvbSAiaHR0cCI7CmltcG9ydCBwYXRoIGZyb20gInBhdGgiOwoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHNldHVwVml0ZShhcHA6IEV4cHJlc3MsIHNlcnZlcjogU2VydmVyKSB7CiAgY29uc3QgeyBjcmVhdGVTZXJ2ZXI6IGNyZWF0ZVZpdGVTZXJ2ZXIgfSA9IGF3YWl0IGltcG9ydCgidml0ZSIpOwogIGNvbnN0IHsgZGVmYXVsdDogdml0ZUNvbmZpZyB9ID0gYXdhaXQgaW1wb3J0KCIuLi8uLi92aXRlLmNvbmZpZy5qcyIpOwoKICBjb25zdCB2aXRlID0gYXdhaXQgY3JlYXRlVml0ZVNlcnZlcih7CiAgICAuLi52aXRlQ29uZmlnLAogICAgY29uZmlnRmlsZTogZmFsc2UsCiAgICBzZXJ2ZXI6IHsKICAgICAgbWlkZGxld2FyZU1vZGU6IHRydWUsCiAgICAgIGhtcjogeyBzZXJ2ZXIgfSwKICAgICAgYWxsb3dlZEhvc3RzOiB0cnVlIGFzIGNvbnN0LAogICAgfSwKICAgIGFwcFR5cGU6ICJjdXN0b20iLAogIH0pOwoKICBhcHAudXNlKHZpdGUubWlkZGxld2FyZXMpOwoKICBhcHAudXNlKCIqIiwgYXN5bmMgKHJlcSwgcmVzLCBuZXh0KSA9PiB7CiAgICBjb25zdCB1cmwgPSByZXEub3JpZ2luYWxVcmw7CiAgICB0cnkgewogICAgICBjb25zdCBjbGllbnRUZW1wbGF0ZSA9IHBhdGgucmVzb2x2ZSgKICAgICAgICBpbXBvcnQubWV0YS5kaXJuYW1lLAogICAgICAgICIuLi8uLiIsCiAgICAgICAgImNsaWVudCIsCiAgICAgICAgImluZGV4Lmh0bWwiCiAgICAgICk7CiAgICAgIGxldCB0ZW1wbGF0ZSA9IGF3YWl0IGZzLnByb21pc2VzLnJlYWRGaWxlKGNsaWVudFRlbXBsYXRlLCAidXRmLTgiKTsKICAgICAgY29uc3QgeyBuYW5vaWQgfSA9IGF3YWl0IGltcG9ydCgibmFub2lkIik7CiAgICAgIHRlbXBsYXRlID0gdGVtcGxhdGUucmVwbGFjZSgKICAgICAgICBgc3JjPSIvc3JjL21haW4udHN4ImAsCiAgICAgICAgYHNyYz0iL3NyYy9tYWluLnRzeD92PSR7bmFub2lkKCl9ImAKICAgICAgKTsKICAgICAgY29uc3QgcGFnZSA9IGF3YWl0IHZpdGUudHJhbnNmb3JtSW5kZXhIdG1sKHVybCwgdGVtcGxhdGUpOwogICAgICByZXMuc3RhdHVzKDIwMCkuc2V0KHsgIkNvbnRlbnQtVHlwZSI6ICJ0ZXh0L2h0bWwiIH0pLmVuZChwYWdlKTsKICAgIH0gY2F0Y2ggKGUpIHsKICAgICAgdml0ZS5zc3JGaXhTdGFja3RyYWNlKGUgYXMgRXJyb3IpOwogICAgICBuZXh0KGUpOwogICAgfQogIH0pOwp9CgpleHBvcnQgZnVuY3Rpb24gc2VydmVTdGF0aWMoYXBwOiBFeHByZXNzKSB7CiAgY29uc3QgZGlzdFBhdGggPSBwYXRoLnJlc29sdmUoaW1wb3J0Lm1ldGEuZGlybmFtZSwgInB1YmxpYyIpOwoKICBpZiAoIWZzLmV4aXN0c1N5bmMoZGlzdFBhdGgpKSB7CiAgICBjb25zb2xlLmVycm9yKAogICAgICBgQ291bGQgbm90IGZpbmQgdGhlIGJ1aWxkIGRpcmVjdG9yeTogJHtkaXN0UGF0aH0sIG1ha2Ugc3VyZSB0byBidWlsZCB0aGUgY2xpZW50IGZpcnN0YAogICAgKTsKICB9CgogIGFwcC51c2UoZXhwcmVzcy5zdGF0aWMoZGlzdFBhdGgpKTsKCiAgYXBwLnVzZSgiKiIsIChfcmVxLCByZXMpID0+IHsKICAgIHJlcy5zZW5kRmlsZShwYXRoLnJlc29sdmUoZGlzdFBhdGgsICJpbmRleC5odG1sIikpOwogIH0pOwp9Cg==
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Create or reset branch
+        run: git checkout -B "$BRANCH"
+
+      - name: Write Dockerfile from base64
+        run: echo "$DOCKERFILE_B64" | base64 -d > Dockerfile
+
+      - name: Write server/_core/vite.ts from base64
+        run: echo "$VITETS_B64" | base64 -d > server/_core/vite.ts
+
+      - name: Verify files
+        run: |
+          echo "=== Dockerfile ==="
+          cat Dockerfile
+          echo ""
+          echo "=== Checking /app/public is gone ==="
+          grep "app/public" Dockerfile && echo "ERROR: bad line found" || echo "OK: /app/public not present"
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Dockerfile server/_core/vite.ts
+          git commit -m "fix: remove /app/public COPY, fix static path and ESM healthcheck"
+
+      - name: Push
+        run: git push origin "$BRANCH" --force
+
+      - name: Print PR URL
+        run: |
+          echo "Open PR at:"
+          echo "https://github.com/lwrnckahiga88/copy-of-copy-of-jua-kali-clinical-intelligence-hub/compare/main...$BRANCH"
