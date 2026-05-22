@@ -4,13 +4,11 @@ import { type Server } from "http";
 import path from "path";
 
 export async function setupVite(app: Express, server: Server) {
-  // Dynamic imports â€” vite is never resolved in production
   const { createServer: createViteServer } = await import("vite");
-  const { default: viteConfig } = await import("../../vite.config.js");
 
   const vite = await createViteServer({
-    ...viteConfig,
     configFile: false,
+    root: path.resolve(process.cwd(), "client"),
     server: {
       middlewareMode: true,
       hmr: { server },
@@ -24,16 +22,11 @@ export async function setupVite(app: Express, server: Server) {
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
     try {
-      const clientTemplate = path.resolve(
-        import.meta.dirname,
-        "../..",
-        "client",
-        "index.html"
-      );
+      const clientTemplate = path.resolve(process.cwd(), "client", "index.html");
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       const { nanoid } = await import("nanoid");
       template = template.replace(
-        `src="/src/main.tsx"`,
+        'src="/src/main.tsx"',
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       const page = await vite.transformIndexHtml(url, template);
@@ -46,14 +39,10 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // In production, import.meta.dirname = /app/dist
-  // Client build is copied to /app/dist/public by Dockerfile
   const distPath = path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {
-    console.error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
-    );
+    console.error(`Could not find the build directory: ${distPath}`);
   }
 
   app.use(express.static(distPath));
@@ -61,4 +50,4 @@ export function serveStatic(app: Express) {
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
-}
+  }
