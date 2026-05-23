@@ -1,1492 +1,1224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1e293b">
-    <meta name="description" content="OncoAI PWA v3 - Advanced Medical AI Platform with BRATS-AFRICA, UNet++, Gemini Vision API, and Agentic Pipeline">
-    <title>OncoAI PWA v3 - Medical AI Platform</title>
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22OncoAI%20PWA%20v3%22,%22short_name%22:%22OncoAI%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%231e293b%22,%22theme_color%22:%22%231e293b%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20192%20192%27%3E%3Crect%20fill=%27%233b82f6%27%20width=%27192%27%20height=%27192%27/%3E%3Ctext%20x=%2750%25%27%20y=%2750%25%27%20font-size=%2780%27%20fill=%27white%27%20text-anchor=%27middle%27%20dominant-baseline=%27middle%27%20font-weight=%27bold%27%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}],%22categories%22:[%22medical%22,%22healthcare%22],%22screenshots%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20540%20720%27%3E%3Crect%20fill=%27%231e293b%27%20width=%27540%27%20height=%27720%27/%3E%3Ctext%20x=%2750%25%27%20y=%2750%25%27%20font-size=%27100%27%20fill=%27%233b82f6%27%20text-anchor=%27middle%27%20dominant-baseline=%27middle%27%3EOncoAI%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22540x720%22,%22type%22:%22image/svg+xml%22,%22form_factor%22:%22narrow%22}]}">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #1e40af;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-tertiary: #94a3b8;
-            --border: #475569;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--bg) 0%, #1a1f3a 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-
-        /* Navigation */
-        nav {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1rem;
-            list-style: none;
-        }
-
-        .nav-links button {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .nav-links button:hover {
-            background: var(--bg-tertiary);
-            color: var(--primary);
-        }
-
-        .nav-links button.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Main Content */
-        main {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Pages */
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .card:hover {
-            border-color: var(--primary);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1);
-        }
-
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .card h3 {
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .card p {
-            color: var(--text-tertiary);
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Forms */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 0.375rem;
-            color: var(--text-primary);
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        /* Buttons */
-        button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-        }
-
-        .tab-button {
-            background: none;
-            border: none;
-            color: var(--text-tertiary);
-            padding: 1rem;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab-button.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th {
-            background: var(--bg-tertiary);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        tr:hover {
-            background: var(--bg-tertiary);
-        }
-
-        /* Progress Bar */
-        .progress {
-            width: 100%;
-            height: 8px;
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 0.3s;
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .badge-primary {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--primary);
-        }
-
-        .badge-success {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
-        }
-
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-        }
-
-        /* Upload Area */
-        .upload-area {
-            border: 2px dashed var(--border);
-            border-radius: 0.75rem;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary);
-            background: rgba(59, 130, 246, 0.05);
-        }
-
-        .upload-area.dragover {
-            border-color: var(--primary);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        /* Charts */
-        .chart-container {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            min-height: 300px;
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Alert */
-        .alert {
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid;
-        }
-
-        .alert-info {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--success);
-            color: var(--success);
-        }
-
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            border-color: var(--warning);
-            color: var(--warning);
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            nav {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            main {
-                padding: 1rem;
-            }
-
-            table {
-                font-size: 0.85rem;
-            }
-
-            th, td {
-                padding: 0.5rem;
-            }
-        }
-
-        /* Footer */
-        footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 2rem;
-            text-align: center;
-            color: var(--text-tertiary);
-            margin-top: 3rem;
-        }
-
-        /* Pipeline Visualization */
-        .pipeline-stages {
-            display: flex;
-            gap: 1rem;
-            margin: 2rem 0;
-            overflow-x: auto;
-            padding: 1rem 0;
-        }
-
-        .pipeline-stage {
-            flex: 1;
-            min-width: 150px;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .pipeline-stage.active {
-            border-color: var(--primary);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .pipeline-stage.completed {
-            border-color: var(--success);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .stage-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Grid Layout */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        /* Stats */
-        .stat-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 0.5rem 0;
-        }
-
-        .stat-label {
-            color: var(--text-tertiary);
-            font-size: 0.9rem;
-        }
-    </style>
-<script>
-    // Jua Kali Hub Sync Script
-    window.addEventListener("message", (event) => {
-        if (event.data && event.data.type === "HUB_SYNC") {
-            console.log("Sync data received:", event.data.payload);
-            if (window.onHubSync) window.onHubSync(event.data.payload);
-        }
-    });
-    function broadcastToHub(data) {
-        window.parent.postMessage({ type: "AGENT_DATA", payload: data }, "*");
-    }
-</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Triad Neuro · OncoAI PWA v3 · Jua Kali Hub</title>
+<meta name="theme-color" content="#0f172a"/>
+<style>
+/* ── Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ── Reset & Base ───────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0f172a;--bg2:#1e293b;--bg3:#334155;
+  --border:#334155;--border2:#475569;
+  --primary:#06b6d4;--primary2:#0891b2;
+  --purple:#a78bfa;--purple2:#7c3aed;
+  --pink:#f472b6;--pink2:#db2777;
+  --green:#34d399;--green2:#059669;
+  --orange:#fb923c;--red:#f87171;--blue:#60a5fa;
+  --txt:#f1f5f9;--txt2:#cbd5e1;--txt3:#94a3b8;--txt4:#64748b;
+  --font-mono:'Space Mono',monospace;
+  --font:'DM Sans',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+/* ── Hub Sync Script ───────────────────────────────── */
+/* (handled in JS) */
+
+/* ── Layout ─────────────────────────────────────────── */
+.app{display:flex;flex-direction:column;min-height:100vh;}
+
+/* ── Top Nav ─────────────────────────────────────────── */
+.topnav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:56px;
+  background:rgba(15,23,42,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:200;
+}
+.topnav-brand{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:0.95rem;font-weight:700;color:var(--primary);
+  letter-spacing:-0.5px;
+}
+.topnav-brand span{color:var(--txt3);font-weight:400;}
+.status-pills{display:flex;gap:8px;align-items:center;}
+.pill{
+  font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;
+  padding:3px 10px;border-radius:99px;border:1px solid;
+}
+.pill-green{color:var(--green);border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.08);}
+.pill-purple{color:var(--purple);border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.08);}
+.pill-cyan{color:var(--primary);border-color:rgba(6,182,212,0.3);background:rgba(6,182,212,0.08);}
+.pill-pink{color:var(--pink);border-color:rgba(244,114,182,0.3);background:rgba(244,114,182,0.08);}
+.dot-pulse{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ── Main Body ───────────────────────────────────────── */
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* ── Left Sidebar ────────────────────────────────────── */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;
+  padding:16px 0;
+}
+.sidebar-section{padding:0 12px 16px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.sidebar-label{
+  font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--txt4);padding:8px 8px 6px;
+}
+.tab-btn{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:9px 10px;border:none;background:transparent;
+  color:var(--txt3);font-family:var(--font);font-size:13px;font-weight:500;
+  cursor:pointer;border-radius:8px;transition:all 0.15s;text-align:left;
+}
+.tab-btn:hover{background:rgba(255,255,255,0.05);color:var(--txt);}
+.tab-btn.active{background:rgba(6,182,212,0.12);color:var(--primary);}
+.tab-btn .icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.tab-btn.active .icon{background:rgba(6,182,212,0.2);}
+.tab-btn:not(.active) .icon{background:rgba(255,255,255,0.05);}
+.tab-sub{font-size:10px;color:var(--txt4);margin-top:1px;}
+
+/* Agent mini-cards */
+.agent-mini{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;border-radius:8px;cursor:pointer;
+  transition:background 0.15s;
+}
+.agent-mini:hover{background:rgba(255,255,255,0.04);}
+.agent-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.agent-dot.connected{background:var(--green);}
+.agent-dot.syncing{background:var(--blue);animation:pulse 1.2s ease-in-out infinite;}
+.agent-dot.idle{background:var(--txt4);}
+.agent-name{font-size:11px;color:var(--txt2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.agent-conf{font-size:10px;color:var(--primary);font-family:var(--font-mono);font-weight:700;}
+
+/* System stats */
+.sys-stat{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;}
+.sys-stat-label{font-size:11px;color:var(--txt3);}
+.sys-stat-val{font-size:11px;font-weight:600;}
+
+/* ── Main Content ────────────────────────────────────── */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+
+/* Panel */
+.panel{flex:1;padding:24px;overflow-y:auto;}
+.panel-header{margin-bottom:20px;}
+.panel-title{
+  font-size:1.5rem;font-weight:700;
+  display:flex;align-items:center;gap:10px;
+}
+.panel-sub{font-size:12px;color:var(--txt3);margin-top:4px;font-family:var(--font-mono);}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+
+/* Grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:900px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}.sidebar{width:220px;}}
+@media(max-width:700px){.sidebar{display:none;}.grid2{grid-template-columns:1fr;}}
+
+/* Stat cards */
+.stat-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:14px;text-align:center;
+}
+.stat-val{font-size:1.6rem;font-weight:700;font-family:var(--font-mono);}
+.stat-lbl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+
+/* Progress bars */
+.pbar{width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin:6px 0;}
+.pbar-fill{height:100%;border-radius:3px;transition:width 0.4s;}
+
+/* Wave bars */
+.wave-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.wave-lbl{font-size:10px;color:var(--txt3);width:36px;flex-shrink:0;font-family:var(--font-mono);}
+.wave-val{font-size:10px;color:var(--txt2);width:28px;text-align:right;font-family:var(--font-mono);}
+
+/* Status badges */
+.sbadge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid;
+}
+.sbadge-green{color:var(--green);border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.08);}
+.sbadge-blue{color:var(--blue);border-color:rgba(96,165,250,0.3);background:rgba(96,165,250,0.08);}
+.sbadge-slate{color:var(--txt3);border-color:var(--border);background:rgba(255,255,255,0.04);}
+.sbadge-red{color:var(--red);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.08);}
+
+/* Agent card */
+.agent-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;margin-bottom:8px;
+}
+.agent-card-head{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  cursor:pointer;transition:background 0.15s;
+}
+.agent-card-head:hover{background:rgba(255,255,255,0.04);}
+.agent-card-icon{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.25);
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
+}
+.agent-card-body{padding:10px 12px;border-top:1px solid rgba(255,255,255,0.06);}
+
+/* Sub-module tabs */
+.subtabs{display:flex;gap:4px;padding:4px;background:var(--bg3);border-radius:10px;border:1px solid var(--border);margin-bottom:14px;}
+.subtab{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 6px;border:none;background:transparent;
+  color:var(--txt3);font-family:var(--font);font-size:12px;font-weight:500;
+  cursor:pointer;border-radius:7px;transition:all 0.15s;
+}
+.subtab.active{background:var(--bg2);color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,0.3);}
+
+/* Info rows */
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;background:rgba(255,255,255,0.03);
+  border-radius:7px;border:1px solid var(--border);margin-bottom:6px;
+}
+.info-row-label{font-size:11px;color:var(--txt3);}
+.info-row-val{font-size:11px;font-weight:600;}
+
+/* Pipeline stages */
+.pipe-stages{display:flex;gap:6px;margin:12px 0;overflow-x:auto;padding-bottom:4px;}
+.pipe-stage{
+  flex-shrink:0;min-width:80px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:8px 6px;text-align:center;
+  font-size:10px;color:var(--txt3);transition:all 0.3s;
+}
+.pipe-stage .ps-icon{font-size:18px;margin-bottom:4px;}
+.pipe-stage.ps-active{border-color:var(--blue);background:rgba(96,165,250,0.08);color:var(--blue);}
+.pipe-stage.ps-done{border-color:var(--green);background:rgba(52,211,153,0.08);color:var(--green);}
+
+/* Topology canvas */
+.topology-wrap{
+  position:relative;height:140px;
+  background:rgba(15,23,42,0.6);border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;margin:10px 0;
+}
+.topo-svg{position:absolute;inset:0;width:100%;height:100%;}
+.topo-center{
+  position:absolute;width:36px;height:36px;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  border-radius:50%;background:rgba(167,139,250,0.25);
+  border:2px solid rgba(167,139,250,0.5);
+  display:flex;align-items:center;justify-content:center;font-size:16px;z-index:2;
+}
+.topo-node{
+  position:absolute;width:22px;height:22px;border-radius:50%;
+  border:1px solid;display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:#fff;font-weight:700;transform:translate(-50%,-50%);z-index:2;
+}
+
+/* Buttons */
+.btn{
+  padding:9px 18px;border:none;border-radius:8px;
+  font-family:var(--font);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn-cyan{background:var(--primary2);color:#fff;}
+.btn-cyan:hover{background:var(--primary);transform:translateY(-1px);}
+.btn-pink{background:var(--pink2);color:#fff;}
+.btn-pink:hover{background:var(--pink);}
+.btn-purple{background:var(--purple2);color:#fff;}
+.btn-purple:hover{background:var(--purple);}
+.btn-ghost{background:rgba(255,255,255,0.06);color:var(--txt2);border:1px solid var(--border);}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);}
+.btn-sm{padding:6px 12px;font-size:11px;}
+.btn-full{width:100%;justify-content:center;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
+
+/* Spinning */
+@keyframes spin{to{transform:rotate(360deg);}}
+.spinning{animation:spin 0.8s linear infinite;display:inline-block;}
+
+/* OncoAI iframe panel */
+#oncoai-iframe-wrap{
+  width:100%;height:100%;
+  display:none;flex-direction:column;
+}
+#oncoai-iframe-wrap.visible{display:flex;}
+#oncoai-frame{border:none;flex:1;border-radius:0;background:var(--bg);}
+
+/* Sync indicator */
+.sync-bar{
+  display:flex;align-items:center;gap:8px;padding:6px 16px;
+  background:rgba(6,182,212,0.06);border-bottom:1px solid rgba(6,182,212,0.15);
+  font-size:11px;color:var(--primary);
+}
+.sync-bar-dot{width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 1.5s ease-in-out infinite;}
+
+/* EEG waveform fake animation */
+.eeg-wave{
+  width:100%;height:60px;
+  background:var(--bg3);border-radius:8px;overflow:hidden;position:relative;
+  margin:10px 0;border:1px solid var(--border);
+}
+.eeg-wave canvas{display:block;}
+
+/* Risk grid */
+.risk-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0;}
+.risk-cell{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:8px;padding:10px;text-align:center;
+}
+.risk-pct{font-size:1.4rem;font-weight:700;font-family:var(--font-mono);}
+.risk-name{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* Table */
+.data-table{width:100%;border-collapse:collapse;font-size:12px;}
+.data-table th{background:var(--bg3);padding:8px 10px;text-align:left;color:var(--txt3);font-weight:600;border-bottom:1px solid var(--border);}
+.data-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.data-table tr:hover td{background:rgba(255,255,255,0.02);}
+
+/* Code block */
+.code-block{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:12px;font-family:var(--font-mono);font-size:10px;
+  color:var(--green);overflow-x:auto;line-height:1.8;
+}
+
+/* Alert */
+.alert{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:10px;border-left:3px solid;}
+.alert-info{background:rgba(96,165,250,0.08);border-color:var(--blue);color:var(--blue);}
+.alert-success{background:rgba(52,211,153,0.08);border-color:var(--green);color:var(--green);}
+.alert-warn{background:rgba(251,146,60,0.08);border-color:var(--orange);color:var(--orange);}
+
+/* Section heading */
+.sec-heading{font-size:12px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;}
+
+/* Fade in */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp 0.25s ease;}
+
+/* Neuro topology legend */
+.topo-legend{display:flex;gap:12px;justify-content:center;margin-top:4px;}
+.topo-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt3);}
+.topo-leg-dot{width:8px;height:8px;border-radius:50%;}
+</style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Navigation -->
-        <nav>
-            <div class="nav-brand">🧠 OncoAI PWA v3</div>
-            <ul class="nav-links">
-                <li><button class="nav-btn" data-page="home">Home</button></li>
-                <li><button class="nav-btn" data-page="imaging">Imaging</button></li>
-                <li><button class="nav-btn" data-page="pipeline">Pipeline</button></li>
-                <li><button class="nav-btn" data-page="treatment">Treatment</button></li>
-                <li><button class="nav-btn" data-page="about">About</button></li>
-            </ul>
-        </nav>
+<div class="app">
 
-        <!-- Main Content -->
-        <main>
-            <!-- Home Page -->
-            <div id="home" class="page active">
-                <div class="hero">
-                    <h1>OncoAI PWA v3</h1>
-                    <p>Advanced Medical AI Platform with BRATS-AFRICA Dataset, UNet++ Segmentation, Gemini Vision API, and Agentic Pipeline Orchestration</p>
-                </div>
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="topnav-brand">
+    🧠 Triad Neuro <span>· OncoAI PWA v3 · Jua Kali Hub</span>
+  </div>
+  <div class="status-pills">
+    <span class="pill pill-green"><span class="dot-pulse"></span> 8 Agents</span>
+    <span class="pill pill-pink">OncoAI v3</span>
+    <span class="pill pill-purple">Neuro-Sync</span>
+    <span class="pill pill-cyan">EEG Live</span>
+  </div>
+</div>
 
-                <div class="cards-grid">
-                    <div class="card" onclick="navigateTo('imaging')">
-                        <div class="card-icon">🖼️</div>
-                        <h3>Medical Imaging</h3>
-                        <p>Upload and analyze brain MRI scans with AI-powered segmentation using UNet++</p>
-                        <button class="btn-primary">Access →</button>
-                    </div>
+<!-- BODY -->
+<div class="body">
 
-                    <div class="card" onclick="navigateTo('pipeline')">
-                        <div class="card-icon">⚡</div>
-                        <h3>Agentic Pipeline</h3>
-                        <p>Multi-agent collaboration for comprehensive medical image analysis and decision support</p>
-                        <button class="btn-primary">Explore →</button>
-                    </div>
-
-                    <div class="card" onclick="navigateTo('treatment')">
-                        <div class="card-icon">📈</div>
-                        <h3>Treatment Optimization</h3>
-                        <p>DQN-based reinforcement learning for personalized oncology treatment recommendations</p>
-                        <button class="btn-primary">View →</button>
-                    </div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="stat-card">
-                        <div class="stat-label">Dataset</div>
-                        <div class="stat-value">BRATS</div>
-                        <p style="color: var(--text-tertiary); font-size: 0.85rem;">African Brain Tumor Scans</p>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Segmentation</div>
-                        <div class="stat-value">UNet++</div>
-                        <p style="color: var(--text-tertiary); font-size: 0.85rem;">Nested U-Net Architecture</p>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Vision API</div>
-                        <div class="stat-value">Gemini</div>
-                        <p style="color: var(--text-tertiary); font-size: 0.85rem;">Multi-modal Analysis</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Imaging Page -->
-            <div id="imaging" class="page">
-                <h2>Medical Imaging Dashboard</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Upload and analyze brain MRI scans</p>
-
-                <div class="grid-2">
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">Upload MRI Scan</h3>
-                        <div class="upload-area" id="uploadArea">
-                            <div style="font-size: 2rem; margin-bottom: 1rem;">📁</div>
-                            <p>Click to upload or drag and drop</p>
-                            <p style="color: var(--text-tertiary); font-size: 0.85rem; margin-top: 0.5rem;">NIfTI, DICOM up to 500MB</p>
-                            <input type="file" id="fileInput" accept=".nii,.nii.gz,.dcm" style="display: none;">
-                        </div>
-                        <div id="uploadProgress" style="display: none; margin-top: 1rem;">
-                            <p style="margin-bottom: 0.5rem;">Uploading... <span id="progressPercent">0</span>%</p>
-                            <div class="progress">
-                                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">Your MRI Scans</h3>
-                        <div id="imagesList" style="max-height: 400px; overflow-y: auto;">
-                            <p style="color: var(--text-tertiary);">No images uploaded yet</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <h3 style="margin-bottom: 1rem;">Segmentation Results</h3>
-                    <div class="tabs">
-                        <button class="tab-button active" onclick="switchTab(event, 'segmentation-results')">Results</button>
-                        <button class="tab-button" onclick="switchTab(event, 'segmentation-metrics')">Metrics</button>
-                        <button class="tab-button" onclick="switchTab(event, 'segmentation-history')">History</button>
-                    </div>
-
-                    <div id="segmentation-results" class="tab-content active">
-                        <div id="resultsContainer" style="color: var(--text-tertiary);">
-                            Select an image to view segmentation results
-                        </div>
-                    </div>
-
-                    <div id="segmentation-metrics" class="tab-content">
-                        <div class="grid-3">
-                            <div class="stat-card">
-                                <div class="stat-label">Dice Score</div>
-                                <div class="stat-value" id="diceScore">—</div>
-                                <p style="color: var(--text-tertiary); font-size: 0.85rem;">Target: ≥ 0.85</p>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">IoU Score</div>
-                                <div class="stat-value" id="iouScore">—</div>
-                                <p style="color: var(--text-tertiary); font-size: 0.85rem;">Target: ≥ 0.80</p>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Tumor Volume</div>
-                                <div class="stat-value" id="tumorVolume">—</div>
-                                <p style="color: var(--text-tertiary); font-size: 0.85rem;">mm³</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="segmentation-history" class="tab-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Dice Score</th>
-                                    <th>IoU Score</th>
-                                    <th>Tumor Volume</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historyTable">
-                                <tr>
-                                    <td colspan="5" style="text-align: center; color: var(--text-tertiary);">No segmentation history</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pipeline Page -->
-            <div id="pipeline" class="page">
-                <h2>Agentic Pipeline Orchestration</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Multi-agent collaboration for medical image analysis</p>
-
-                <div class="grid-2">
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">Pipeline Runs</h3>
-                        <button class="btn-primary" onclick="startPipeline()" style="width: 100%; margin-bottom: 1rem;">Start New Pipeline</button>
-                        <div id="pipelineList" style="max-height: 400px; overflow-y: auto;">
-                            <p style="color: var(--text-tertiary);">No pipeline runs yet</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">Pipeline Stages</h3>
-                        <div id="pipelineStages" class="pipeline-stages">
-                            <div class="pipeline-stage" title="Image Upload">
-                                <div class="stage-icon">📤</div>
-                                <small>Upload</small>
-                            </div>
-                            <div class="pipeline-stage" title="Preprocessing">
-                                <div class="stage-icon">⚙️</div>
-                                <small>Preprocess</small>
-                            </div>
-                            <div class="pipeline-stage" title="Segmentation">
-                                <div class="stage-icon">🎯</div>
-                                <small>Segment</small>
-                            </div>
-                            <div class="pipeline-stage" title="Gemini Analysis">
-                                <div class="stage-icon">🤖</div>
-                                <small>Gemini</small>
-                            </div>
-                            <div class="pipeline-stage" title="Clinical Integration">
-                                <div class="stage-icon">🏥</div>
-                                <small>Clinical</small>
-                            </div>
-                            <div class="pipeline-stage" title="Treatment Optimization">
-                                <div class="stage-icon">💊</div>
-                                <small>Treatment</small>
-                            </div>
-                            <div class="pipeline-stage" title="Decision Support">
-                                <div class="stage-icon">📊</div>
-                                <small>Decision</small>
-                            </div>
-                            <div class="pipeline-stage" title="Final Report">
-                                <div class="stage-icon">📄</div>
-                                <small>Report</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <h3 style="margin-bottom: 1rem;">Agent Communication</h3>
-                    <div class="tabs">
-                        <button class="tab-button active" onclick="switchTab(event, 'agent-messages')">Messages</button>
-                        <button class="tab-button" onclick="switchTab(event, 'agent-metrics')">Metrics</button>
-                        <button class="tab-button" onclick="switchTab(event, 'agent-workflow')">Workflow</button>
-                    </div>
-
-                    <div id="agent-messages" class="tab-content active">
-                        <div id="messagesContainer" style="max-height: 400px; overflow-y: auto; color: var(--text-tertiary);">
-                            No agent messages yet
-                        </div>
-                    </div>
-
-                    <div id="agent-metrics" class="tab-content">
-                        <div class="grid-3">
-                            <div class="stat-card">
-                                <div class="stat-label">Total Messages</div>
-                                <div class="stat-value" id="totalMessages">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Success Rate</div>
-                                <div class="stat-value" id="successRate">0%</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Duration</div>
-                                <div class="stat-value" id="pipelineDuration">0s</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="agent-workflow" class="tab-content">
-                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Agentic Pipeline Workflow:</p>
-                        <ol style="color: var(--text-secondary); line-height: 2;">
-                            <li><strong>IMAGE_UPLOAD:</strong> Receive and validate medical image</li>
-                            <li><strong>IMAGE_PREPROCESSING:</strong> Normalize, skull strip, register MRI</li>
-                            <li><strong>SEGMENTATION:</strong> Run UNet++ model for tumor segmentation</li>
-                            <li><strong>GEMINI_ANALYSIS:</strong> Multi-modal analysis with Gemini Vision API</li>
-                            <li><strong>CLINICAL_INTEGRATION:</strong> Integrate findings with patient records</li>
-                            <li><strong>TREATMENT_OPTIMIZATION:</strong> Apply DQN RL for treatment selection</li>
-                            <li><strong>DECISION_SUPPORT:</strong> Generate clinical recommendations</li>
-                            <li><strong>FINAL_REPORT:</strong> Create FHIR R4 compliant report</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Treatment Page -->
-            <div id="treatment" class="page">
-                <h2>Treatment Optimization</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">DQN-based reinforcement learning for personalized oncology treatment</p>
-
-                <div class="alert alert-info">
-                    <strong>Recommended Action:</strong> Immunotherapy (Q-value: 0.71, Confidence: 88%)
-                </div>
-
-                <div class="grid-2">
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">DQN Q-Values</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Treatment Action</th>
-                                    <th>Q-Value</th>
-                                    <th>Confidence</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Chemo Low</td>
-                                    <td><span class="badge badge-danger">0.45</span></td>
-                                    <td>72%</td>
-                                </tr>
-                                <tr>
-                                    <td>Chemo Med</td>
-                                    <td><span class="badge badge-warning">0.62</span></td>
-                                    <td>85%</td>
-                                </tr>
-                                <tr>
-                                    <td>Immunotherapy</td>
-                                    <td><span class="badge badge-success">0.71</span></td>
-                                    <td>88%</td>
-                                </tr>
-                                <tr>
-                                    <td>Combo A</td>
-                                    <td><span class="badge badge-success">0.68</span></td>
-                                    <td>84%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">IQVIA Quintiles</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Quintile</th>
-                                    <th>Patients</th>
-                                    <th>Avg Survival</th>
-                                    <th>Risk</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Q1 (Lowest)</td>
-                                    <td>2</td>
-                                    <td>45%</td>
-                                    <td><span class="badge badge-danger">Critical</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q3 (Median)</td>
-                                    <td>12</td>
-                                    <td>75%</td>
-                                    <td><span class="badge badge-warning">Medium</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q5 (Highest)</td>
-                                    <td>3</td>
-                                    <td>92%</td>
-                                    <td><span class="badge badge-success">Very Low</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <h3 style="margin-bottom: 1rem;">Clinical Decision Support</h3>
-                    <div class="tabs">
-                        <button class="tab-button active" onclick="switchTab(event, 'recommendations')">Recommendations</button>
-                        <button class="tab-button" onclick="switchTab(event, 'trajectory')">Trajectory</button>
-                        <button class="tab-button" onclick="switchTab(event, 'fhir')">FHIR Export</button>
-                    </div>
-
-                    <div id="recommendations" class="tab-content active">
-                        <div class="alert alert-success">
-                            <strong>Primary Recommendation:</strong> Immunotherapy is recommended based on DQN optimization with 88% confidence.
-                        </div>
-                        <div class="alert alert-info">
-                            <strong>Clinical Considerations:</strong>
-                            <ul style="margin-top: 0.5rem; margin-left: 1rem;">
-                                <li>Patient stratification: IQVIA Quintile Q3 (Median Risk)</li>
-                                <li>Imaging findings: Tumor volume 32,000 mm³, significant edema</li>
-                                <li>Projected outcome: 78% survival probability at 28 days</li>
-                                <li>Monitor for adverse effects and adjust as needed</li>
-                            </ul>
-                        </div>
-                        <div class="alert alert-warning">
-                            <strong>Alternative Options:</strong> Combo A (Q-value: 0.68) and Chemo Med (Q-value: 0.62) are viable alternatives with similar expected outcomes.
-                        </div>
-                    </div>
-
-                    <div id="trajectory" class="tab-content">
-                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Projected Treatment Outcome Trajectory:</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Day</th>
-                                    <th>Tumor Volume</th>
-                                    <th>Edema Volume</th>
-                                    <th>Survival Prob</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>45,000 mm³</td>
-                                    <td>28,000 mm³</td>
-                                    <td><span class="badge badge-warning">65%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>7</td>
-                                    <td>42,000 mm³</td>
-                                    <td>26,000 mm³</td>
-                                    <td><span class="badge badge-warning">68%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>14</td>
-                                    <td>38,000 mm³</td>
-                                    <td>23,000 mm³</td>
-                                    <td><span class="badge badge-primary">72%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>28</td>
-                                    <td>32,000 mm³</td>
-                                    <td>18,000 mm³</td>
-                                    <td><span class="badge badge-success">78%</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="fhir" class="tab-content">
-                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">FHIR R4 DiagnosticReport Export:</p>
-                        <pre style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0.375rem; padding: 1rem; overflow-x: auto; color: var(--text-secondary); font-size: 0.85rem;">{
-  "resourceType": "DiagnosticReport",
-  "status": "final",
-  "code": {
-    "coding": [{
-      "system": "http://loinc.org",
-      "code": "72134-0",
-      "display": "Brain MRI"
-    }]
-  },
-  "result": [{
-    "reference": "Observation/tumor-segmentation",
-    "display": "Brain Tumor Segmentation"
-  }],
-  "conclusion": "Immunotherapy recommended with 88% confidence"
-}</pre>
-                    </div>
-                </div>
-            </div>
-
-            <!-- About Page -->
-            <div id="about" class="page">
-                <h2>About OncoAI PWA v3</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Advanced Medical AI Platform for Oncology Treatment Optimization</p>
-
-                <div class="grid-2">
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">🧠 Core Technologies</h3>
-                        <ul style="color: var(--text-secondary); line-height: 2; margin-left: 1rem;">
-                            <li><strong>BRATS-AFRICA Dataset:</strong> Brain tumor MRI scans from African populations</li>
-                            <li><strong>UNet++ Segmentation:</strong> Nested U-Net architecture for precise tumor delineation</li>
-                            <li><strong>Gemini Vision API:</strong> Multi-modal medical image analysis and clinical findings extraction</li>
-                            <li><strong>Agentic Pipeline:</strong> 8-stage orchestration with multi-agent collaboration</li>
-                            <li><strong>DQN Reinforcement Learning:</strong> Deep Q-Network for treatment optimization</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 style="margin-bottom: 1rem;">📋 Features</h3>
-                        <ul style="color: var(--text-secondary); line-height: 2; margin-left: 1rem;">
-                            <li>Medical image upload and preprocessing</li>
-                            <li>Brain tumor segmentation with quality metrics</li>
-                            <li>Multi-agent collaborative analysis</li>
-                            <li>Clinical decision support system</li>
-                            <li>FHIR R4 compliant reporting</li>
-                            <li>IQVIA quintile stratification</li>
-                            <li>Treatment outcome trajectory visualization</li>
-                            <li>Offline-first PWA capability</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <h3 style="margin-bottom: 1rem;">🔬 Pipeline Architecture</h3>
-                    <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; color: var(--text-secondary);">
-                        <p style="margin-bottom: 1rem;">The agentic pipeline orchestrates 8 stages of medical AI analysis:</p>
-                        <ol style="line-height: 2; margin-left: 1rem;">
-                            <li><strong>IMAGE_UPLOAD:</strong> Receive and validate medical image</li>
-                            <li><strong>IMAGE_PREPROCESSING:</strong> Normalize, skull strip, register MRI</li>
-                            <li><strong>SEGMENTATION:</strong> Run UNet++ model for tumor segmentation</li>
-                            <li><strong>GEMINI_ANALYSIS:</strong> Multi-modal analysis with Gemini Vision API</li>
-                            <li><strong>CLINICAL_INTEGRATION:</strong> Integrate findings with patient records</li>
-                            <li><strong>TREATMENT_OPTIMIZATION:</strong> Apply DQN RL for treatment selection</li>
-                            <li><strong>DECISION_SUPPORT:</strong> Generate clinical recommendations</li>
-                            <li><strong>FINAL_REPORT:</strong> Create FHIR R4 compliant report</li>
-                        </ol>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <h3 style="margin-bottom: 1rem;">🌍 Africa-Ready Infrastructure</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">OncoAI PWA v3 is designed with African healthcare systems in mind:</p>
-                    <ul style="color: var(--text-secondary); line-height: 2; margin-left: 1rem;">
-                        <li>✓ Offline-first architecture for unreliable connectivity</li>
-                        <li>✓ Lightweight PWA for low-bandwidth environments</li>
-                        <li>✓ BRATS-AFRICA dataset with African population representation</li>
-                        <li>✓ Multi-language support ready</li>
-                        <li>✓ Local data storage with optional cloud sync</li>
-                        <li>✓ FHIR R4 compliance for healthcare interoperability</li>
-                    </ul>
-                </div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer>
-            <p>OncoAI PWA v3 - Advanced Medical AI Platform</p>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Integrating BRATS-AFRICA, UNet++, Gemini Vision API, and Agentic AI Workflows</p>
-        </footer>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Triad Modules</div>
+      <button class="tab-btn active" onclick="switchTab('eeg',this)">
+        <span class="icon">⚡</span>
+        <div><div>EEG Analysis</div><div class="tab-sub">Live brain waves</div></div>
+      </button>
+      <button class="tab-btn" onclick="switchTab('oncoai',this)">
+        <span class="icon">🧪</span>
+        <div><div>OncoAI PWA v3</div><div class="tab-sub">Full platform</div></div>
+      </button>
+      <button class="tab-btn" onclick="switchTab('neurosync',this)">
+        <span class="icon">🌐</span>
+        <div><div>Neuro-Sync</div><div class="tab-sub">Agent network</div></div>
+      </button>
     </div>
 
-    <!-- Service Worker Registration -->
-    <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
-                const CACHE_NAME = 'oncoai-pwa-v3-cache-1';
-                const urlsToCache = [
-                    '/',
-                    '/index.html',
-                    '/manifest.json'
-                ];
-
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME).then(cache => {
-                            return cache.addAll(urlsToCache).catch(() => {
-                                console.log('Cache addAll failed, continuing...');
-                            });
-                        })
-                    );
-                    self.skipWaiting();
-                });
-
-                self.addEventListener('activate', event => {
-                    event.waitUntil(
-                        caches.keys().then(cacheNames => {
-                            return Promise.all(
-                                cacheNames.map(cacheName => {
-                                    if (cacheName !== CACHE_NAME) {
-                                        return caches.delete(cacheName);
-                                    }
-                                })
-                            );
-                        })
-                    );
-                    self.clients.claim();
-                });
-
-                self.addEventListener('fetch', event => {
-                    if (event.request.method !== 'GET') {
-                        return;
-                    }
-
-                    event.respondWith(
-                        caches.match(event.request).then(response => {
-                            if (response) {
-                                return response;
-                            }
-
-                            return fetch(event.request).then(response => {
-                                if (!response || response.status !== 200 || response.type !== 'basic') {
-                                    return response;
-                                }
-
-                                const responseToCache = response.clone();
-                                caches.open(CACHE_NAME).then(cache => {
-                                    cache.put(event.request, responseToCache);
-                                });
-
-                                return response;
-                            }).catch(() => {
-                                return caches.match('/index.html');
-                            });
-                        })
-                    );
-                });
-
-                self.addEventListener('message', event => {
-                    if (event.data && event.data.type === 'SKIP_WAITING') {
-                        self.skipWaiting();
-                    }
-                });
-            `)).catch(err => console.log('SW registration failed:', err));
-        }
-    </script>
-
-    <!-- Application Logic -->
-    <script>
-        // State Management
-        const state = {
-            currentPage: 'home',
-            images: [],
-            pipelineRuns: [],
-            agentMessages: [],
-            selectedImage: null,
-            selectedPipeline: null
-        };
-
-        // Initialize IndexedDB for offline storage
-        let db;
-        const dbRequest = indexedDB.open('OncoAI', 1);
-
-        dbRequest.onerror = () => console.error('DB error:', dbRequest.error);
-        dbRequest.onsuccess = () => {
-            db = dbRequest.result;
-            console.log('Database initialized');
-        };
-
-        dbRequest.onupgradeneeded = (event) => {
-            db = event.target.result;
-            if (!db.objectStoreNames.contains('images')) {
-                db.createObjectStore('images', { keyPath: 'id', autoIncrement: true });
-            }
-            if (!db.objectStoreNames.contains('pipelines')) {
-                db.createObjectStore('pipelines', { keyPath: 'id', autoIncrement: true });
-            }
-            if (!db.objectStoreNames.contains('messages')) {
-                db.createObjectStore('messages', { keyPath: 'id', autoIncrement: true });
-            }
-        };
-
-        // Navigation
-        function navigateTo(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[data-page="${page}"]`).classList.add('active');
-            state.currentPage = page;
-            window.scrollTo(0, 0);
-        }
-
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const page = e.target.dataset.page;
-                navigateTo(page);
-            });
-        });
-
-        // Tab Switching
-        function switchTab(event, tabId) {
-            event.preventDefault();
-            const tabContent = document.querySelectorAll('.tab-content');
-            const tabButtons = event.target.parentElement.querySelectorAll('.tab-button');
-
-            tabContent.forEach(content => content.classList.remove('active'));
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // File Upload Handler
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-
-        if (uploadArea) {
-            uploadArea.addEventListener('click', () => fileInput.click());
-
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                handleFileUpload(e.dataTransfer.files);
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                handleFileUpload(e.target.files);
-            });
-        }
-
-        function handleFileUpload(files) {
-            if (files.length === 0) return;
-
-            const file = files[0];
-            const progressDiv = document.getElementById('uploadProgress');
-            const progressBar = document.getElementById('progressBar');
-            const progressPercent = document.getElementById('progressPercent');
-
-            progressDiv.style.display = 'block';
-
-            // Simulate upload progress
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 30;
-                if (progress > 100) progress = 100;
-
-                progressBar.style.width = progress + '%';
-                progressPercent.textContent = Math.floor(progress);
-
-                if (progress === 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        progressDiv.style.display = 'none';
-                        addImageToList(file.name);
-                    }, 500);
-                }
-            }, 200);
-        }
-
-        function addImageToList(fileName) {
-            const image = {
-                id: Date.now(),
-                name: fileName,
-                date: new Date().toLocaleDateString(),
-                status: 'COMPLETED',
-                diceScore: 0.87 + Math.random() * 0.1,
-                iouScore: 0.78 + Math.random() * 0.1,
-                tumorVolume: 30000 + Math.random() * 10000
-            };
-
-            state.images.push(image);
-
-            // Save to IndexedDB
-            if (db) {
-                const transaction = db.transaction(['images'], 'readwrite');
-                transaction.objectStore('images').add(image);
-            }
-
-            updateImagesList();
-        }
-
-        function updateImagesList() {
-            const imagesList = document.getElementById('imagesList');
-            if (!imagesList) return;
-
-            if (state.images.length === 0) {
-                imagesList.innerHTML = '<p style="color: var(--text-tertiary);">No images uploaded yet</p>';
-                return;
-            }
-
-            imagesList.innerHTML = state.images.map(img => `
-                <div class="card" onclick="selectImage(${img.id})" style="cursor: pointer; margin-bottom: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <div>
-                            <p style="font-weight: 500; color: var(--text-primary);">${img.name}</p>
-                            <p style="font-size: 0.85rem; color: var(--text-tertiary);">${img.date}</p>
-                        </div>
-                        <span class="badge badge-success">${img.status}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function selectImage(imageId) {
-            state.selectedImage = imageId;
-            const image = state.images.find(img => img.id === imageId);
-
-            if (image) {
-                document.getElementById('diceScore').textContent = image.diceScore.toFixed(3);
-                document.getElementById('iouScore').textContent = image.iouScore.toFixed(3);
-                document.getElementById('tumorVolume').textContent = Math.floor(image.tumorVolume).toLocaleString();
-
-                const historyTable = document.getElementById('historyTable');
-                historyTable.innerHTML = `
-                    <tr>
-                        <td>${image.date}</td>
-                        <td><span class="badge badge-success">${image.diceScore.toFixed(3)}</span></td>
-                        <td><span class="badge badge-success">${image.iouScore.toFixed(3)}</span></td>
-                        <td>${Math.floor(image.tumorVolume)} mm³</td>
-                        <td><span class="badge badge-success">${image.status}</span></td>
-                    </tr>
-                `;
-            }
-        }
-
-        // Pipeline Management
-        function startPipeline() {
-            const pipeline = {
-                id: Date.now(),
-                patientId: `PT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-                startTime: new Date(),
-                currentStage: 'IMAGE_UPLOAD',
-                status: 'PROCESSING',
-                progress: 0
-            };
-
-            state.pipelineRuns.push(pipeline);
-
-            // Save to IndexedDB
-            if (db) {
-                const transaction = db.transaction(['pipelines'], 'readwrite');
-                transaction.objectStore('pipelines').add(pipeline);
-            }
-
-            state.selectedPipeline = pipeline.id;
-            updatePipelineList();
-            simulatePipelineExecution(pipeline.id);
-        }
-
-        function updatePipelineList() {
-            const pipelineList = document.getElementById('pipelineList');
-            if (!pipelineList) return;
-
-            if (state.pipelineRuns.length === 0) {
-                pipelineList.innerHTML = '<p style="color: var(--text-tertiary);">No pipeline runs yet</p>';
-                return;
-            }
-
-            pipelineList.innerHTML = state.pipelineRuns.map(run => `
-                <div class="card" onclick="selectPipeline(${run.id})" style="cursor: pointer; margin-bottom: 1rem; ${state.selectedPipeline === run.id ? 'border-color: var(--primary);' : ''}">
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <div>
-                            <p style="font-weight: 500; color: var(--text-primary);">${run.patientId}</p>
-                            <p style="font-size: 0.85rem; color: var(--text-tertiary);">${run.currentStage}</p>
-                        </div>
-                        <span class="badge ${run.status === 'COMPLETED' ? 'badge-success' : run.status === 'FAILED' ? 'badge-danger' : 'badge-warning'}">${run.status}</span>
-                    </div>
-                    <div class="progress" style="margin-top: 0.5rem;">
-                        <div class="progress-bar" style="width: ${run.progress}%"></div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function selectPipeline(pipelineId) {
-            state.selectedPipeline = pipelineId;
-            updatePipelineList();
-            updateAgentMessages();
-        }
-
-        function simulatePipelineExecution(pipelineId) {
-            const stages = ['IMAGE_UPLOAD', 'IMAGE_PREPROCESSING', 'SEGMENTATION', 'GEMINI_ANALYSIS', 'CLINICAL_INTEGRATION', 'TREATMENT_OPTIMIZATION', 'DECISION_SUPPORT', 'FINAL_REPORT'];
-            let stageIndex = 0;
-
-            const interval = setInterval(() => {
-                const pipeline = state.pipelineRuns.find(p => p.id === pipelineId);
-                if (!pipeline) {
-                    clearInterval(interval);
-                    return;
-                }
-
-                if (stageIndex < stages.length) {
-                    pipeline.currentStage = stages[stageIndex];
-                    pipeline.progress = ((stageIndex + 1) / stages.length) * 100;
-
-                    // Add agent message
-                    addAgentMessage(pipelineId, `AGENT_${stageIndex}`, `AGENT_${stageIndex + 1}`, stages[stageIndex]);
-
-                    // Update pipeline stages visualization
-                    updatePipelineStages(stageIndex);
-
-                    stageIndex++;
-                } else {
-                    pipeline.status = 'COMPLETED';
-                    pipeline.progress = 100;
-                    clearInterval(interval);
-                }
-
-                updatePipelineList();
-            }, 1500);
-        }
-
-        function updatePipelineStages(completedIndex) {
-            const stages = document.querySelectorAll('.pipeline-stage');
-            stages.forEach((stage, index) => {
-                stage.classList.remove('active', 'completed');
-                if (index < completedIndex) {
-                    stage.classList.add('completed');
-                } else if (index === completedIndex) {
-                    stage.classList.add('active');
-                }
-            });
-        }
-
-        function addAgentMessage(pipelineId, fromAgent, toAgent, messageType) {
-            const message = {
-                id: Date.now(),
-                pipelineId,
-                fromAgent,
-                toAgent,
-                messageType,
-                timestamp: new Date(),
-                status: 'COMPLETED'
-            };
-
-            state.agentMessages.push(message);
-
-            // Save to IndexedDB
-            if (db) {
-                const transaction = db.transaction(['messages'], 'readwrite');
-                transaction.objectStore('messages').add(message);
-            }
-
-            if (state.selectedPipeline === pipelineId) {
-                updateAgentMessages();
-            }
-        }
-
-        function updateAgentMessages() {
-            const messagesContainer = document.getElementById('messagesContainer');
-            if (!messagesContainer) return;
-
-            const messages = state.agentMessages.filter(m => m.pipelineId === state.selectedPipeline);
-
-            if (messages.length === 0) {
-                messagesContainer.innerHTML = '<p style="color: var(--text-tertiary);">No agent messages yet</p>';
-                return;
-            }
-
-            messagesContainer.innerHTML = messages.slice(-10).map(msg => `
-                <div style="background: var(--bg-tertiary); border-left: 3px solid var(--primary); padding: 1rem; margin-bottom: 0.5rem; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <span style="font-weight: 500; color: var(--text-primary);">${msg.fromAgent} → ${msg.toAgent}</span>
-                        <span class="badge badge-success">${msg.status}</span>
-                    </div>
-                    <p style="font-size: 0.85rem; color: var(--text-secondary);">${msg.messageType}</p>
-                    <p style="font-size: 0.75rem; color: var(--text-tertiary);">${msg.timestamp.toLocaleTimeString()}</p>
-                </div>
-            `).join('');
-
-            // Update metrics
-            const totalMessages = messages.length;
-            const completedMessages = messages.filter(m => m.status === 'COMPLETED').length;
-            const successRate = totalMessages > 0 ? (completedMessages / totalMessages * 100).toFixed(0) : 0;
-
-            document.getElementById('totalMessages').textContent = totalMessages;
-            document.getElementById('successRate').textContent = successRate + '%';
-
-            const pipeline = state.pipelineRuns.find(p => p.id === state.selectedPipeline);
-            if (pipeline) {
-                const duration = (new Date() - pipeline.startTime) / 1000;
-                document.getElementById('pipelineDuration').textContent = duration.toFixed(1) + 's';
-            }
-        }
-
-        // Initialize
-        updateImagesList();
-        updatePipelineList();
-
-        // PWA Install Prompt
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            console.log('PWA install prompt available');
-        });
-
-        // Check for updates
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(registration => {
-                registration.addEventListener('updatefound', () => {
-                    console.log('Service Worker update found');
-                });
-            });
-        }
-
-        console.log('OncoAI PWA v3 initialized');
-    </script>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Agent Network</div>
+      <div id="sidebar-agents"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">System Overview</div>
+      <div id="sidebar-stats"></div>
+    </div>
+
+    <div style="padding:12px;">
+      <div class="sidebar-label">OncoAI Quick Access</div>
+      <div class="card-sm" style="padding:10px;">
+        <div class="info-row"><span class="info-row-label">Imaging</span><span class="info-row-val" style="color:var(--green)">Ready</span></div>
+        <div class="info-row"><span class="info-row-label">Pipeline</span><span class="info-row-val" style="color:var(--blue)">Running</span></div>
+        <div class="info-row"><span class="info-row-label">Treatment</span><span class="info-row-val" style="color:var(--green)">Ready</span></div>
+        <button class="btn btn-pink btn-full btn-sm" style="margin-top:8px;" onclick="switchTab('oncoai',null)">Open OncoAI →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- Sync bar -->
+    <div class="sync-bar" id="sync-bar">
+      <span class="sync-bar-dot"></span>
+      <span>Jua Kali Hub · Neuro-Sync Active · All modules synced</span>
+      <span id="sync-time" style="margin-left:auto;color:var(--txt3);font-family:var(--font-mono);"></span>
+    </div>
+
+    <!-- EEG PANEL -->
+    <div class="panel fade-up" id="panel-eeg">
+      <div class="panel-header">
+        <div class="panel-title" style="color:var(--primary)">⚡ EEG Analysis <span id="eeg-live-badge" class="sbadge sbadge-green" style="font-size:10px;margin-left:4px;">● LIVE</span></div>
+        <div class="panel-sub">Real-time electroencephalography · 19 active channels</div>
+      </div>
+
+      <!-- EEG Live wave -->
+      <div class="eeg-wave">
+        <canvas id="eeg-canvas" width="900" height="60"></canvas>
+      </div>
+
+      <div class="grid2" style="margin-bottom:16px;">
+        <!-- Wave bands -->
+        <div class="card">
+          <div class="sec-heading">Neural Frequency Bands</div>
+          <div id="eeg-waves"></div>
+        </div>
+        <!-- Neuro status -->
+        <div class="card">
+          <div class="sec-heading">Neurological Status</div>
+          <div id="eeg-status"></div>
+        </div>
+      </div>
+
+      <!-- Risk indicators -->
+      <div class="card">
+        <div class="sec-heading">Integrated Risk Indicators</div>
+        <div class="risk-grid" id="eeg-risk"></div>
+      </div>
+    </div>
+
+    <!-- ONCOAI IFRAME PANEL -->
+    <div id="panel-oncoai" class="panel fade-up" style="display:none;padding:0;height:100%;overflow:hidden;">
+      <div class="sync-bar" style="background:rgba(244,114,182,0.06);border-color:rgba(244,114,182,0.15);color:var(--pink);">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--pink);animation:pulse 1.5s ease-in-out infinite;display:inline-block;"></span>
+        <span>OncoAI PWA v3 · Full Platform · Synced with Triad Neuro shell</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="syncFromOncoAI()">↻ Sync</button>
+      </div>
+      <iframe id="oncoai-frame" src="about:blank" style="width:100%;flex:1;border:none;min-height:calc(100vh - 120px);"></iframe>
+    </div>
+
+    <!-- NEUROSYNC PANEL -->
+    <div class="panel fade-up" id="panel-neurosync" style="display:none;">
+      <div class="panel-header">
+        <div class="panel-title" style="color:var(--purple)">🌐 Neuro-Sync Intelligence</div>
+        <div class="panel-sub">Multi-agent neural synchronization network · 8 agents</div>
+      </div>
+
+      <!-- Network summary -->
+      <div class="grid4" id="neurosync-stats" style="margin-bottom:16px;"></div>
+
+      <div class="grid2">
+        <!-- Topology -->
+        <div class="card">
+          <div class="sec-heading">Agent Network Topology</div>
+          <div class="topology-wrap" id="topology-wrap">
+            <svg class="topo-svg" id="topo-svg"></svg>
+            <div class="topo-center">🧠</div>
+            <div id="topo-nodes"></div>
+          </div>
+          <div class="topo-legend">
+            <div class="topo-leg-item"><div class="topo-leg-dot" style="background:var(--green)"></div>Connected</div>
+            <div class="topo-leg-item"><div class="topo-leg-dot" style="background:var(--blue)"></div>Syncing</div>
+            <div class="topo-leg-item"><div class="topo-leg-dot" style="background:var(--txt4)"></div>Idle</div>
+          </div>
+        </div>
+
+        <!-- Aggregated risk -->
+        <div class="card">
+          <div class="sec-heading">Aggregated Risk Indicators</div>
+          <div id="neurosync-risk"></div>
+        </div>
+      </div>
+
+      <!-- Agent cards -->
+      <div class="sec-heading" style="margin-top:16px;">Connected Agents (8)</div>
+      <div id="agent-cards"></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /body -->
+</div><!-- /app -->
+
+<!-- ONCOAI PWA v3 HTML (injected into iframe as blob) -->
+<script id="oncoai-src" type="text/html-template">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OncoAI PWA v3</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--primary:#3b82f6;--primary-dark:#1e40af;--secondary:#8b5cf6;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--txt:#f1f5f9;--txt2:#cbd5e1;--txt3:#94a3b8;--border:#475569;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,var(--bg) 0%,#1a1f3a 100%);color:var(--txt);line-height:1.6;min-height:100vh;}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0.75rem 1.5rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+.nav-brand{font-size:1.1rem;font-weight:700;color:var(--primary);}
+.nav-links{display:flex;gap:0.5rem;list-style:none;}
+.nav-btn{background:none;border:none;color:var(--txt3);cursor:pointer;padding:0.4rem 0.8rem;border-radius:6px;transition:all 0.2s;font-size:0.85rem;}
+.nav-btn:hover{background:var(--bg3);color:var(--primary);}
+.nav-btn.active{background:var(--primary);color:#fff;}
+main{padding:1.5rem;max-width:1200px;margin:0 auto;}
+.page{display:none;animation:fadeIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.hero{text-align:center;margin-bottom:2rem;}
+.hero h1{font-size:2rem;margin-bottom:0.75rem;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{color:var(--txt3);max-width:500px;margin:0 auto;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;transition:all 0.3s;cursor:pointer;}
+.card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 12px 20px rgba(59,130,246,0.1);}
+.card-icon{font-size:2rem;margin-bottom:0.75rem;}
+.card h3{margin-bottom:0.4rem;}
+.card p{color:var(--txt3);font-size:0.85rem;margin-bottom:0.75rem;}
+.form-group{margin-bottom:1.25rem;}
+label{display:block;margin-bottom:0.4rem;color:var(--txt2);font-weight:500;font-size:0.9rem;}
+input,select,textarea{width:100%;padding:0.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-family:inherit;transition:all 0.2s;font-size:0.9rem;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);}
+button{padding:0.6rem 1.25rem;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.2s;font-size:0.85rem;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-secondary{background:var(--bg3);color:var(--txt);border:1px solid var(--border);}
+.btn-success{background:var(--success);color:#fff;}
+.tabs{display:flex;gap:0.5rem;border-bottom:1px solid var(--border);margin-bottom:1.25rem;}
+.tab-button{background:none;border:none;color:var(--txt3);padding:0.75rem;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;font-size:0.85rem;}
+.tab-button.active{color:var(--primary);border-bottom-color:var(--primary);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+table{width:100%;border-collapse:collapse;margin-top:0.75rem;}
+th{background:var(--bg3);padding:0.75rem;text-align:left;font-weight:600;color:var(--txt2);border-bottom:1px solid var(--border);font-size:0.85rem;}
+td{padding:0.75rem;border-bottom:1px solid var(--border);font-size:0.85rem;}
+tr:hover{background:var(--bg3);}
+.progress{width:100%;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin:0.75rem 0;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 0.3s;}
+.badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:9999px;font-size:0.75rem;font-weight:500;}
+.badge-primary{background:rgba(59,130,246,0.2);color:var(--primary);}
+.badge-success{background:rgba(16,185,129,0.2);color:var(--success);}
+.badge-warning{background:rgba(245,158,11,0.2);color:var(--warning);}
+.badge-danger{background:rgba(239,68,68,0.2);color:var(--danger);}
+.upload-area{border:2px dashed var(--border);border-radius:10px;padding:1.5rem;text-align:center;transition:all 0.2s;cursor:pointer;}
+.upload-area:hover{border-color:var(--primary);background:rgba(59,130,246,0.05);}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:1.25rem;}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;text-align:center;}
+.stat-value{font-size:1.6rem;font-weight:bold;color:var(--primary);margin:0.4rem 0;}
+.stat-label{color:var(--txt3);font-size:0.8rem;}
+.alert{padding:0.75rem 1rem;border-radius:6px;margin-bottom:0.75rem;border-left:3px solid;font-size:0.85rem;}
+.alert-info{background:rgba(59,130,246,0.08);border-color:var(--primary);color:#93c5fd;}
+.alert-success{background:rgba(16,185,129,0.08);border-color:var(--success);color:#6ee7b7;}
+.alert-warning{background:rgba(245,158,11,0.08);border-color:var(--warning);color:#fcd34d;}
+.pipeline-stages{display:flex;gap:0.5rem;margin:1rem 0;overflow-x:auto;padding-bottom:4px;}
+.pipeline-stage{flex:1;min-width:100px;background:var(--bg2);border:2px solid var(--border);border-radius:8px;padding:0.75rem 0.5rem;text-align:center;transition:all 0.3s;font-size:0.8rem;}
+.pipeline-stage.active{border-color:var(--primary);background:rgba(59,130,246,0.08);}
+.pipeline-stage.completed{border-color:var(--success);background:rgba(16,185,129,0.08);}
+.stage-icon{font-size:1.4rem;margin-bottom:0.3rem;}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:0.75rem;overflow-x:auto;color:var(--txt2);font-size:0.75rem;}
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:1.5rem;text-align:center;color:var(--txt3);margin-top:2rem;font-size:0.85rem;}
+@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr;}nav{flex-direction:column;gap:0.5rem;}.nav-links{flex-wrap:wrap;justify-content:center;}main{padding:1rem;}}
+</style>
+<script>
+window.addEventListener("message",(e)=>{
+  if(e.data&&e.data.type==="HUB_SYNC"){
+    console.log("OncoAI received hub sync:",e.data.payload);
+    if(window.onHubSync)window.onHubSync(e.data.payload);
+  }
+});
+function broadcastToHub(data){
+  window.parent.postMessage({type:"AGENT_DATA",payload:data},"*");
+}
+<\/script>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">🧠 OncoAI PWA v3</div>
+  <ul class="nav-links">
+    <li><button class="nav-btn active" data-page="home">Home</button></li>
+    <li><button class="nav-btn" data-page="imaging">Imaging</button></li>
+    <li><button class="nav-btn" data-page="pipeline">Pipeline</button></li>
+    <li><button class="nav-btn" data-page="treatment">Treatment</button></li>
+    <li><button class="nav-btn" data-page="about">About</button></li>
+  </ul>
+</nav>
+<main>
+  <!-- HOME -->
+  <div id="home" class="page active">
+    <div class="hero">
+      <h1>OncoAI PWA v3</h1>
+      <p>BRATS-AFRICA · UNet++ · Gemini Vision API · Agentic Pipeline · DQN RL</p>
+    </div>
+    <div class="cards-grid">
+      <div class="card" onclick="navigateTo('imaging')"><div class="card-icon">🖼️</div><h3>Medical Imaging</h3><p>Upload and analyze brain MRI scans with AI-powered segmentation using UNet++</p><button class="btn-primary">Access →</button></div>
+      <div class="card" onclick="navigateTo('pipeline')"><div class="card-icon">⚡</div><h3>Agentic Pipeline</h3><p>Multi-agent 8-stage orchestration for comprehensive medical image analysis</p><button class="btn-primary">Explore →</button></div>
+      <div class="card" onclick="navigateTo('treatment')"><div class="card-icon">📈</div><h3>Treatment Optimization</h3><p>DQN reinforcement learning for personalized oncology treatment recommendations</p><button class="btn-primary">View →</button></div>
+    </div>
+    <div class="grid-3">
+      <div class="stat-card"><div class="stat-label">Dataset</div><div class="stat-value">BRATS</div><p style="color:var(--txt3);font-size:0.8rem;">African Brain Tumor Scans</p></div>
+      <div class="stat-card"><div class="stat-label">Segmentation</div><div class="stat-value">UNet++</div><p style="color:var(--txt3);font-size:0.8rem;">Nested U-Net Architecture</p></div>
+      <div class="stat-card"><div class="stat-label">Vision API</div><div class="stat-value">Gemini</div><p style="color:var(--txt3);font-size:0.8rem;">Multi-modal Analysis</p></div>
+    </div>
+  </div>
+  <!-- IMAGING -->
+  <div id="imaging" class="page">
+    <h2>Medical Imaging Dashboard</h2>
+    <p style="color:var(--txt3);margin-bottom:1.5rem;">Upload and analyze brain MRI scans</p>
+    <div class="grid-2">
+      <div>
+        <h3 style="margin-bottom:0.75rem;">Upload MRI Scan</h3>
+        <div class="upload-area" id="uploadArea"><div style="font-size:2rem;margin-bottom:0.5rem;">📁</div><p>Click to upload or drag & drop</p><p style="color:var(--txt3);font-size:0.8rem;margin-top:4px;">NIfTI, DICOM up to 500MB</p><input type="file" id="fileInput" accept=".nii,.nii.gz,.dcm" style="display:none;"></div>
+        <div id="uploadProgress" style="display:none;margin-top:0.75rem;"><p style="margin-bottom:4px;font-size:0.85rem;">Uploading... <span id="progressPercent">0</span>%</p><div class="progress"><div class="progress-bar" id="progressBar" style="width:0%"></div></div></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:0.75rem;">Your MRI Scans</h3>
+        <div id="imagesList" style="max-height:350px;overflow-y:auto;"><p style="color:var(--txt3);">No images uploaded yet</p></div>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <h3 style="margin-bottom:0.75rem;">Segmentation Results</h3>
+      <div class="tabs">
+        <button class="tab-button active" onclick="switchTab(event,'seg-results')">Results</button>
+        <button class="tab-button" onclick="switchTab(event,'seg-metrics')">Metrics</button>
+        <button class="tab-button" onclick="switchTab(event,'seg-history')">History</button>
+      </div>
+      <div id="seg-results" class="tab-content active"><p style="color:var(--txt3);">Select an image to view segmentation results</p></div>
+      <div id="seg-metrics" class="tab-content">
+        <div class="grid-3">
+          <div class="stat-card"><div class="stat-label">Dice Score</div><div class="stat-value" id="diceScore">—</div><p style="color:var(--txt3);font-size:0.8rem;">Target: ≥ 0.85</p></div>
+          <div class="stat-card"><div class="stat-label">IoU Score</div><div class="stat-value" id="iouScore">—</div><p style="color:var(--txt3);font-size:0.8rem;">Target: ≥ 0.80</p></div>
+          <div class="stat-card"><div class="stat-label">Tumor Volume</div><div class="stat-value" id="tumorVolume">—</div><p style="color:var(--txt3);font-size:0.8rem;">mm³</p></div>
+        </div>
+      </div>
+      <div id="seg-history" class="tab-content">
+        <table><thead><tr><th>Date</th><th>Dice</th><th>IoU</th><th>Volume</th><th>Status</th></tr></thead><tbody id="historyTable"><tr><td colspan="5" style="text-align:center;color:var(--txt3);">No history</td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+  <!-- PIPELINE -->
+  <div id="pipeline" class="page">
+    <h2>Agentic Pipeline Orchestration</h2>
+    <p style="color:var(--txt3);margin-bottom:1.5rem;">Multi-agent collaboration for medical image analysis</p>
+    <div class="grid-2">
+      <div>
+        <h3 style="margin-bottom:0.75rem;">Pipeline Runs</h3>
+        <button class="btn-primary" onclick="startPipeline()" style="width:100%;margin-bottom:0.75rem;">▶ Start New Pipeline</button>
+        <div id="pipelineList" style="max-height:350px;overflow-y:auto;"><p style="color:var(--txt3);">No pipeline runs yet</p></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:0.75rem;">Pipeline Stages</h3>
+        <div id="pipelineStages" class="pipeline-stages">
+          <div class="pipeline-stage"><div class="stage-icon">📤</div><small>Upload</small></div>
+          <div class="pipeline-stage"><div class="stage-icon">⚙️</div><small>Preprocess</small></div>
+          <div class="pipeline-stage"><div class="stage-icon">🎯</div><small>Segment</small></div>
+          <div class="pipeline-stage"><div class="stage-icon">🤖</div><small>Gemini</small></div>
+          <div class="pipeline-stage"><div class="stage-icon">🏥</div><small>Clinical</small></div>
+          <div class="pipeline-stage"><div class="stage-icon">💊</div><small>Treatment</small></div>
+          <div class="pipeline-stage"><div class="stage-icon">📊</div><small>Decision</small></div>
+          <div class="pipeline-stage"><div class="stage-icon">📄</div><small>Report</small></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <h3 style="margin-bottom:0.75rem;">Agent Communication</h3>
+      <div class="tabs">
+        <button class="tab-button active" onclick="switchTab(event,'agent-messages')">Messages</button>
+        <button class="tab-button" onclick="switchTab(event,'agent-metrics')">Metrics</button>
+        <button class="tab-button" onclick="switchTab(event,'agent-workflow')">Workflow</button>
+      </div>
+      <div id="agent-messages" class="tab-content active"><div id="messagesContainer" style="max-height:300px;overflow-y:auto;color:var(--txt3);">No agent messages yet</div></div>
+      <div id="agent-metrics" class="tab-content">
+        <div class="grid-3">
+          <div class="stat-card"><div class="stat-label">Total Messages</div><div class="stat-value" id="totalMessages">0</div></div>
+          <div class="stat-card"><div class="stat-label">Success Rate</div><div class="stat-value" id="successRate">0%</div></div>
+          <div class="stat-card"><div class="stat-label">Duration</div><div class="stat-value" id="pipelineDuration">0s</div></div>
+        </div>
+      </div>
+      <div id="agent-workflow" class="tab-content">
+        <ol style="color:var(--txt2);line-height:2;font-size:0.85rem;margin-left:1rem;">
+          <li><strong>IMAGE_UPLOAD:</strong> Receive and validate medical image</li>
+          <li><strong>IMAGE_PREPROCESSING:</strong> Normalize, skull strip, register MRI</li>
+          <li><strong>SEGMENTATION:</strong> Run UNet++ model for tumor segmentation</li>
+          <li><strong>GEMINI_ANALYSIS:</strong> Multi-modal analysis with Gemini Vision API</li>
+          <li><strong>CLINICAL_INTEGRATION:</strong> Integrate findings with patient records</li>
+          <li><strong>TREATMENT_OPTIMIZATION:</strong> Apply DQN RL for treatment selection</li>
+          <li><strong>DECISION_SUPPORT:</strong> Generate clinical recommendations</li>
+          <li><strong>FINAL_REPORT:</strong> Create FHIR R4 compliant report</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <!-- TREATMENT -->
+  <div id="treatment" class="page">
+    <h2>Treatment Optimization</h2>
+    <p style="color:var(--txt3);margin-bottom:1.5rem;">DQN reinforcement learning for personalized oncology treatment</p>
+    <div class="alert alert-success"><strong>Recommended:</strong> Immunotherapy (Q-value: 0.71, Confidence: 88%)</div>
+    <div class="grid-2">
+      <div>
+        <h3 style="margin-bottom:0.75rem;">DQN Q-Values</h3>
+        <table><thead><tr><th>Treatment</th><th>Q-Value</th><th>Confidence</th></tr></thead><tbody>
+          <tr><td>Chemo Low</td><td><span class="badge badge-danger">0.45</span></td><td>72%</td></tr>
+          <tr><td>Chemo Med</td><td><span class="badge badge-warning">0.62</span></td><td>85%</td></tr>
+          <tr><td>Immunotherapy</td><td><span class="badge badge-success">0.71</span></td><td>88%</td></tr>
+          <tr><td>Combo A</td><td><span class="badge badge-success">0.68</span></td><td>84%</td></tr>
+        </tbody></table>
+      </div>
+      <div>
+        <h3 style="margin-bottom:0.75rem;">IQVIA Quintiles</h3>
+        <table><thead><tr><th>Quintile</th><th>Patients</th><th>Avg Survival</th><th>Risk</th></tr></thead><tbody>
+          <tr><td>Q1 (Lowest)</td><td>2</td><td>45%</td><td><span class="badge badge-danger">Critical</span></td></tr>
+          <tr><td>Q3 (Median)</td><td>12</td><td>75%</td><td><span class="badge badge-warning">Medium</span></td></tr>
+          <tr><td>Q5 (Highest)</td><td>3</td><td>92%</td><td><span class="badge badge-success">Very Low</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <div class="tabs">
+        <button class="tab-button active" onclick="switchTab(event,'recommendations')">Recommendations</button>
+        <button class="tab-button" onclick="switchTab(event,'trajectory')">Trajectory</button>
+        <button class="tab-button" onclick="switchTab(event,'fhir')">FHIR Export</button>
+      </div>
+      <div id="recommendations" class="tab-content active">
+        <div class="alert alert-success"><strong>Primary:</strong> Immunotherapy recommended by DQN with 88% confidence.</div>
+        <div class="alert alert-info"><strong>Clinical:</strong> IQVIA Q3 · Tumor 32,000 mm³ · 78% survival probability at 28 days.</div>
+        <div class="alert alert-warning"><strong>Alternatives:</strong> Combo A (0.68) and Chemo Med (0.62) are viable.</div>
+      </div>
+      <div id="trajectory" class="tab-content">
+        <table><thead><tr><th>Day</th><th>Tumor Vol.</th><th>Edema Vol.</th><th>Survival</th></tr></thead><tbody>
+          <tr><td>1</td><td>45,000 mm³</td><td>28,000 mm³</td><td><span class="badge badge-warning">65%</span></td></tr>
+          <tr><td>7</td><td>42,000 mm³</td><td>26,000 mm³</td><td><span class="badge badge-warning">68%</span></td></tr>
+          <tr><td>14</td><td>38,000 mm³</td><td>23,000 mm³</td><td><span class="badge badge-primary">72%</span></td></tr>
+          <tr><td>28</td><td>32,000 mm³</td><td>18,000 mm³</td><td><span class="badge badge-success">78%</span></td></tr>
+        </tbody></table>
+      </div>
+      <div id="fhir" class="tab-content">
+        <pre>{"resourceType":"DiagnosticReport","status":"final","code":{"coding":[{"system":"http://loinc.org","code":"72134-0","display":"Brain MRI"}]},"result":[{"reference":"Observation/tumor-segmentation"}],"conclusion":"Immunotherapy recommended — 88% confidence"}</pre>
+        <button class="btn-primary" style="margin-top:0.75rem;" onclick="broadcastToHub({type:'FHIR_EXPORT',data:'DiagnosticReport generated'})">📤 Broadcast to Hub</button>
+      </div>
+    </div>
+  </div>
+  <!-- ABOUT -->
+  <div id="about" class="page">
+    <h2>About OncoAI PWA v3</h2>
+    <div class="grid-2">
+      <div>
+        <h3 style="margin-bottom:0.75rem;">🧠 Core Technologies</h3>
+        <ul style="color:var(--txt2);line-height:2;margin-left:1rem;font-size:0.9rem;">
+          <li><strong>BRATS-AFRICA:</strong> Brain tumor MRI from African populations</li>
+          <li><strong>UNet++:</strong> Nested U-Net for tumor segmentation</li>
+          <li><strong>Gemini Vision API:</strong> Multi-modal image analysis</li>
+          <li><strong>8-Stage Agentic Pipeline:</strong> Multi-agent orchestration</li>
+          <li><strong>DQN RL:</strong> Deep Q-Network treatment optimization</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:0.75rem;">🌍 Africa-Ready</h3>
+        <ul style="color:var(--txt2);line-height:2;margin-left:1rem;font-size:0.9rem;">
+          <li>✓ Offline-first PWA architecture</li>
+          <li>✓ Low-bandwidth optimized</li>
+          <li>✓ BRATS-AFRICA dataset representation</li>
+          <li>✓ FHIR R4 compliance</li>
+          <li>✓ Local IndexedDB storage</li>
+          <li>✓ M-Pesa payment integration ready</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+<footer><p>OncoAI PWA v3 · Jua Kali Hub · BRATS-AFRICA · UNet++ · Gemini · DQN RL</p></footer>
+
+<script>
+const state={currentPage:'home',images:[],pipelineRuns:[],agentMessages:[],selectedImage:null,selectedPipeline:null};
+let db;
+const dbRequest=indexedDB.open('OncoAIv3',1);
+dbRequest.onsuccess=()=>{db=dbRequest.result;};
+dbRequest.onupgradeneeded=(e)=>{db=e.target.result;['images','pipelines','messages'].forEach(s=>{if(!db.objectStoreNames.contains(s))db.createObjectStore(s,{keyPath:'id',autoIncrement:true});});};
+
+function navigateTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-page="'+page+'"]').classList.add('active');
+  state.currentPage=page;
+  window.scrollTo(0,0);
+  broadcastToHub({type:'PAGE_CHANGE',page});
+}
+document.querySelectorAll('.nav-btn').forEach(btn=>{btn.addEventListener('click',e=>navigateTo(e.target.dataset.page));});
+
+function switchTab(event,tabId){
+  event.preventDefault();
+  event.target.parentElement.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  const siblings=event.target.parentElement.nextElementSibling;
+  if(siblings){let el=event.target.parentElement.parentElement.querySelectorAll('.tab-content');el.forEach(c=>c.classList.remove('active'));document.getElementById(tabId).classList.add('active');}
+}
+
+const uploadArea=document.getElementById('uploadArea');
+const fileInput=document.getElementById('fileInput');
+if(uploadArea){
+  uploadArea.addEventListener('click',()=>fileInput.click());
+  uploadArea.addEventListener('dragover',e=>{e.preventDefault();uploadArea.style.borderColor='var(--primary)';});
+  uploadArea.addEventListener('dragleave',()=>uploadArea.style.borderColor='');
+  uploadArea.addEventListener('drop',e=>{e.preventDefault();uploadArea.style.borderColor='';handleFileUpload(e.dataTransfer.files);});
+  fileInput.addEventListener('change',e=>handleFileUpload(e.target.files));
+}
+
+function handleFileUpload(files){
+  if(!files.length)return;
+  const file=files[0];
+  const pd=document.getElementById('uploadProgress');
+  const pb=document.getElementById('progressBar');
+  const pp=document.getElementById('progressPercent');
+  pd.style.display='block';
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*30;
+    if(p>100)p=100;
+    pb.style.width=p+'%';pp.textContent=Math.floor(p);
+    if(p===100){clearInterval(iv);setTimeout(()=>{pd.style.display='none';addImageToList(file.name);},500);}
+  },200);
+}
+
+function addImageToList(fileName){
+  const img={id:Date.now(),name:fileName,date:new Date().toLocaleDateString(),status:'COMPLETED',diceScore:0.87+Math.random()*0.1,iouScore:0.78+Math.random()*0.1,tumorVolume:30000+Math.random()*10000};
+  state.images.push(img);
+  if(db){const t=db.transaction(['images'],'readwrite');t.objectStore('images').add(img);}
+  updateImagesList();
+  broadcastToHub({type:'IMAGE_ADDED',image:img});
+}
+
+function updateImagesList(){
+  const el=document.getElementById('imagesList');
+  if(!el)return;
+  if(!state.images.length){el.innerHTML='<p style="color:var(--txt3);">No images uploaded yet</p>';return;}
+  el.innerHTML=state.images.map(img=>`<div class="card" onclick="selectImage(${img.id})" style="margin-bottom:0.75rem;padding:0.75rem;"><div style="display:flex;justify-content:space-between;align-items:start;"><div><p style="font-weight:500;">${img.name}</p><p style="font-size:0.8rem;color:var(--txt3);">${img.date}</p></div><span class="badge badge-success">${img.status}</span></div></div>`).join('');
+}
+
+function selectImage(id){
+  state.selectedImage=id;
+  const img=state.images.find(i=>i.id===id);
+  if(img){
+    document.getElementById('diceScore').textContent=img.diceScore.toFixed(3);
+    document.getElementById('iouScore').textContent=img.iouScore.toFixed(3);
+    document.getElementById('tumorVolume').textContent=Math.floor(img.tumorVolume).toLocaleString();
+    document.getElementById('historyTable').innerHTML=`<tr><td>${img.date}</td><td><span class="badge badge-success">${img.diceScore.toFixed(3)}</span></td><td><span class="badge badge-success">${img.iouScore.toFixed(3)}</span></td><td>${Math.floor(img.tumorVolume)} mm³</td><td><span class="badge badge-success">${img.status}</span></td></tr>`;
+    broadcastToHub({type:'IMAGE_SELECTED',image:img});
+  }
+}
+
+function startPipeline(){
+  const pipeline={id:Date.now(),patientId:'PT-'+Math.random().toString(36).substr(2,9).toUpperCase(),startTime:new Date(),currentStage:'IMAGE_UPLOAD',status:'PROCESSING',progress:0};
+  state.pipelineRuns.push(pipeline);
+  if(db){const t=db.transaction(['pipelines'],'readwrite');t.objectStore('pipelines').add(pipeline);}
+  state.selectedPipeline=pipeline.id;
+  updatePipelineList();
+  simulatePipeline(pipeline.id);
+  broadcastToHub({type:'PIPELINE_STARTED',patientId:pipeline.patientId});
+}
+
+function updatePipelineList(){
+  const el=document.getElementById('pipelineList');
+  if(!el)return;
+  if(!state.pipelineRuns.length){el.innerHTML='<p style="color:var(--txt3);">No pipeline runs yet</p>';return;}
+  el.innerHTML=state.pipelineRuns.map(r=>`<div class="card" onclick="selectPipeline(${r.id})" style="margin-bottom:0.75rem;padding:0.75rem;${state.selectedPipeline===r.id?'border-color:var(--primary);':''}"><div style="display:flex;justify-content:space-between;align-items:center;"><div><p style="font-weight:500;font-size:0.9rem;">${r.patientId}</p><p style="font-size:0.75rem;color:var(--txt3);">${r.currentStage}</p></div><span class="badge ${r.status==='COMPLETED'?'badge-success':r.status==='FAILED'?'badge-danger':'badge-warning'}">${r.status}</span></div><div class="progress" style="margin-top:0.4rem;margin-bottom:0;"><div class="progress-bar" style="width:${r.progress}%"></div></div></div>`).join('');
+}
+
+function selectPipeline(id){state.selectedPipeline=id;updatePipelineList();updateAgentMessages();}
+
+function simulatePipeline(pipelineId){
+  const stages=['IMAGE_UPLOAD','IMAGE_PREPROCESSING','SEGMENTATION','GEMINI_ANALYSIS','CLINICAL_INTEGRATION','TREATMENT_OPTIMIZATION','DECISION_SUPPORT','FINAL_REPORT'];
+  let i=0;
+  const iv=setInterval(()=>{
+    const pipeline=state.pipelineRuns.find(p=>p.id===pipelineId);
+    if(!pipeline){clearInterval(iv);return;}
+    if(i<stages.length){
+      pipeline.currentStage=stages[i];
+      pipeline.progress=((i+1)/stages.length)*100;
+      addAgentMessage(pipelineId,'AGENT_'+i,'AGENT_'+(i+1),stages[i]);
+      updatePipelineStages(i);
+      i++;
+    } else {pipeline.status='COMPLETED';pipeline.progress=100;clearInterval(iv);broadcastToHub({type:'PIPELINE_COMPLETE',pipelineId});}
+    updatePipelineList();
+  },1400);
+}
+
+function updatePipelineStages(completedIdx){
+  document.querySelectorAll('.pipeline-stage').forEach((s,idx)=>{s.classList.remove('active','completed');if(idx<completedIdx)s.classList.add('completed');else if(idx===completedIdx)s.classList.add('active');});
+}
+
+function addAgentMessage(pipelineId,from,to,type){
+  const msg={id:Date.now(),pipelineId,from,to,type,timestamp:new Date(),status:'COMPLETED'};
+  state.agentMessages.push(msg);
+  if(state.selectedPipeline===pipelineId)updateAgentMessages();
+}
+
+function updateAgentMessages(){
+  const el=document.getElementById('messagesContainer');
+  if(!el)return;
+  const msgs=state.agentMessages.filter(m=>m.pipelineId===state.selectedPipeline);
+  if(!msgs.length){el.innerHTML='<p style="color:var(--txt3);">No messages</p>';return;}
+  el.innerHTML=msgs.slice(-8).map(m=>`<div style="background:var(--bg3);border-left:2px solid var(--primary);padding:0.75rem;margin-bottom:0.4rem;border-radius:4px;"><div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span style="font-weight:500;">${m.from} → ${m.to}</span><span class="badge badge-success">${m.status}</span></div><p style="font-size:0.75rem;color:var(--txt2);margin-top:3px;">${m.type}</p><p style="font-size:0.7rem;color:var(--txt3);">${m.timestamp.toLocaleTimeString()}</p></div>`).join('');
+  const total=msgs.length;const done=msgs.filter(m=>m.status==='COMPLETED').length;
+  document.getElementById('totalMessages').textContent=total;
+  document.getElementById('successRate').textContent=(total>0?(done/total*100).toFixed(0):0)+'%';
+  const pl=state.pipelineRuns.find(p=>p.id===state.selectedPipeline);
+  if(pl)document.getElementById('pipelineDuration').textContent=((new Date()-pl.startTime)/1000).toFixed(1)+'s';
+}
+
+updateImagesList();updatePipelineList();
+<\/script>
+</body>
+</html>
+</script>
+
+<!-- MAIN SCRIPT -->
+<script>
+// ── Hub Sync ────────────────────────────────────────
+window.addEventListener("message",(e)=>{
+  if(e.data&&e.data.type==="HUB_SYNC"){
+    if(window.onHubSync)window.onHubSync(e.data.payload);
+  }
+  if(e.data&&e.data.type==="AGENT_DATA"){
+    handleAgentData(e.data.payload);
+  }
+});
+function handleAgentData(payload){
+  const sb=document.getElementById('sync-bar');
+  const type=payload?.type||'DATA';
+  if(sb){
+    const span=sb.querySelector('span:last-of-type')||sb.lastChild;
+    sb.children[1].textContent='OncoAI → Hub: '+type+' received';
+    document.getElementById('sync-time').textContent=new Date().toLocaleTimeString();
+    setTimeout(()=>{sb.children[1].textContent='Jua Kali Hub · Neuro-Sync Active · All modules synced';},3000);
+  }
+}
+
+// ── Agents data ─────────────────────────────────────
+const AGENTS=[
+  {id:"eeg-001",name:"EEG Analyzer Pro",type:"eeg_analyzer",status:"connected",conf:94,alpha:82,beta:67,theta:45,delta:23},
+  {id:"mri-001",name:"MRI Processor v2",type:"mri_processor",status:"syncing",conf:88,alpha:78,beta:71,theta:52,delta:31},
+  {id:"sz-001",name:"Seizure Predictor",type:"seizure_predictor",status:"connected",conf:91,alpha:75,beta:63,theta:48,delta:19},
+  {id:"st-001",name:"Stroke Detector AI",type:"stroke_detector",status:"connected",conf:89,alpha:80,beta:69,theta:41,delta:27},
+  {id:"cog-001",name:"Cognitive Assessor",type:"cognitive_assessor",status:"idle",conf:85,alpha:72,beta:58,theta:55,delta:35},
+  {id:"tx-001",name:"Treatment Optimizer",type:"treatment_optimizer",status:"connected",conf:92,alpha:84,beta:74,theta:43,delta:22},
+  {id:"di-001",name:"Drug Interaction Engine",type:"drug_interaction",status:"connected",conf:96,alpha:88,beta:77,theta:39,delta:18},
+  {id:"nm-001",name:"Neuro Monitor 360",type:"neuro_monitor",status:"syncing",conf:87,alpha:76,beta:65,theta:50,delta:29},
+];
+const TYPE_ICONS={eeg_analyzer:"⚡",mri_processor:"🔬",seizure_predictor:"🧠",stroke_detector:"⚠️",cognitive_assessor:"💭",treatment_optimizer:"🎯",drug_interaction:"🧪",neuro_monitor:"📡"};
+
+// ── EEG Waves data ──────────────────────────────────
+const EEG_WAVES=[
+  {name:"Alpha",hz:"8-13 Hz",val:82,color:"#06b6d4",desc:"Relaxed alertness"},
+  {name:"Beta",hz:"13-30 Hz",val:67,color:"#3b82f6",desc:"Active thinking"},
+  {name:"Theta",hz:"4-8 Hz",val:45,color:"#a78bfa",desc:"Drowsiness / creativity"},
+  {name:"Delta",hz:"0.5-4 Hz",val:23,color:"#f472b6",desc:"Deep sleep"},
+  {name:"Gamma",hz:"30-100 Hz",val:38,color:"#34d399",desc:"Cognitive processing"},
+];
+const EEG_STATUS=[
+  {label:"Consciousness",val:"Alert",color:"var(--green)"},
+  {label:"Seizure Risk",val:"Low (12%)",color:"var(--green)"},
+  {label:"Cognitive Fn",val:"Normal",color:"var(--green)"},
+  {label:"Motor Response",val:"Normal",color:"var(--green)"},
+  {label:"Stroke Prob.",val:"8%",color:"var(--green)"},
+  {label:"ICP Status",val:"Normal",color:"var(--green)"},
+];
+const EEG_RISK=[
+  {name:"Seizure Risk",pct:34,color:"#fb923c"},
+  {name:"Stroke Prob.",pct:12,color:"#34d399"},
+  {name:"Cognitive",pct:65,color:"#60a5fa"},
+];
+
+// ── Tab switching ────────────────────────────────────
+let currentTab='eeg';
+function switchTab(tab,btn){
+  currentTab=tab;
+  ['eeg','oncoai','neurosync'].forEach(t=>{
+    const p=document.getElementById('panel-'+t);
+    if(p)p.style.display='none';
+  });
+  const panel=document.getElementById('panel-'+tab);
+  if(panel){panel.style.display='';panel.classList.remove('fade-up');void panel.offsetWidth;panel.classList.add('fade-up');}
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  else{
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+tab+"'")){b.classList.add('active');}
+    });
+  }
+  // Load OncoAI iframe if needed
+  if(tab==='oncoai'){loadOncoAIFrame();}
+  document.getElementById('sync-time').textContent=new Date().toLocaleTimeString();
+}
+
+// ── Load OncoAI iframe ───────────────────────────────
+let oncoLoaded=false;
+function loadOncoAIFrame(){
+  if(oncoLoaded)return;
+  oncoLoaded=true;
+  const tmpl=document.getElementById('oncoai-src').textContent;
+  const blob=new Blob([tmpl],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  document.getElementById('oncoai-frame').src=url;
+}
+function syncFromOncoAI(){
+  const frame=document.getElementById('oncoai-frame');
+  if(frame&&frame.contentWindow){
+    frame.contentWindow.postMessage({type:'HUB_SYNC',payload:{action:'refresh',from:'triad-neuro'}},'*');
+  }
+}
+
+// ── Render sidebar agents ────────────────────────────
+function renderSidebarAgents(){
+  const el=document.getElementById('sidebar-agents');
+  if(!el)return;
+  el.innerHTML=AGENTS.map(a=>`
+    <div class="agent-mini">
+      <span class="agent-dot ${a.status}"></span>
+      <span class="agent-name">${a.name}</span>
+      <span class="agent-conf">${a.conf}%</span>
+    </div>`).join('');
+}
+
+// ── Render sidebar stats ─────────────────────────────
+function renderSidebarStats(){
+  const el=document.getElementById('sidebar-stats');
+  if(!el)return;
+  const stats=[
+    {lbl:"EEG Channels",val:"19 Active",col:"var(--primary)"},
+    {lbl:"OncoAI Sessions",val:"3 Today",col:"var(--pink)"},
+    {lbl:"Sync Agents",val:"8 / 8",col:"var(--purple)"},
+    {lbl:"Risk Alerts",val:"0 Critical",col:"var(--green)"},
+    {lbl:"Data Points",val:"142,847",col:"var(--blue)"},
+    {lbl:"Uptime",val:"99.8%",col:"var(--green)"},
+  ];
+  el.innerHTML=stats.map(s=>`
+    <div class="sys-stat">
+      <span class="sys-stat-label">${s.lbl}</span>
+      <span class="sys-stat-val" style="color:${s.col}">${s.val}</span>
+    </div>`).join('');
+}
+
+// ── Render EEG panel ─────────────────────────────────
+function renderEEGPanel(){
+  // Waves
+  const wEl=document.getElementById('eeg-waves');
+  if(wEl){
+    wEl.innerHTML=EEG_WAVES.map(w=>`
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <div>
+            <span style="font-size:12px;color:var(--txt2);">${w.name} <span style="color:var(--txt4);font-size:10px;">${w.hz}</span></span>
+            <div style="font-size:10px;color:var(--txt4);">${w.desc}</div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${w.color};font-family:var(--font-mono);">${w.val}%</span>
+        </div>
+        <div class="pbar"><div class="pbar-fill" style="width:${w.val}%;background:${w.color};"></div></div>
+      </div>`).join('');
+  }
+  // Status
+  const sEl=document.getElementById('eeg-status');
+  if(sEl){
+    sEl.innerHTML=`<div class="grid2">${EEG_STATUS.map(s=>`
+      <div class="info-row">
+        <span class="info-row-label">${s.label}</span>
+        <span class="info-row-val" style="color:${s.color}">${s.val}</span>
+      </div>`).join('')}</div>`;
+  }
+  // Risk
+  const rEl=document.getElementById('eeg-risk');
+  if(rEl){
+    rEl.innerHTML=EEG_RISK.map(r=>`
+      <div class="risk-cell">
+        <div class="risk-pct" style="color:${r.color}">${r.pct}%</div>
+        <div class="risk-name">${r.name}</div>
+        <div class="pbar" style="margin-top:6px;"><div class="pbar-fill" style="width:${r.pct}%;background:${r.color};"></div></div>
+      </div>`).join('');
+  }
+}
+
+// ── EEG Canvas animation ─────────────────────────────
+function startEEGCanvas(){
+  const canvas=document.getElementById('eeg-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let offset=0;
+  function draw(){
+    const W=canvas.offsetWidth||900;canvas.width=W;
+    ctx.clearRect(0,0,W,60);
+    ctx.strokeStyle='rgba(6,182,212,0.8)';ctx.lineWidth=1.5;
+    ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const y=30+Math.sin((x+offset)*0.04)*8+Math.sin((x+offset)*0.09)*4+Math.sin((x+offset)*0.02)*6;
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    offset+=1.5;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ── Render NeuroSync panel ───────────────────────────
+function renderNeuroSyncPanel(){
+  const connected=AGENTS.filter(a=>a.status==='connected').length;
+  const syncing=AGENTS.filter(a=>a.status==='syncing').length;
+  const idle=AGENTS.filter(a=>a.status==='idle').length;
+  const avgConf=Math.round(AGENTS.reduce((s,a)=>s+a.conf,0)/AGENTS.length);
+  // Stats
+  const statsEl=document.getElementById('neurosync-stats');
+  if(statsEl){
+    const stats=[
+      {lbl:"Connected",val:connected,col:"var(--green)"},
+      {lbl:"Syncing",val:syncing,col:"var(--blue)"},
+      {lbl:"Idle",val:idle,col:"var(--txt3)"},
+      {lbl:"Avg Conf.",val:avgConf+'%',col:"var(--primary)"},
+    ];
+    statsEl.innerHTML=stats.map(s=>`<div class="stat-box"><div class="stat-val" style="color:${s.col}">${s.val}</div><div class="stat-lbl">${s.lbl}</div></div>`).join('');
+  }
+  // Topology nodes + SVG lines
+  renderTopology();
+  // Risk
+  renderNeuroRisk();
+  // Agent cards
+  renderAgentCards();
+}
+
+function renderTopology(){
+  const wrap=document.getElementById('topology-wrap');
+  const nodesEl=document.getElementById('topo-nodes');
+  const svg=document.getElementById('topo-svg');
+  if(!wrap||!nodesEl||!svg)return;
+  const colorMap={connected:'rgba(52,211,153,0.3)',syncing:'rgba(96,165,250,0.3)',idle:'rgba(100,116,139,0.3)'};
+  const borderMap={connected:'rgba(52,211,153,0.7)',syncing:'rgba(96,165,250,0.7)',idle:'rgba(100,116,139,0.4)'};
+  const strokeMap={connected:'#34d399',syncing:'#60a5fa',idle:'#475569'};
+  nodesEl.innerHTML='';
+  let lines='';
+  AGENTS.forEach((agent,i)=>{
+    const angle=(i/AGENTS.length)*2*Math.PI-Math.PI/2;
+    const r=42;
+    const x=50+r*Math.cos(angle);
+    const y=50+r*Math.sin(angle);
+    const node=document.createElement('div');
+    node.className='topo-node';
+    node.style.left=x+'%';node.style.top=y+'%';
+    node.style.background=colorMap[agent.status];
+    node.style.borderColor=borderMap[agent.status];
+    node.textContent=i+1;
+    node.title=agent.name;
+    nodesEl.appendChild(node);
+    lines+=`<line x1="50%" y1="50%" x2="${x}%" y2="${y}%" stroke="${strokeMap[agent.status]}" stroke-width="1" stroke-opacity="0.35" ${agent.status==='syncing'?'stroke-dasharray="3,3"':''}/>`;
+  });
+  svg.innerHTML=lines;
+}
+
+function renderNeuroRisk(){
+  const el=document.getElementById('neurosync-risk');
+  if(!el)return;
+  const risks=[
+    {lbl:"Seizure Risk",val:22,threshold:30,col:"var(--orange)",icon:"⚡"},
+    {lbl:"Stroke Probability",val:8,threshold:20,col:"var(--green)",icon:"⚠️"},
+    {lbl:"Cognitive Status",val:78,threshold:60,col:"var(--blue)",icon:"🧠",invert:true},
+    {lbl:"ICP Pressure",val:14,threshold:20,col:"var(--green)",icon:"📊"},
+  ];
+  el.innerHTML=risks.map(r=>{
+    const alert=r.invert?r.val<r.threshold:r.val>r.threshold;
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="font-size:14px;">${r.icon}</span>
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+          <span style="color:var(--txt3);">${r.lbl}</span>
+          <span style="font-weight:700;color:${r.col};font-family:var(--font-mono);">${r.val}%</span>
+        </div>
+        <div class="pbar"><div class="pbar-fill" style="width:${r.val}%;background:${r.col};"></div></div>
+      </div>
+      ${alert?'<span style="color:var(--red);font-size:12px;">⚠</span>':''}
+    </div>`;
+  }).join('');
+}
+
+function renderAgentCards(){
+  const el=document.getElementById('agent-cards');
+  if(!el)return;
+  const statusBadge={
+    connected:`<span class="sbadge sbadge-green"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;"></span>Connected</span>`,
+    syncing:`<span class="sbadge sbadge-blue"><span style="width:5px;height:5px;border-radius:50%;background:var(--blue);display:inline-block;animation:pulse 1.2s ease-in-out infinite;"></span>Syncing</span>`,
+    idle:`<span class="sbadge sbadge-slate">Idle</span>`,
+  };
+  el.innerHTML=AGENTS.map((a,i)=>`
+    <div class="agent-card">
+      <div class="agent-card-head" onclick="toggleAgentCard(${i})">
+        <div class="agent-card-icon">${TYPE_ICONS[a.type]||'🤖'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.name}</div>
+          <div style="font-size:10px;color:var(--txt4);">${a.type.replace(/_/g,' ')}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${statusBadge[a.status]||''}
+          <span style="font-size:11px;color:var(--primary);font-family:var(--font-mono);font-weight:700;">${a.conf}%</span>
+          <span id="chevron-${i}" style="color:var(--txt4);font-size:12px;">›</span>
+        </div>
+      </div>
+      <div id="agent-body-${i}" style="display:none;" class="agent-card-body">
+        <div class="wave-row"><span class="wave-lbl">Alpha</span><div class="pbar" style="flex:1;margin:0 6px;"><div class="pbar-fill" style="width:${a.alpha}%;background:#06b6d4;"></div></div><span class="wave-val">${a.alpha}%</span></div>
+        <div class="wave-row"><span class="wave-lbl">Beta</span><div class="pbar" style="flex:1;margin:0 6px;"><div class="pbar-fill" style="width:${a.beta}%;background:#3b82f6;"></div></div><span class="wave-val">${a.beta}%</span></div>
+        <div class="wave-row"><span class="wave-lbl">Theta</span><div class="pbar" style="flex:1;margin:0 6px;"><div class="pbar-fill" style="width:${a.theta}%;background:#a78bfa;"></div></div><span class="wave-val">${a.theta}%</span></div>
+        <div class="wave-row"><span class="wave-lbl">Delta</span><div class="pbar" style="flex:1;margin:0 6px;"><div class="pbar-fill" style="width:${a.delta}%;background:#f472b6;"></div></div><span class="wave-val">${a.delta}%</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:8px;">
+          <span style="color:var(--txt3);">Confidence</span>
+          <span style="color:var(--primary);font-weight:700;font-family:var(--font-mono);">${a.conf}%</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleAgentCard(i){
+  const body=document.getElementById('agent-body-'+i);
+  const chev=document.getElementById('chevron-'+i);
+  if(!body)return;
+  const open=body.style.display==='none';
+  body.style.display=open?'':'none';
+  if(chev)chev.textContent=open?'⌄':'›';
+}
+
+// ── Sync time updater ────────────────────────────────
+function updateSyncTime(){
+  const el=document.getElementById('sync-time');
+  if(el)el.textContent=new Date().toLocaleTimeString();
+}
+
+// ── Init ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  renderSidebarAgents();
+  renderSidebarStats();
+  renderEEGPanel();
+  startEEGCanvas();
+  renderNeuroSyncPanel();
+  updateSyncTime();
+  setInterval(updateSyncTime,1000);
+});
+</script>
 </body>
 </html>
