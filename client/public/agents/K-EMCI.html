@@ -3,131 +3,28 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>K-EMCI Clinical NeuroGuardian - Prevention & Early Detection</title>
+<title>TBR1 Clinical NeuroGuardian - Prevention & Early Detection</title>
 <meta name="theme-color" content="#10b981"/>
 <meta name="description" content="Clinical-grade TBR1 monitoring for prevention, prenatal screening, and early intervention"/>
-
-<script type="application/json" id="manifest-placeholder">
-{
-  "name": "K-EMCI Clinical NeuroGuardian",
-  "short_name": "K-EMCI Clinical",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#10b981",
-  "orientation": "portrait",
-  "icons": [
-    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
-    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
-  ]
-}
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-  background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  color:#1f2937;
-  line-height:1.6;
-  padding:0;
-}
-
-/* Header */
-.header{
-  background:#10b981;
-  color:#fff;
-  padding:20px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-  position:sticky;
-  top:0;
-  z-index:100;
-}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%);color:#1f2937;line-height:1.6;padding:0;}
+.header{background:#10b981;color:#fff;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);position:sticky;top:0;z-index:100;}
 .header h1{font-size:1.5em;font-weight:600;margin-bottom:4px;}
 .header p{font-size:0.9em;opacity:0.9;}
-
-/* Navigation */
-.nav{
-  display:flex;
-  gap:8px;
-  padding:12px 20px;
-  background:#fff;
-  border-bottom:1px solid #e5e7eb;
-  overflow-x:auto;
-  position:sticky;
-  top:80px;
-  z-index:99;
-  box-shadow:0 1px 3px rgba(0,0,0,0.05);
-}
-.nav-btn{
-  padding:10px 20px;
-  border:none;
-  border-radius:8px;
-  background:#f3f4f6;
-  color:#374151;
-  font-weight:500;
-  cursor:pointer;
-  white-space:nowrap;
-  transition:all 0.2s;
-  font-size:14px;
-}
+.nav{display:flex;gap:8px;padding:12px 20px;background:#fff;border-bottom:1px solid #e5e7eb;overflow-x:auto;position:sticky;top:80px;z-index:99;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.nav-btn{padding:10px 20px;border:none;border-radius:8px;background:#f3f4f6;color:#374151;font-weight:500;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-size:14px;}
 .nav-btn:hover{background:#e5e7eb;}
 .nav-btn.active{background:#10b981;color:#fff;}
-
-/* Container */
-.container{
-  max-width:1200px;
-  margin:0 auto;
-  padding:20px;
-}
-
-/* Cards */
-.card{
-  background:#fff;
-  border-radius:12px;
-  padding:24px;
-  margin-bottom:20px;
-  box-shadow:0 1px 3px rgba(0,0,0,0.1);
-  border:1px solid #e5e7eb;
-}
-.card h2{
-  color:#10b981;
-  font-size:1.3em;
-  margin-bottom:12px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.card h3{
-  color:#059669;
-  font-size:1.1em;
-  margin:16px 0 8px 0;
-}
-.card-subtitle{
-  color:#6b7280;
-  font-size:0.9em;
-  margin-bottom:16px;
-}
-
-/* Sections */
+.container{max-width:1200px;margin:0 auto;padding:20px;}
+.card{background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.1);border:1px solid #e5e7eb;}
+.card h2{color:#10b981;font-size:1.3em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card h3{color:#059669;font-size:1.1em;margin:16px 0 8px 0;}
+.card-subtitle{color:#6b7280;font-size:0.9em;margin-bottom:16px;}
 .section{display:none;}
 .section.active{display:block;}
-
-/* Buttons */
-.btn{
-  padding:12px 24px;
-  border:none;
-  border-radius:8px;
-  font-weight:500;
-  cursor:pointer;
-  transition:all 0.2s;
-  font-size:14px;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-}
+.btn{padding:12px 24px;border:none;border-radius:8px;font-weight:500;cursor:pointer;transition:all 0.2s;font-size:14px;display:inline-flex;align-items:center;gap:6px;}
 .btn-primary{background:#10b981;color:#fff;}
 .btn-primary:hover{background:#059669;transform:translateY(-1px);box-shadow:0 4px 8px rgba(16,185,129,0.3);}
 .btn-secondary{background:#3b82f6;color:#fff;}
@@ -135,204 +32,52 @@ body{
 .btn-outline{background:#fff;color:#10b981;border:2px solid #10b981;}
 .btn-outline:hover{background:#f0fdf4;}
 .btn-danger{background:#ef4444;color:#fff;}
-.btn-danger:hover{background:#dc2626;}
-
-/* Forms */
 .form-group{margin-bottom:16px;}
-.form-group label{
-  display:block;
-  font-weight:500;
-  margin-bottom:6px;
-  color:#374151;
-}
-.form-control{
-  width:100%;
-  padding:10px 12px;
-  border:2px solid #e5e7eb;
-  border-radius:8px;
-  font-size:14px;
-  transition:border-color 0.2s;
-}
-.form-control:focus{
-  outline:none;
-  border-color:#10b981;
-}
+.form-group label{display:block;font-weight:500;margin-bottom:6px;color:#374151;}
+.form-control{width:100%;padding:10px 12px;border:2px solid #e5e7eb;border-radius:8px;font-size:14px;transition:border-color 0.2s;}
+.form-control:focus{outline:none;border-color:#10b981;}
 select.form-control{cursor:pointer;}
 textarea.form-control{resize:vertical;min-height:80px;font-family:inherit;}
-
-/* Flex utilities */
 .flex{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
 .flex-col{display:flex;flex-direction:column;gap:12px;}
-
-/* Alert boxes */
-.alert{
-  padding:16px;
-  border-radius:8px;
-  margin-bottom:16px;
-  display:flex;
-  align-items:start;
-  gap:12px;
-}
+.alert{padding:16px;border-radius:8px;margin-bottom:16px;display:flex;align-items:start;gap:12px;}
 .alert-info{background:#dbeafe;border-left:4px solid #3b82f6;color:#1e40af;}
 .alert-success{background:#d1fae5;border-left:4px solid #10b981;color:#065f46;}
 .alert-warning{background:#fef3c7;border-left:4px solid #f59e0b;color:#92400e;}
 .alert-danger{background:#fee2e2;border-left:4px solid #ef4444;color:#991b1b;}
-
-/* Progress bar */
-.progress-bar{
-  width:100%;
-  height:8px;
-  background:#e5e7eb;
-  border-radius:4px;
-  overflow:hidden;
-  margin:8px 0;
-}
-.progress-fill{
-  height:100%;
-  background:#10b981;
-  transition:width 0.3s;
-}
-
-/* Risk meter */
-.risk-meter{
-  display:flex;
-  gap:4px;
-  height:40px;
-  border-radius:8px;
-  overflow:hidden;
-  margin:12px 0;
-}
-.risk-segment{flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;}
-.risk-low{background:#10b981;}
-.risk-medium{background:#f59e0b;}
-.risk-high{background:#ef4444;}
-
-/* Timeline */
+.progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin:8px 0;}
+.progress-fill{height:100%;background:#10b981;transition:width 0.3s;}
 .timeline{position:relative;padding-left:30px;margin:20px 0;}
-.timeline-item{
-  position:relative;
-  padding-bottom:20px;
-  border-left:2px solid #d1d5db;
-}
+.timeline-item{position:relative;padding-bottom:20px;border-left:2px solid #d1d5db;}
 .timeline-item:last-child{border:none;}
-.timeline-dot{
-  position:absolute;
-  left:-31px;
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:#10b981;
-  border:2px solid #fff;
-  box-shadow:0 0 0 2px #10b981;
-}
-.timeline-content{
-  background:#f9fafb;
-  padding:12px;
-  border-radius:8px;
-  margin-left:10px;
-}
-
-/* Stats grid */
-.stats-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:16px;
-  margin:16px 0;
-}
-.stat-card{
-  background:linear-gradient(135deg,#10b981,#059669);
-  color:#fff;
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-}
+.timeline-dot{position:absolute;left:-31px;width:12px;height:12px;border-radius:50%;background:#10b981;border:2px solid #fff;box-shadow:0 0 0 2px #10b981;}
+.timeline-content{background:#f9fafb;padding:12px;border-radius:8px;margin-left:10px;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:16px 0;}
+.stat-card{background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:20px;border-radius:12px;text-align:center;}
 .stat-value{font-size:2em;font-weight:700;}
 .stat-label{font-size:0.9em;opacity:0.9;margin-top:4px;}
-
-/* Responsive */
-@media (max-width:768px){
-  .container{padding:12px;}
-  .card{padding:16px;}
-  .stats-grid{grid-template-columns:1fr;}
-}
-
-/* Loading spinner */
-.spinner{
-  border:3px solid #e5e7eb;
-  border-top:3px solid #10b981;
-  border-radius:50%;
-  width:24px;
-  height:24px;
-  animation:spin 1s linear infinite;
-  display:inline-block;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* Modal */
-.modal{
-  display:none;
-  position:fixed;
-  top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.5);
-  z-index:1000;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
+@media(max-width:768px){.container{padding:12px;}.card{padding:16px;}.stats-grid{grid-template-columns:1fr;}}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:20px;}
 .modal.active{display:flex;}
-.modal-content{
-  background:#fff;
-  border-radius:12px;
-  padding:24px;
-  max-width:600px;
-  width:100%;
-  max-height:90vh;
-  overflow:auto;
-  position:relative;
-}
-.modal-close{
-  position:absolute;
-  top:12px;
-  right:12px;
-  background:#f3f4f6;
-  border:none;
-  border-radius:6px;
-  padding:8px 12px;
-  cursor:pointer;
-  font-weight:600;
-}
+.modal-content{background:#fff;border-radius:12px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow:auto;position:relative;}
+.modal-close{position:absolute;top:12px;right:12px;background:#f3f4f6;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;font-weight:600;}
 .modal-close:hover{background:#e5e7eb;}
-
-/* Tables */
 table{width:100%;border-collapse:collapse;margin:12px 0;}
 th,td{padding:12px;text-align:left;border-bottom:1px solid #e5e7eb;}
 th{background:#f9fafb;font-weight:600;color:#374151;}
 tr:hover{background:#f9fafb;}
 </style>
-
 <script>
-    // Jua Kali Hub Sync Script
-    window.addEventListener("message", (event) => {
-        if (event.data && event.data.type === "HUB_SYNC") {
-            console.log("Sync data received:", event.data.payload);
-            if (window.onHubSync) window.onHubSync(event.data.payload);
-        }
-    });
-    function broadcastToHub(data) {
-        window.parent.postMessage({ type: "AGENT_DATA", payload: data }, "*");
-    }
-</script>
-<script>
-    // Jua Kali Hub Sync Script
-    window.addEventListener("message", (event) => {
-        if (event.data && event.data.type === "HUB_SYNC") {
-            console.log("Sync data received:", event.data.payload);
-            if (window.onHubSync) window.onHubSync(event.data.payload);
-        }
-    });
-    function broadcastToHub(data) {
-        window.parent.postMessage({ type: "AGENT_DATA", payload: data }, "*");
-    }
+// Jua Kali Hub Sync — single instance
+window.addEventListener("message",(event)=>{
+  if(event.data&&event.data.type==="HUB_SYNC"){
+    console.log("Sync data received:",event.data.payload);
+    if(window.onHubSync)window.onHubSync(event.data.payload);
+  }
+});
+function broadcastToHub(data){
+  window.parent.postMessage({type:"AGENT_DATA",payload:data},"*");
+}
 </script>
 </head>
 <body>
@@ -343,46 +88,32 @@ tr:hover{background:#f9fafb;}
 </div>
 
 <div class="nav">
-  <button class="nav-btn active" onclick="showSection('overview')">📊 Overview</button>
-  <button class="nav-btn" onclick="showSection('prenatal')">🤰 Prenatal Screening</button>
-  <button class="nav-btn" onclick="showSection('postnatal')">👶 Postnatal Monitoring</button>
-  <button class="nav-btn" onclick="showSection('metabolic')">🧪 Metabolic Disorders</button>
-  <button class="nav-btn" onclick="showSection('prevention')">💊 Prevention Protocols</button>
-  <button class="nav-btn" onclick="showSection('intervention')">🏥 Early Intervention</button>
-  <button class="nav-btn" onclick="showSection('resources')">📚 Resources</button>
+  <button class="nav-btn active" onclick="showSection('overview',this)">📊 Overview</button>
+  <button class="nav-btn" onclick="showSection('prenatal',this)">🤰 Prenatal Screening</button>
+  <button class="nav-btn" onclick="showSection('postnatal',this)">👶 Postnatal Monitoring</button>
+  <button class="nav-btn" onclick="showSection('metabolic',this)">🧪 Metabolic Disorders</button>
+  <button class="nav-btn" onclick="showSection('prevention',this)">💊 Prevention Protocols</button>
+  <button class="nav-btn" onclick="showSection('intervention',this)">🏥 Early Intervention</button>
+  <button class="nav-btn" onclick="showSection('resources',this)">📚 Resources</button>
 </div>
 
 <div class="container">
 
-<!-- OVERVIEW SECTION -->
+<!-- OVERVIEW -->
 <div id="overview" class="section active">
   <div class="card">
     <h2>🎯 Clinical Purpose</h2>
     <div class="alert alert-info">
       <strong>ℹ️</strong>
-      <div>This platform provides clinical decision support for TBR1-related neurodevelopmental conditions through evidence-based prenatal screening, postnatal monitoring, and early intervention strategies with focus on prevention and early detection.</div>
+      <div>This platform provides clinical decision support for TBR1-related neurodevelopmental conditions through evidence-based prenatal screening, postnatal monitoring, and early intervention strategies.</div>
     </div>
   </div>
-
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-value">95%</div>
-      <div class="stat-label">Early Detection Rate</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">3-6mo</div>
-      <div class="stat-label">Optimal Screening Window</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">70%</div>
-      <div class="stat-label">Prevention Efficacy</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">24/7</div>
-      <div class="stat-label">NeuroGuardian Monitoring</div>
-    </div>
+    <div class="stat-card"><div class="stat-value">95%</div><div class="stat-label">Early Detection Rate</div></div>
+    <div class="stat-card"><div class="stat-value">3-6mo</div><div class="stat-label">Optimal Screening Window</div></div>
+    <div class="stat-card"><div class="stat-value">70%</div><div class="stat-label">Prevention Efficacy</div></div>
+    <div class="stat-card"><div class="stat-value">24/7</div><div class="stat-label">NeuroGuardian Monitoring</div></div>
   </div>
-
   <div class="card">
     <h2>🧬 NeuroGuardian Clinical Detection Methods</h2>
     <div class="timeline">
@@ -412,186 +143,83 @@ tr:hover{background:#f9fafb;}
       </div>
     </div>
   </div>
-
   <div class="card">
     <h2>🛡️ NeuroGuardian Protection Matrix</h2>
-    <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 16px 0;">
-      <div class="card" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
-        <h3 style="color: white;">🔒 Primary Prevention</h3>
-        <ul>
-          <li>Pre-conception genetic counseling</li>
-          <li>High-dose folic acid protocols</li>
-          <li>Environmental risk reduction</li>
-          <li>Nutritional optimization</li>
-        </ul>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:16px 0;">
+      <div class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;">
+        <h3 style="color:white;">🔒 Primary Prevention</h3>
+        <ul><li>Pre-conception genetic counseling</li><li>High-dose folic acid protocols</li><li>Environmental risk reduction</li><li>Nutritional optimization</li></ul>
       </div>
-      <div class="card" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;">
-        <h3 style="color: white;">🔄 Secondary Prevention</h3>
-        <ul>
-          <li>Early biomarker detection</li>
-          <li>Pre-symptomatic screening</li>
-          <li>Developmental surveillance</li>
-          <li>Risk stratification algorithms</li>
-        </ul>
+      <div class="card" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;">
+        <h3 style="color:white;">🔄 Secondary Prevention</h3>
+        <ul><li>Early biomarker detection</li><li>Pre-symptomatic screening</li><li>Developmental surveillance</li><li>Risk stratification algorithms</li></ul>
       </div>
-      <div class="card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white;">
-        <h3 style="color: white;">⚡ Tertiary Prevention</h3>
-        <ul>
-          <li>Precision interventions</li>
-          <li>Neural circuit remodeling</li>
-          <li>Metabolic pathway support</li>
-          <li>Family support systems</li>
-        </ul>
+      <div class="card" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;">
+        <h3 style="color:white;">⚡ Tertiary Prevention</h3>
+        <ul><li>Precision interventions</li><li>Neural circuit remodeling</li><li>Metabolic pathway support</li><li>Family support systems</li></ul>
       </div>
     </div>
   </div>
-
   <div class="card">
-    <h2>📊 NeuroGuardian Real-time Monitoring Dashboard</h2>
-    <div class="flex" style="gap: 16px; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 200px;">
-        <div class="card" style="text-align: center; background: #f0fdf4;">
-          <h4 style="color: #059669;">🧠 Neural Oscillations</h4>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 85%;"></div>
-          </div>
-          <div class="small">85% Normal Gamma</div>
+    <h2>📊 Real-time Monitoring Dashboard</h2>
+    <div class="flex" style="gap:16px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <div class="card" style="text-align:center;background:#f0fdf4;">
+          <h4 style="color:#059669;">🧠 Neural Oscillations</h4>
+          <div class="progress-bar"><div class="progress-fill" style="width:85%;"></div></div>
+          <div>85% Normal Gamma</div>
         </div>
       </div>
-      <div style="flex: 1; min-width: 200px;">
-        <div class="card" style="text-align: center; background: #eff6ff;">
-          <h4 style="color: #2563eb;">👀 Visual Tracking</h4>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 92%;"></div>
-          </div>
-          <div class="small">92% Fixation Accuracy</div>
+      <div style="flex:1;min-width:200px;">
+        <div class="card" style="text-align:center;background:#eff6ff;">
+          <h4 style="color:#2563eb;">👀 Visual Tracking</h4>
+          <div class="progress-bar"><div class="progress-fill" style="width:92%;"></div></div>
+          <div>92% Fixation Accuracy</div>
         </div>
       </div>
-      <div style="flex: 1; min-width: 200px;">
-        <div class="card" style="text-align: center; background: #fef3c7;">
-          <h4 style="color: #d97706;">🎯 Social Engagement</h4>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 78%;"></div>
-          </div>
-          <div class="small">78% Joint Attention</div>
+      <div style="flex:1;min-width:200px;">
+        <div class="card" style="text-align:center;background:#fef3c7;">
+          <h4 style="color:#d97706;">🎯 Social Engagement</h4>
+          <div class="progress-bar"><div class="progress-fill" style="width:78%;"></div></div>
+          <div>78% Joint Attention</div>
         </div>
       </div>
     </div>
-
-    <div style="margin-top: 20px;">
-      <canvas id="neuroguardianChart" height="150"></canvas>
-    </div>
+    <div style="margin-top:20px;"><canvas id="neuroguardianChart" height="150"></canvas></div>
   </div>
-
   <div class="card">
     <h2>🔬 NeuroGuardian Evidence Base</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Intervention</th>
-          <th>Evidence Level</th>
-          <th>Efficacy</th>
-          <th>Clinical Stage</th>
-          <th>NeuroGuardian Protocol</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Intervention</th><th>Evidence Level</th><th>Efficacy</th><th>Clinical Stage</th><th>Protocol</th></tr></thead>
       <tbody>
-        <tr>
-          <td>Folic Acid Neuroprotection</td>
-          <td>Level I (RCTs)</td>
-          <td>40-50% risk reduction</td>
-          <td>FDA Approved</td>
-          <td>🛡️ Primary Prevention</td>
-        </tr>
-        <tr>
-          <td>EEG Biomarker Detection</td>
-          <td>Level I</td>
-          <td>95% detection rate</td>
-          <td>Clinical Validation</td>
-          <td>🔄 Secondary Prevention</td>
-        </tr>
-        <tr>
-          <td>Early Behavioral Intervention</td>
-          <td>Level II</td>
-          <td>60-70% improvement</td>
-          <td>Clinical Practice</td>
-          <td>⚡ Tertiary Prevention</td>
-        </tr>
-        <tr>
-          <td>Metabolic Pathway Support</td>
-          <td>Level II</td>
-          <td>Early detection</td>
-          <td>Clinical Practice</td>
-          <td>🔄 Secondary Prevention</td>
-        </tr>
-        <tr>
-          <td>Parent-Mediated Therapy</td>
-          <td>Level I</td>
-          <td>45% better outcomes</td>
-          <td>Standard of Care</td>
-          <td>⚡ Tertiary Prevention</td>
-        </tr>
+        <tr><td>Folic Acid Neuroprotection</td><td>Level I (RCTs)</td><td>40-50% risk reduction</td><td>FDA Approved</td><td>🛡️ Primary</td></tr>
+        <tr><td>EEG Biomarker Detection</td><td>Level I</td><td>95% detection rate</td><td>Clinical Validation</td><td>🔄 Secondary</td></tr>
+        <tr><td>Early Behavioral Intervention</td><td>Level II</td><td>60-70% improvement</td><td>Clinical Practice</td><td>⚡ Tertiary</td></tr>
+        <tr><td>Metabolic Pathway Support</td><td>Level II</td><td>Early detection</td><td>Clinical Practice</td><td>🔄 Secondary</td></tr>
+        <tr><td>Parent-Mediated Therapy</td><td>Level I</td><td>45% better outcomes</td><td>Standard of Care</td><td>⚡ Tertiary</td></tr>
       </tbody>
     </table>
   </div>
-
   <div class="card">
     <h2>🚨 NeuroGuardian Alert System</h2>
-    <div class="alert alert-warning">
-      <strong>⚠️ Active Monitoring</strong>
-      <div>The NeuroGuardian system continuously monitors for early warning signs and provides real-time alerts for clinical intervention.</div>
-    </div>
-    
+    <div class="alert alert-warning"><strong>⚠️ Active Monitoring</strong><div>The NeuroGuardian system continuously monitors for early warning signs and provides real-time alerts for clinical intervention.</div></div>
     <div class="flex-col">
-      <div class="card" style="border-left: 4px solid #ef4444;">
-        <h4>🔴 High Priority Alerts</h4>
-        <ul>
-          <li>Abnormal EEG patterns persisting >48 hours</li>
-          <li>Developmental regression in social communication</li>
-          <li>Metabolic markers outside reference range</li>
-        </ul>
-      </div>
-      
-      <div class="card" style="border-left: 4px solid #f59e0b;">
-        <h4>🟡 Medium Priority Alerts</h4>
-        <ul>
-          <li>Subtle changes in visual tracking patterns</li>
-          <li>Minor deviations in milestone acquisition</li>
-          <li>Family report of behavioral changes</li>
-        </ul>
-      </div>
-      
-      <div class="card" style="border-left: 4px solid #10b981;">
-        <h4>🟢 Routine Monitoring</h4>
-        <ul>
-          <li>Monthly developmental assessments</li>
-          <li>Quarterly metabolic panels</li>
-          <li>Bi-annual comprehensive evaluations</li>
-        </ul>
-      </div>
+      <div class="card" style="border-left:4px solid #ef4444;"><h4>🔴 High Priority Alerts</h4><ul><li>Abnormal EEG patterns persisting >48 hours</li><li>Developmental regression in social communication</li><li>Metabolic markers outside reference range</li></ul></div>
+      <div class="card" style="border-left:4px solid #f59e0b;"><h4>🟡 Medium Priority Alerts</h4><ul><li>Subtle changes in visual tracking patterns</li><li>Minor deviations in milestone acquisition</li><li>Family report of behavioral changes</li></ul></div>
+      <div class="card" style="border-left:4px solid #10b981;"><h4>🟢 Routine Monitoring</h4><ul><li>Monthly developmental assessments</li><li>Quarterly metabolic panels</li><li>Bi-annual comprehensive evaluations</li></ul></div>
     </div>
   </div>
 </div>
 
-<!-- PRENATAL SCREENING SECTION -->
+<!-- PRENATAL SCREENING -->
 <div id="prenatal" class="section">
   <div class="card">
     <h2>🤰 Prenatal Screening Protocol</h2>
     <p class="card-subtitle">Comprehensive genetic and risk assessment for TBR1-related conditions</p>
-
-    <div class="alert alert-warning">
-      <strong>⚠️</strong>
-      <div>This tool is for healthcare professional use only. All results must be interpreted by a qualified genetic counselor or physician.</div>
-    </div>
-
+    <div class="alert alert-warning"><strong>⚠️</strong><div>This tool is for healthcare professional use only. All results must be interpreted by a qualified genetic counselor or physician.</div></div>
     <h3>Patient Information</h3>
-    <div class="form-group">
-      <label>Maternal Age</label>
-      <input type="number" id="maternalAge" class="form-control" placeholder="Years" min="18" max="50">
-    </div>
-
-    <div class="form-group">
-      <label>Gestational Age</label>
+    <div class="form-group"><label>Maternal Age</label><input type="number" id="maternalAge" class="form-control" placeholder="Years" min="18" max="50"></div>
+    <div class="form-group"><label>Gestational Age</label>
       <select id="gestationalAge" class="form-control">
         <option value="">Select week</option>
         <option value="15">15-16 weeks (CVS/Amnio recommended)</option>
@@ -600,27 +228,12 @@ tr:hover{background:#f9fafb;}
         <option value="21">21-24 weeks (Late screening)</option>
       </select>
     </div>
-
     <h3>Family History</h3>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="familyASD"> Family history of ASD
-      </label>
-    </div>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="familyID"> Family history of intellectual disability
-      </label>
-    </div>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="familyTBR1"> Known TBR1 variant in family
-      </label>
-    </div>
-
+    <div class="form-group"><label><input type="checkbox" id="familyASD"> Family history of ASD</label></div>
+    <div class="form-group"><label><input type="checkbox" id="familyID"> Family history of intellectual disability</label></div>
+    <div class="form-group"><label><input type="checkbox" id="familyTBR1"> Known TBR1 variant in family</label></div>
     <h3>Prenatal Supplementation</h3>
-    <div class="form-group">
-      <label>Folic Acid Intake (mcg/day)</label>
+    <div class="form-group"><label>Folic Acid Intake (mcg/day)</label>
       <select id="folicAcid" class="form-control">
         <option value="0">None/Unknown</option>
         <option value="400">400 mcg (Standard prenatal)</option>
@@ -628,38 +241,24 @@ tr:hover{background:#f9fafb;}
         <option value="1000">1000+ mcg (Therapeutic dose)</option>
       </select>
     </div>
-
-    <div class="form-group">
-      <label>Additional Supplements</label>
-      <textarea id="supplements" class="form-control" placeholder="List other prenatal vitamins, omega-3, choline, etc."></textarea>
-    </div>
-
-    <button class="btn btn-primary" onclick="calculatePrenatalRisk()">
-      Calculate Risk Assessment
-    </button>
-
+    <div class="form-group"><label>Additional Supplements</label><textarea id="supplements" class="form-control" placeholder="List other prenatal vitamins, omega-3, choline, etc."></textarea></div>
+    <button class="btn btn-primary" onclick="calculatePrenatalRisk()">Calculate Risk Assessment</button>
     <div id="prenatalResults" style="margin-top:20px;"></div>
   </div>
-
   <div class="card">
     <h2>🧪 Recommended Testing Protocol</h2>
-    <div class="alert alert-info">
-      <strong>💡</strong>
-      <div>Based on current gestational age and risk factors, the following tests are recommended:</div>
-    </div>
+    <div class="alert alert-info"><strong>💡</strong><div>Based on current gestational age and risk factors, the following tests are recommended:</div></div>
     <div id="testingProtocol"></div>
   </div>
 </div>
 
-<!-- POSTNATAL MONITORING SECTION -->
+<!-- POSTNATAL MONITORING -->
 <div id="postnatal" class="section">
   <div class="card">
     <h2>👶 Postnatal Developmental Monitoring</h2>
     <p class="card-subtitle">Track developmental milestones and identify early warning signs</p>
-
     <h3>Patient Information</h3>
-    <div class="form-group">
-      <label>Child's Age</label>
+    <div class="form-group"><label>Child's Age</label>
       <select id="childAge" class="form-control" onchange="updateMilestones()">
         <option value="">Select age range</option>
         <option value="0-3">0-3 months (Neonatal)</option>
@@ -670,59 +269,27 @@ tr:hover{background:#f9fafb;}
         <option value="24-36">24-36 months (Preschool)</option>
       </select>
     </div>
-
     <h3>Clinical Assessments Completed</h3>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="eegDone"> EEG performed (abnormal cortical activity screening)
-      </label>
-    </div>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="eyeTrackingDone"> Eye tracking assessment (visual attention)
-      </label>
-    </div>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="metabolicDone"> Metabolic panel completed
-      </label>
-    </div>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="geneticDone"> Genetic testing performed
-      </label>
-    </div>
-
+    <div class="form-group"><label><input type="checkbox" id="eegDone"> EEG performed</label></div>
+    <div class="form-group"><label><input type="checkbox" id="eyeTrackingDone"> Eye tracking assessment</label></div>
+    <div class="form-group"><label><input type="checkbox" id="metabolicDone"> Metabolic panel completed</label></div>
+    <div class="form-group"><label><input type="checkbox" id="geneticDone"> Genetic testing performed</label></div>
     <h3>Developmental Milestone Checklist</h3>
     <div id="milestoneChecklist"></div>
-
-    <button class="btn btn-primary" onclick="assessDevelopment()">
-      Assess Development
-    </button>
-
+    <button class="btn btn-primary" onclick="assessDevelopment()">Assess Development</button>
     <div id="developmentResults" style="margin-top:20px;"></div>
   </div>
-
-  <div class="card">
-    <h2>📊 Tracking Dashboard</h2>
-    <canvas id="developmentChart" height="200"></canvas>
-  </div>
+  <div class="card"><h2>📊 Tracking Dashboard</h2><canvas id="developmentChart" height="200"></canvas></div>
 </div>
 
-<!-- METABOLIC DISORDERS SECTION -->
+<!-- METABOLIC DISORDERS -->
 <div id="metabolic" class="section">
   <div class="card">
     <h2>🧪 Metabolic Disorders Screening</h2>
     <p class="card-subtitle">Early detection of metabolic conditions that may co-occur with TBR1 variants</p>
-
-    <div class="alert alert-info">
-      <strong>ℹ️</strong>
-      <div>TBR1-related neurodevelopmental disorders may be associated with metabolic imbalances. Early detection allows for targeted interventions.</div>
-    </div>
-
+    <div class="alert alert-info"><strong>ℹ️</strong><div>TBR1-related neurodevelopmental disorders may be associated with metabolic imbalances. Early detection allows for targeted interventions.</div></div>
     <h3>Symptom Assessment</h3>
-    <div class="form-group">
-      <label>Age at Symptom Onset</label>
+    <div class="form-group"><label>Age at Symptom Onset</label>
       <select id="metabOnset" class="form-control">
         <option value="">Select age range</option>
         <option value="neonatal">Neonatal (0-1 month)</option>
@@ -731,7 +298,6 @@ tr:hover{background:#f9fafb;}
         <option value="child">Child (3-12 years)</option>
       </select>
     </div>
-
     <h4>Clinical Features (select all that apply)</h4>
     <div class="form-group">
       <label><input type="checkbox" id="feat_encephalopathy"> Encephalopathy/lethargy</label><br>
@@ -744,7 +310,6 @@ tr:hover{background:#f9fafb;}
       <label><input type="checkbox" id="feat_regression"> Developmental regression</label><br>
       <label><input type="checkbox" id="feat_failure"> Failure to thrive</label>
     </div>
-
     <h4>Laboratory Findings (select all that apply)</h4>
     <div class="form-group">
       <label><input type="checkbox" id="lab_acidosis"> Metabolic acidosis</label><br>
@@ -753,441 +318,138 @@ tr:hover{background:#f9fafb;}
       <label><input type="checkbox" id="lab_lactate"> Elevated lactate</label><br>
       <label><input type="checkbox" id="lab_ketones"> Ketones in urine</label>
     </div>
-
     <h4>Family History</h4>
     <div class="form-group">
       <label><input type="checkbox" id="fam_consanguinity"> Consanguinity</label><br>
       <label><input type="checkbox" id="fam_sibling"> Similar symptoms in siblings</label><br>
       <label><input type="checkbox" id="fam_death"> Unexplained infant death in family</label>
     </div>
-
-    <button class="btn btn-primary" onclick="assessMetabolicRisk()">
-      Assess Metabolic Risk
-    </button>
-
+    <button class="btn btn-primary" onclick="assessMetabolicRisk()">Assess Metabolic Risk</button>
     <div id="metabolicResults" style="margin-top:20px;"></div>
   </div>
-
-  <div class="card">
-    <h2>🔬 Metabolic Testing Recommendations</h2>
-    <div id="metabolicTesting"></div>
-  </div>
+  <div class="card"><h2>🔬 Metabolic Testing Recommendations</h2><div id="metabolicTesting"></div></div>
 </div>
 
-<!-- PREVENTION PROTOCOLS SECTION -->
+<!-- PREVENTION PROTOCOLS -->
 <div id="prevention" class="section">
   <div class="card">
     <h2>💊 Evidence-Based Prevention Protocols</h2>
     <p class="card-subtitle">Nutritional and environmental interventions to reduce TBR1-related risks</p>
-
-    <div class="alert alert-success">
-      <strong>✓</strong>
-      <div>These protocols are based on Level I-II clinical evidence and can reduce risk by up to 50% when implemented during critical developmental windows.</div>
-    </div>
-
-    <!-- Collapsible Clinician Zone Section -->
+    <div class="alert alert-success"><strong>✓</strong><div>These protocols are based on Level I-II clinical evidence and can reduce risk by up to 50% when implemented during critical developmental windows.</div></div>
     <div class="card" style="background:#f8fafc;border:2px solid #10b981;margin:20px 0;">
-      <h3 style="color:#10b981;cursor:pointer;display:flex;align-items:center;gap:8px;" onclick="toggleClinicianZone()">
-        <span>🔒</span> 
-        Clinician Zone: Advanced Prevention Protocols
-        <span style="margin-left:auto;font-size:0.8em;">📋 Click to expand</span>
+      <h3 style="color:#10b981;cursor:pointer;display:flex;align-items:center;gap:8px;" onclick="toggleClinicianZone(this)">
+        <span>🔒</span> Clinician Zone: Advanced Prevention Protocols
+        <span id="clinicianToggleLabel" style="margin-left:auto;font-size:0.8em;">📋 Click to expand</span>
       </h3>
-      
       <div id="clinicianZoneContent" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;">
-        <div class="alert alert-info">
-          <strong>👨‍⚕️ CLINICIAN USE ONLY</strong>
-          <div>Advanced protocols for high-risk cases and specialized clinical settings</div>
-        </div>
-
+        <div class="alert alert-info"><strong>👨‍⚕️ CLINICIAN USE ONLY</strong><div>Advanced protocols for high-risk cases and specialized clinical settings</div></div>
         <h4>🔬 High-Risk Supplementation Protocol</h4>
         <div class="card" style="background:#f0fdf4;">
           <h5>Pre-conception (3-6 months before pregnancy)</h5>
           <table>
-            <thead>
-              <tr>
-                <th>Supplement</th>
-                <th>Standard Dose</th>
-                <th>High-Risk Dose</th>
-                <th>Monitoring Parameters</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Supplement</th><th>Standard Dose</th><th>High-Risk Dose</th><th>Monitoring</th></tr></thead>
             <tbody>
-              <tr>
-                <td>Folic Acid</td>
-                <td>400-600 mcg</td>
-                <td>1000-5000 mcg</td>
-                <td>RBC folate, homocysteine</td>
-              </tr>
-              <tr>
-                <td>Choline</td>
-                <td>450 mg</td>
-                <td>900-1200 mg</td>
-                <td>Liver function tests</td>
-              </tr>
-              <tr>
-                <td>Vitamin B12</td>
-                <td>2.6 mcg</td>
-                <td>1000-2500 mcg</td>
-                <td>Serum B12, MMA</td>
-              </tr>
-              <tr>
-                <td>Vitamin D</td>
-                <td>600-800 IU</td>
-                <td>2000-4000 IU</td>
-                <td>25-OH Vitamin D</td>
-              </tr>
-              <tr>
-                <td>Omega-3 (DHA)</td>
-                <td>200 mg</td>
-                <td>600-1000 mg</td>
-                <td>AA:EPA ratio</td>
-              </tr>
+              <tr><td>Folic Acid</td><td>400-600 mcg</td><td>1000-5000 mcg</td><td>RBC folate, homocysteine</td></tr>
+              <tr><td>Choline</td><td>450 mg</td><td>900-1200 mg</td><td>Liver function tests</td></tr>
+              <tr><td>Vitamin B12</td><td>2.6 mcg</td><td>1000-2500 mcg</td><td>Serum B12, MMA</td></tr>
+              <tr><td>Vitamin D</td><td>600-800 IU</td><td>2000-4000 IU</td><td>25-OH Vitamin D</td></tr>
+              <tr><td>Omega-3 (DHA)</td><td>200 mg</td><td>600-1000 mg</td><td>AA:EPA ratio</td></tr>
             </tbody>
           </table>
         </div>
-
         <h4>🧬 Genetic Risk Stratification</h4>
         <div class="flex-col">
-          <div class="card" style="background:#eff6ff;">
-            <h5>Tier 1: Confirmed TBR1 Variant</h5>
-            <ul>
-              <li>Pre-conception genetic counseling mandatory</li>
-              <li>Consider PGD/PGS for family planning</li>
-              <li>High-dose protocol from 6 months pre-conception</li>
-              <li>Monthly monitoring of nutrient levels</li>
-            </ul>
-          </div>
-          
-          <div class="card" style="background:#fef3c7;">
-            <h5>Tier 2: Family History (1st degree relative)</h5>
-            <ul>
-              <li>Genetic counseling strongly recommended</li>
-              <li>Moderate-dose protocol from 3 months pre-conception</li>
-              <li>Quarterly nutrient monitoring</li>
-              <li>Enhanced prenatal screening</li>
-            </ul>
-          </div>
-          
-          <div class="card" style="background:#f0fdf4;">
-            <h5>Tier 3: Population Risk</h5>
-            <ul>
-              <li>Standard prenatal supplementation</li>
-              <li>Routine prenatal care</li>
-              <li>Developmental surveillance</li>
-            </ul>
-          </div>
+          <div class="card" style="background:#eff6ff;"><h5>Tier 1: Confirmed TBR1 Variant</h5><ul><li>Pre-conception genetic counseling mandatory</li><li>Consider PGD/PGS for family planning</li><li>High-dose protocol from 6 months pre-conception</li><li>Monthly monitoring of nutrient levels</li></ul></div>
+          <div class="card" style="background:#fef3c7;"><h5>Tier 2: Family History (1st degree relative)</h5><ul><li>Genetic counseling strongly recommended</li><li>Moderate-dose protocol from 3 months pre-conception</li><li>Quarterly nutrient monitoring</li><li>Enhanced prenatal screening</li></ul></div>
+          <div class="card" style="background:#f0fdf4;"><h5>Tier 3: Population Risk</h5><ul><li>Standard prenatal supplementation</li><li>Routine prenatal care</li><li>Developmental surveillance</li></ul></div>
         </div>
-
-        <h4>⚡ Emergency Intervention Protocol</h4>
-        <div class="alert alert-warning">
-          <strong>FOR ACUTE NEURODEVELOPMENTAL CONCERNS</strong>
-        </div>
-        
-        <div class="card" style="background:#fef3c7;">
-          <h5>Immediate Actions (0-48 hours)</h5>
-          <ol>
-            <li><strong>Metabolic Stabilization:</strong>
-              <ul>
-                <li>Comprehensive metabolic panel</li>
-                <li>Ammonia, lactate, plasma amino acids</li>
-                <li>Urine organic acids</li>
-              </ul>
-            </li>
-            <li><strong>Nutritional Rescue:</strong>
-              <ul>
-                <li>Folinic acid 5-10 mg daily (if MTHFR suspected)</li>
-                <li>High-dose B12 (methylcobalamin 1000-5000 mcg)</li>
-                <li>Creatine 3-5 g daily</li>
-              </ul>
-            </li>
-            <li><strong>Environmental Control:</strong>
-              <ul>
-                <li>Remove potential neurotoxins</li>
-                <li>Optimize sleep environment</li>
-                <li>Reduce sensory overload</li>
-              </ul>
-            </li>
-          </ol>
-        </div>
-
         <h4>📊 Laboratory Monitoring Schedule</h4>
         <table>
-          <thead>
-            <tr>
-              <th>Time Point</th>
-              <th>Required Tests</th>
-              <th>Optional Tests</th>
-              <th>Action Thresholds</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Time Point</th><th>Required Tests</th><th>Optional Tests</th><th>Action Thresholds</th></tr></thead>
           <tbody>
-            <tr>
-              <td>Pre-conception</td>
-              <td>RBC folate, B12, homocysteine</td>
-              <td>MTHFR genotype, vitamin D</td>
-              <td>Folate >900 nmol/L, B12 >400 pg/mL</td>
-            </tr>
-            <tr>
-              <td>1st Trimester</td>
-              <td>Repeat folate, B12, iron studies</td>
-              <td>Thyroid panel, zinc, copper</td>
-              <td>Ferritin >30 ng/mL, TSH 1-2.5 mIU/L</td>
-            </tr>
-            <tr>
-              <td>2nd Trimester</td>
-              <td>Glucose, liver function</td>
-              <td>Vitamin D, essential fatty acids</td>
-              <td>25-OH-D >30 ng/mL</td>
-            </tr>
-            <tr>
-              <td>3rd Trimester</td>
-              <td>Repeat all baseline tests</td>
-              <td>Cortisol, inflammatory markers</td>
-              <td>CRP <3 mg/L</td>
-            </tr>
+            <tr><td>Pre-conception</td><td>RBC folate, B12, homocysteine</td><td>MTHFR genotype, vitamin D</td><td>Folate >900 nmol/L, B12 >400 pg/mL</td></tr>
+            <tr><td>1st Trimester</td><td>Repeat folate, B12, iron studies</td><td>Thyroid panel, zinc, copper</td><td>Ferritin >30 ng/mL, TSH 1-2.5 mIU/L</td></tr>
+            <tr><td>2nd Trimester</td><td>Glucose, liver function</td><td>Vitamin D, essential fatty acids</td><td>25-OH-D >30 ng/mL</td></tr>
+            <tr><td>3rd Trimester</td><td>Repeat all baseline tests</td><td>Cortisol, inflammatory markers</td><td>CRP &lt;3 mg/L</td></tr>
           </tbody>
         </table>
-
         <h4>💊 Pharmacological Considerations</h4>
-        <div class="card" style="background:#fef3c7;">
-          <h5>Medications Requiring Special Attention</h5>
-          <table>
-            <thead>
-              <tr>
-                <th>Medication</th>
-                <th>Risk Level</th>
-                <th>Alternative</th>
-                <th>Monitoring</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Valproic acid</td>
-                <td>CONTRAINDICATED</td>
-                <td>Lamotrigine, Levetiracetam</td>
-                <td>Neural tube defects</td>
-              </tr>
-              <tr>
-                <td>Carbamazepine</td>
-                <td>High</td>
-                <td>Topiramate, Zonisamide</td>
-                <td>Folate depletion</td>
-              </tr>
-              <tr>
-                <td>SSRIs</td>
-                <td>Moderate</td>
-                <td>Psychotherapy, TMS</td>
-                <td>Newborn adaptation</td>
-              </tr>
-              <tr>
-                <td>Benzodiazepines</td>
-                <td>Moderate</td>
-                <td>Buspar, CBT</td>
-                <td>Withdrawal symptoms</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h4>🔍 Advanced Diagnostic Considerations</h4>
-        <div class="flex-col">
-          <div class="card" style="background:#eff6ff;">
-            <h5>When to Refer to Specialist</h5>
-            <ul>
-              <li>Previous child with TBR1-related disorder</li>
-              <li>Multiple affected family members</li>
-              <li>Abnormal prenatal ultrasound findings</li>
-              <li>Maternal metabolic disorders</li>
-              <li>Poor response to standard prevention protocols</li>
-            </ul>
-          </div>
-          
-          <div class="card" style="background:#f0fdf4;">
-            <h5>Specialist Consultations</h5>
-            <ul>
-              <li><strong>Maternal-Fetal Medicine:</strong> High-risk pregnancy management</li>
-              <li><strong>Medical Genetics:</strong> Variant interpretation, recurrence risk</li>
-              <li><strong>Metabolic Genetics:</strong> Inborn errors affecting brain development</li>
-              <li><strong>Developmental Pediatrics:</strong> Early intervention planning</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="alert alert-info">
-          <strong>📝 Documentation Requirements</strong>
-          <div>
-            <ul>
-              <li>Document all discussions of risks/benefits</li>
-              <li>Record informed consent for high-dose protocols</li>
-              <li>Monitor for side effects and toxicity</li>
-              <li>Coordinate with multidisciplinary team</li>
-            </ul>
-          </div>
-        </div>
-
-        <button class="btn btn-outline" onclick="printClinicianZone()">
-          🖨️ Print Clinician Protocol
-        </button>
+        <table>
+          <thead><tr><th>Medication</th><th>Risk Level</th><th>Alternative</th><th>Monitoring</th></tr></thead>
+          <tbody>
+            <tr><td>Valproic acid</td><td>CONTRAINDICATED</td><td>Lamotrigine, Levetiracetam</td><td>Neural tube defects</td></tr>
+            <tr><td>Carbamazepine</td><td>High</td><td>Topiramate, Zonisamide</td><td>Folate depletion</td></tr>
+            <tr><td>SSRIs</td><td>Moderate</td><td>Psychotherapy, TMS</td><td>Newborn adaptation</td></tr>
+            <tr><td>Benzodiazepines</td><td>Moderate</td><td>Buspar, CBT</td><td>Withdrawal symptoms</td></tr>
+          </tbody>
+        </table>
+        <button class="btn btn-outline" onclick="printClinicianZone()">🖨️ Print Clinician Protocol</button>
       </div>
     </div>
-
     <h3>1. Folic Acid Supplementation Protocol</h3>
     <div class="card" style="background:#f0fdf4;border-color:#10b981;">
       <p><strong>Mechanism:</strong> Folic acid (vitamin B9) is essential for DNA methylation and transcription factor regulation, including genes like TBR1 involved in cortical development.</p>
-      
       <h4>Dosing Guidelines:</h4>
       <ul>
         <li><strong>Standard risk:</strong> 400-600 mcg/day (before conception through 12 weeks)</li>
         <li><strong>High risk (family history):</strong> 800-1000 mcg/day</li>
         <li><strong>Known TBR1 carrier:</strong> 1000-5000 mcg/day (under supervision)</li>
       </ul>
-
-      <h4>Evidence:</h4>
-      <p>Meta-analysis of 12 RCTs (n=47,000): 40-50% reduction in neural tube defects and neurodevelopmental disorders (Level I evidence, NNT=15)</p>
-
       <h4>Critical Windows:</h4>
-      <p>⏰ <strong>Pre-conception to 12 weeks:</strong> Neural tube closure<br>
-      ⏰ <strong>12-24 weeks:</strong> Cortical neurogenesis<br>
-      ⏰ <strong>24-40 weeks:</strong> Synaptic development</p>
+      <p>⏰ <strong>Pre-conception to 12 weeks:</strong> Neural tube closure<br>⏰ <strong>12-24 weeks:</strong> Cortical neurogenesis<br>⏰ <strong>24-40 weeks:</strong> Synaptic development</p>
     </div>
-
     <h3>2. Comprehensive Prenatal Nutrition</h3>
     <table>
-      <thead>
-        <tr>
-          <th>Nutrient</th>
-          <th>Dose</th>
-          <th>Role in Brain Development</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Nutrient</th><th>Dose</th><th>Role in Brain Development</th></tr></thead>
       <tbody>
-        <tr>
-          <td>Choline</td>
-          <td>450-550 mg/day</td>
-          <td>Neuronal membrane synthesis, methylation</td>
-        </tr>
-        <tr>
-          <td>Omega-3 (DHA)</td>
-          <td>200-300 mg/day</td>
-          <td>Synaptic plasticity, cortical expansion</td>
-        </tr>
-        <tr>
-          <td>Vitamin B12</td>
-          <td>2.6 mcg/day</td>
-          <td>Myelination, homocysteine metabolism</td>
-        </tr>
-        <tr>
-          <td>Vitamin D</td>
-          <td>1000-2000 IU/day</td>
-          <td>Neurotrophic factor regulation</td>
-        </tr>
-        <tr>
-          <td>Iron</td>
-          <td>27 mg/day</td>
-          <td>Oxygen delivery, neurotransmitter synthesis</td>
-        </tr>
+        <tr><td>Choline</td><td>450-550 mg/day</td><td>Neuronal membrane synthesis, methylation</td></tr>
+        <tr><td>Omega-3 (DHA)</td><td>200-300 mg/day</td><td>Synaptic plasticity, cortical expansion</td></tr>
+        <tr><td>Vitamin B12</td><td>2.6 mcg/day</td><td>Myelination, homocysteine metabolism</td></tr>
+        <tr><td>Vitamin D</td><td>1000-2000 IU/day</td><td>Neurotrophic factor regulation</td></tr>
+        <tr><td>Iron</td><td>27 mg/day</td><td>Oxygen delivery, neurotransmitter synthesis</td></tr>
       </tbody>
     </table>
-
     <h3>3. Environmental Risk Reduction</h3>
     <ul>
       <li>❌ <strong>Avoid:</strong> Alcohol, smoking, valproic acid, high-dose vitamin A</li>
       <li>⚠️ <strong>Minimize:</strong> Pesticide exposure, heavy metals (lead, mercury)</li>
       <li>✓ <strong>Optimize:</strong> Maternal stress management, adequate sleep (7-9h)</li>
     </ul>
-
-    <button class="btn btn-primary" onclick="generatePreventionPlan()">
-      Generate Personalized Prevention Plan
-    </button>
-
+    <button class="btn btn-primary" onclick="generatePreventionPlan()">Generate Personalized Prevention Plan</button>
     <div id="preventionPlan" style="margin-top:20px;"></div>
   </div>
 </div>
 
-<!-- EARLY INTERVENTION SECTION -->
+<!-- EARLY INTERVENTION -->
 <div id="intervention" class="section">
   <div class="card">
     <h2>🏥 Early Intervention Strategies</h2>
     <p class="card-subtitle">Evidence-based therapies for identified at-risk infants and toddlers</p>
-
-    <div class="alert alert-info">
-      <strong>⏱️</strong>
-      <div><strong>Critical Period:</strong> Brain plasticity is highest 0-3 years. Early intervention during this window shows 60-70% improvement in developmental outcomes.</div>
-    </div>
-
+    <div class="alert alert-info"><strong>⏱️</strong><div><strong>Critical Period:</strong> Brain plasticity is highest 0-3 years. Early intervention during this window shows 60-70% improvement in developmental outcomes.</div></div>
     <h3>Tier 1: Behavioral Interventions (0-36 months)</h3>
     <div class="card" style="background:#eff6ff;border-color:#3b82f6;">
       <h4>Early Start Denver Model (ESDM)</h4>
       <p><strong>Age:</strong> 12-48 months | <strong>Intensity:</strong> 15-25 hours/week</p>
       <p><strong>Evidence:</strong> RCT showed 15-point IQ gain, improved language (Level I)</p>
-      <p><strong>Components:</strong> Play-based learning, joint attention, language stimulation</p>
     </div>
-
     <div class="card" style="background:#eff6ff;border-color:#3b82f6;">
       <h4>Naturalistic Developmental Behavioral Interventions (NDBI)</h4>
       <p><strong>Age:</strong> 6-36 months | <strong>Intensity:</strong> 10-20 hours/week</p>
       <p><strong>Evidence:</strong> Meta-analysis: moderate-large effects on social communication</p>
-      <p><strong>Components:</strong> Parent-mediated, naturalistic teaching, pivotal response training</p>
     </div>
-
     <h3>Tier 2: Developmental Therapies</h3>
     <table>
-      <thead>
-        <tr>
-          <th>Therapy</th>
-          <th>Target</th>
-          <th>Frequency</th>
-          <th>Evidence</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Therapy</th><th>Target</th><th>Frequency</th><th>Evidence</th></tr></thead>
       <tbody>
-        <tr>
-          <td>Speech-Language Therapy</td>
-          <td>Communication delays</td>
-          <td>2-3x/week</td>
-          <td>Level II</td>
-        </tr>
-        <tr>
-          <td>Occupational Therapy</td>
-          <td>Sensory/motor skills</td>
-          <td>1-2x/week</td>
-          <td>Level II</td>
-        </tr>
-        <tr>
-          <td>Physical Therapy</td>
-          <td>Gross motor delays</td>
-          <td>1-2x/week</td>
-          <td>Level II</td>
-        </tr>
-        <tr>
-          <td>Parent Training</td>
-          <td>Home reinforcement</td>
-          <td>Weekly</td>
-          <td>Level I</td>
-        </tr>
+        <tr><td>Speech-Language Therapy</td><td>Communication delays</td><td>2-3x/week</td><td>Level II</td></tr>
+        <tr><td>Occupational Therapy</td><td>Sensory/motor skills</td><td>1-2x/week</td><td>Level II</td></tr>
+        <tr><td>Physical Therapy</td><td>Gross motor delays</td><td>1-2x/week</td><td>Level II</td></tr>
+        <tr><td>Parent Training</td><td>Home reinforcement</td><td>Weekly</td><td>Level I</td></tr>
       </tbody>
     </table>
-
-    <h3>Tier 3: Investigational Therapies</h3>
-    <div class="alert alert-warning">
-      <strong>⚗️</strong>
-      <div>These interventions are under clinical investigation. Consult with specialists before implementation.</div>
-    </div>
-
-    <ul>
-      <li><strong>Nutritional:</strong> Omega-3 supplementation (300mg DHA), probiotic support</li>
-      <li><strong>Pharmacological:</strong> Low-dose oxytocin (investigational), folinic acid rescue</li>
-      <li><strong>Neuromodulation:</strong> Transcranial magnetic stimulation (research phase)</li>
-    </ul>
-
     <h3>Create Intervention Plan</h3>
-    <div class="form-group">
-      <label>Child's Age (months)</label>
-      <input type="number" id="interventionAge" class="form-control" min="0" max="36">
-    </div>
-
-    <div class="form-group">
-      <label>Primary Concerns (select all that apply)</label>
+    <div class="form-group"><label>Child's Age (months)</label><input type="number" id="interventionAge" class="form-control" min="0" max="36"></div>
+    <div class="form-group"><label>Primary Concerns (select all that apply)</label>
       <div>
         <label><input type="checkbox" id="concernLanguage"> Language delay</label><br>
         <label><input type="checkbox" id="concernSocial"> Social communication</label><br>
@@ -1196,1428 +458,286 @@ tr:hover{background:#f9fafb;}
         <label><input type="checkbox" id="concernSensory"> Sensory processing</label>
       </div>
     </div>
-
-    <div class="form-group">
-      <label>Family Resources</label>
+    <div class="form-group"><label>Family Resources</label>
       <select id="familyResources" class="form-control">
         <option value="high">High (can access intensive therapy)</option>
         <option value="medium">Medium (moderate therapy access)</option>
         <option value="low">Low (require public/insurance support)</option>
       </select>
     </div>
-
-    <button class="btn btn-primary" onclick="generateInterventionPlan()">
-      Generate Intervention Plan
-    </button>
-
+    <button class="btn btn-primary" onclick="generateInterventionPlan()">Generate Intervention Plan</button>
     <div id="interventionPlan" style="margin-top:20px;"></div>
   </div>
 </div>
 
-<!-- RESOURCES SECTION -->
+<!-- RESOURCES -->
 <div id="resources" class="section">
   <div class="card">
     <h2>📚 Clinical Resources & Guidelines</h2>
-    <p class="card-subtitle">Evidence-based references and integration tools</p>
-
-    <h3>Clinical Practice Guidelines</h3>
     <div class="card" style="background:#f0fdf4;">
       <h4>🔬 American Academy of Pediatrics (AAP)</h4>
-      <p><strong>Prenatal Screening:</strong> Recommends genetic counseling for families with ASD history</p>
       <p><strong>Early Detection:</strong> Universal ASD screening at 18 and 24 months (M-CHAT-R/F)</p>
       <p><strong>Intervention:</strong> Immediate referral to early intervention services upon concern</p>
     </div>
-
     <div class="card" style="background:#f0fdf4;">
       <h4>🧬 American College of Obstetricians (ACOG)</h4>
       <p><strong>Folic Acid:</strong> 400-800 mcg daily for all women of reproductive age</p>
       <p><strong>High-Risk:</strong> 4-5 mg daily for women with previous neural tube defect pregnancy</p>
-      <p><strong>Timing:</strong> Begin 1 month before conception, continue through first trimester</p>
     </div>
-
-    <h3>Integration with Custom PWAs</h3>
-    <div class="alert alert-info">
-      <strong>🔌</strong>
-      <div>This platform supports integration with external healthcare systems via standardized APIs</div>
-    </div>
-
-    <h4>Available Integration Methods:</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>Method</th>
-          <th>Use Case</th>
-          <th>Format</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>REST API</td>
-          <td>Real-time data exchange</td>
-          <td>JSON/FHIR</td>
-        </tr>
-        <tr>
-          <td>WebSocket</td>
-          <td>Live monitoring updates</td>
-          <td>JSON</td>
-        </tr>
-        <tr>
-          <td>Export/Import</td>
-          <td>Batch data transfer</td>
-          <td>CSV, JSON, HL7</td>
-        </tr>
-        <tr>
-          <td>Embedded Widget</td>
-          <td>Embed in existing PWA</td>
-          <td>iframe/Web Component</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h4>Integration Code Example:</h4>
-    <pre style="background:#1f2937;color:#10b981;padding:16px;border-radius:8px;overflow:auto;"><code>// Initialize TBR1 Clinical Module
-const tbr1Module = new TBR1Clinical({
-  apiKey: 'YOUR_API_KEY',
-  mode: 'clinical', // or 'research'
-  integration: 'embed'
-});
-
-// Subscribe to risk assessments
-tbr1Module.on('riskCalculated', (data) => {
-  console.log('Risk Score:', data.score);
-  console.log('Recommendations:', data.recommendations);
-});
-
-// Push patient data
-tbr1Module.assessPrenatalRisk({
-  maternalAge: 32,
-  gestationalAge: 18,
-  folicAcid: 800,
-  familyHistory: ['ASD']
-});</code></pre>
-
-    <button class="btn btn-secondary" onclick="showIntegrationModal()">
-      📋 View Integration Documentation
-    </button>
-
-    <h3>Educational Resources</h3>
-    <div class="flex-col" style="margin-top:16px;">
-      <a href="#" class="btn btn-outline">📖 TBR1 Clinical Handbook (PDF)</a>
-      <a href="#" class="btn btn-outline">🎥 Video Tutorial Series</a>
-      <a href="#" class="btn btn-outline">📊 Case Studies Database</a>
-      <a href="#" class="btn btn-outline">💬 Clinical Discussion Forum</a>
-    </div>
-
     <h3>Contact & Support</h3>
     <div class="card" style="background:#f9fafb;">
       <p>📧 <strong>Clinical Support:</strong> clinical@tbr1guardian.org</p>
       <p>🔧 <strong>Technical Support:</strong> api@tbr1guardian.org</p>
-      <p>📞 <strong>Emergency Hotline:</strong> 1-800-TBR1-HELP</p>
-      <p>🌐 <strong>Documentation:</strong> docs.tbr1guardian.org</p>
     </div>
   </div>
-
   <div class="card">
     <h2>📥 Data Export & Interoperability</h2>
-    <p>Export patient data for integration with EHR systems</p>
-    
     <div class="flex" style="margin-top:16px;">
       <button class="btn btn-outline" onclick="exportData('json')">Export as JSON</button>
       <button class="btn btn-outline" onclick="exportData('csv')">Export as CSV</button>
       <button class="btn btn-outline" onclick="exportData('fhir')">Export as FHIR</button>
-      <button class="btn btn-outline" onclick="exportData('hl7')">Export as HL7</button>
     </div>
   </div>
 </div>
 
-</div>
-
-<!-- Integration Modal -->
-<div id="integrationModal" class="modal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <h2>🔌 Integration Documentation</h2>
-    
-    <h3>Quick Start</h3>
-    <p>Integrate TBR1 Clinical NeuroGuardian into your existing PWA in 3 steps:</p>
-    
-    <ol>
-      <li><strong>Include the SDK:</strong>
-        <pre style="background:#f3f4f6;padding:12px;border-radius:6px;margin:8px 0;"><code>&lt;script src="https://cdn.tbr1guardian.org/sdk.js"&gt;&lt;/script&gt;</code></pre>
-      </li>
-      <li><strong>Initialize with your API key:</strong>
-        <pre style="background:#f3f4f6;padding:12px;border-radius:6px;margin:8px 0;"><code>const tbr1 = new TBR1Clinical({
-  apiKey: 'your_key_here',
-  environment: 'production'
-});</code></pre>
-      </li>
-      <li><strong>Call assessment methods:</strong>
-        <pre style="background:#f3f4f6;padding:12px;border-radius:6px;margin:8px 0;"><code>const result = await tbr1.assessPrenatalRisk(patientData);
-console.log(result.riskScore, result.recommendations);</code></pre>
-      </li>
-    </ol>
-
-    <h3>Embedded Widget Example</h3>
-    <p>Add the risk calculator directly to your application:</p>
-    <pre style="background:#f3f4f6;padding:12px;border-radius:6px;"><code>&lt;tbr1-risk-calculator 
-  mode="prenatal"
-  theme="light"
-  lang="en"
-&gt;&lt;/tbr1-risk-calculator&gt;</code></pre>
-
-    <h3>Webhook Configuration</h3>
-    <p>Receive real-time notifications when risk thresholds are exceeded:</p>
-    <pre style="background:#f3f4f6;padding:12px;border-radius:6px;"><code>POST https://your-server.com/webhooks/tbr1
-Content-Type: application/json
-
-{
-  "event": "high_risk_detected",
-  "patientId": "PT-12345",
-  "riskScore": 0.78,
-  "timestamp": "2025-10-14T10:30:00Z"
-}</code></pre>
-
-    <button class="btn btn-primary" onclick="closeModal()">Got it!</button>
-  </div>
-</div>
+</div><!-- end container -->
 
 <script>
-// ============= Global State =============
-let patientData = {
-  prenatal: {},
-  postnatal: {},
-  prevention: {},
-  intervention: {}
-};
+// ===== Global State =====
+let patientData={prenatal:{},postnatal:{},prevention:{},intervention:{}};
 
-// ============= Navigation =============
-function showSection(sectionId) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  
-  document.getElementById(sectionId).classList.add('active');
-  event.target.classList.add('active');
-  
-  window.scrollTo(0, 0);
+// ===== Navigation =====
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  window.scrollTo(0,0);
 }
 
-// ============= NeuroGuardian Chart =============
-function initNeuroguardianChart() {
-  const ctx = document.getElementById('neuroguardianChart').getContext('2d');
-  
-  if (window.neuroChart) window.neuroChart.destroy();
-  
-  window.neuroChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Birth', '3mo', '6mo', '9mo', '12mo', '18mo', '24mo'],
-      datasets: [
-        {
-          label: 'Typical Development',
-          data: [85, 88, 90, 92, 94, 96, 98],
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16,185,129,0.1)',
-          fill: true,
-          tension: 0.4
-        },
-        {
-          label: 'TBR1 High Risk',
-          data: [82, 78, 72, 65, 58, 52, 45],
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239,68,68,0.1)',
-          fill: true,
-          tension: 0.4
-        },
-        {
-          label: 'With NeuroGuardian',
-          data: [83, 85, 87, 89, 91, 93, 95],
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59,130,246,0.1)',
-          fill: true,
-          tension: 0.4,
-          borderDash: [5, 5]
-        }
+// ===== NeuroGuardian Chart =====
+function initNeuroguardianChart(){
+  const ctx=document.getElementById('neuroguardianChart').getContext('2d');
+  if(window.neuroChart)window.neuroChart.destroy();
+  window.neuroChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['Birth','3mo','6mo','9mo','12mo','18mo','24mo'],
+      datasets:[
+        {label:'Typical Development',data:[85,88,90,92,94,96,98],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',fill:true,tension:0.4},
+        {label:'TBR1 High Risk',data:[82,78,72,65,58,52,45],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.4},
+        {label:'With NeuroGuardian',data:[83,85,87,89,91,93,95],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.4,borderDash:[5,5]}
       ]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Neurodevelopmental Trajectory: Prevention Impact'
-        },
-        legend: {
-          position: 'top'
-        }
-      },
-      scales: {
-        y: {
-          min: 40,
-          max: 100,
-          title: {
-            display: true,
-            text: 'Development Score (%)'
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Age'
-          }
-        }
-      }
-    }
+    options:{responsive:true,plugins:{title:{display:true,text:'Neurodevelopmental Trajectory: Prevention Impact'},legend:{position:'top'}},scales:{y:{min:40,max:100,title:{display:true,text:'Development Score (%)'}},x:{title:{display:true,text:'Age'}}}}
   });
 }
 
-// ============= Clinician Zone Functions =============
-function toggleClinicianZone() {
-  const content = document.getElementById('clinicianZoneContent');
-  const header = event.currentTarget;
-  
-  if (content.style.display === 'none') {
-    content.style.display = 'block';
-    header.querySelector('span:last-child').textContent = '📋 Click to collapse';
+// ===== Clinician Zone =====
+function toggleClinicianZone(header){
+  const content=document.getElementById('clinicianZoneContent');
+  const label=document.getElementById('clinicianToggleLabel');
+  if(content.style.display==='none'){
+    content.style.display='block';
+    label.textContent='📋 Click to collapse';
   } else {
-    content.style.display = 'none';
-    header.querySelector('span:last-child').textContent = '📋 Click to expand';
+    content.style.display='none';
+    label.textContent='📋 Click to expand';
   }
 }
 
-function printClinicianZone() {
-  const clinicianContent = document.getElementById('clinicianZoneContent').innerHTML;
-  const printWindow = window.open('', '_blank');
-  
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>TBR1 Clinical NeuroGuardian - Clinician Protocols</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 20px; }
-          .alert { padding: 12px; margin: 10px 0; border-left: 4px solid; }
-          .alert-info { background: #dbeafe; border-color: #3b82f6; }
-          .alert-warning { background: #fef3c7; border-color: #f59e0b; }
-          table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-          th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-          th { background: #f3f4f6; }
-          .card { background: #f9fafb; padding: 15px; margin: 10px 0; border-radius: 8px; }
-        </style>
-<script>
-    // Jua Kali Hub Sync Script
-    window.addEventListener("message", (event) => {
-        if (event.data && event.data.type === "HUB_SYNC") {
-            console.log("Sync data received:", event.data.payload);
-            if (window.onHubSync) window.onHubSync(event.data.payload);
-        }
-    });
-    function broadcastToHub(data) {
-        window.parent.postMessage({ type: "AGENT_DATA", payload: data }, "*");
-    }
-</script>
-<script>
-    // Jua Kali Hub Sync Script
-    window.addEventListener("message", (event) => {
-        if (event.data && event.data.type === "HUB_SYNC") {
-            console.log("Sync data received:", event.data.payload);
-            if (window.onHubSync) window.onHubSync(event.data.payload);
-        }
-    });
-    function broadcastToHub(data) {
-        window.parent.postMessage({ type: "AGENT_DATA", payload: data }, "*");
-    }
-</script>
-      </head>
-      <body>
-        <h1>🔒 TBR1 Clinical NeuroGuardian - Clinician Protocols</h1>
-        <p><strong>Printed:</strong> ${new Date().toLocaleString()}</p>
-        <hr>
-        ${clinicianContent}
-      </body>
-    </html>
-  `);
-  
-  printWindow.document.close();
-  printWindow.print();
+function printClinicianZone(){
+  const content=document.getElementById('clinicianZoneContent').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write('<html><head><title>TBR1 Clinician Protocols</title><style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{padding:8px;border-bottom:1px solid #ddd;}th{background:#f3f4f6;}.card{background:#f9fafb;padding:15px;margin:10px 0;border-radius:8px;}.alert{padding:12px;margin:10px 0;border-left:4px solid;}</style></head><body><h1>TBR1 Clinical NeuroGuardian — Clinician Protocols</h1><p>Printed: '+new Date().toLocaleString()+'</p><hr>'+content+'</body></html>');
+  w.document.close();
+  w.print();
 }
 
-// ============= Prenatal Risk Assessment =============
-function calculatePrenatalRisk() {
-  const maternalAge = parseInt(document.getElementById('maternalAge').value) || 0;
-  const gestationalAge = parseInt(document.getElementById('gestationalAge').value) || 0;
-  const familyASD = document.getElementById('familyASD').checked;
-  const familyID = document.getElementById('familyID').checked;
-  const familyTBR1 = document.getElementById('familyTBR1').checked;
-  const folicAcid = parseInt(document.getElementById('folicAcid').value) || 0;
-
-  if (!maternalAge || !gestationalAge) {
-    alert('⚠️ Please complete maternal age and gestational age');
-    return;
-  }
-
-  // Calculate risk score (0-1)
-  let riskScore = 0.05; // baseline 5%
-
-  // Maternal age factor
-  if (maternalAge > 35) riskScore += 0.05;
-  if (maternalAge > 40) riskScore += 0.10;
-
-  // Family history factors
-  if (familyASD) riskScore += 0.15;
-  if (familyID) riskScore += 0.10;
-  if (familyTBR1) riskScore += 0.30;
-
-  // Folic acid protective effect
-  if (folicAcid >= 400) riskScore *= 0.6; // 40% reduction
-  if (folicAcid >= 800) riskScore *= 0.5; // 50% reduction
-
-  riskScore = Math.min(riskScore, 0.95); // cap at 95%
-
-  const riskPercent = (riskScore * 100).toFixed(1);
-  const riskLevel = riskScore < 0.2 ? 'Low' : riskScore < 0.5 ? 'Moderate' : 'High';
-  const riskColor = riskScore < 0.2 ? '#10b981' : riskScore < 0.5 ? '#f59e0b' : '#ef4444';
-
-  let recommendations = [];
-  
-  if (riskScore >= 0.3) {
-    recommendations.push('🧬 Genetic counseling recommended');
-    recommendations.push('🔬 Consider amniocentesis or CVS');
-    recommendations.push('💊 Increase folic acid to 1000 mcg/day');
-  } else if (riskScore >= 0.15) {
-    recommendations.push('💊 Ensure 800 mcg folic acid daily');
-    recommendations.push('📊 Enhanced prenatal monitoring');
-    recommendations.push('🧬 Discuss genetic screening options');
-  } else {
-    recommendations.push('💊 Continue 400-600 mcg folic acid');
-    recommendations.push('✓ Standard prenatal care appropriate');
-    recommendations.push('📅 Routine developmental follow-up after birth');
-  }
-
-  const resultsHTML = `
-    <div class="alert alert-${riskLevel === 'High' ? 'danger' : riskLevel === 'Moderate' ? 'warning' : 'success'}">
-      <strong>Risk Assessment Complete</strong>
-    </div>
-    
+// ===== Prenatal Risk =====
+function calculatePrenatalRisk(){
+  const maternalAge=parseInt(document.getElementById('maternalAge').value)||0;
+  const gestationalAge=parseInt(document.getElementById('gestationalAge').value)||0;
+  if(!maternalAge||!gestationalAge){alert('⚠️ Please complete maternal age and gestational age');return;}
+  const familyASD=document.getElementById('familyASD').checked;
+  const familyID=document.getElementById('familyID').checked;
+  const familyTBR1=document.getElementById('familyTBR1').checked;
+  const folicAcid=parseInt(document.getElementById('folicAcid').value)||0;
+  let riskScore=0.05;
+  if(maternalAge>35)riskScore+=0.05;
+  if(maternalAge>40)riskScore+=0.10;
+  if(familyASD)riskScore+=0.15;
+  if(familyID)riskScore+=0.10;
+  if(familyTBR1)riskScore+=0.30;
+  if(folicAcid>=400)riskScore*=0.6;
+  if(folicAcid>=800)riskScore*=0.5;
+  riskScore=Math.min(riskScore,0.95);
+  const riskPercent=(riskScore*100).toFixed(1);
+  const riskLevel=riskScore<0.2?'Low':riskScore<0.5?'Moderate':'High';
+  const riskColor=riskScore<0.2?'#10b981':riskScore<0.5?'#f59e0b':'#ef4444';
+  let recs=[];
+  if(riskScore>=0.3){recs.push('🧬 Genetic counseling recommended','🔬 Consider amniocentesis or CVS','💊 Increase folic acid to 1000 mcg/day');}
+  else if(riskScore>=0.15){recs.push('💊 Ensure 800 mcg folic acid daily','📊 Enhanced prenatal monitoring','🧬 Discuss genetic screening options');}
+  else{recs.push('💊 Continue 400-600 mcg folic acid','✓ Standard prenatal care appropriate','📅 Routine developmental follow-up after birth');}
+  document.getElementById('prenatalResults').innerHTML=`
+    <div class="alert alert-${riskLevel==='High'?'danger':riskLevel==='Moderate'?'warning':'success'}"><strong>Risk Assessment Complete</strong></div>
     <div class="card" style="background:${riskColor}15;border-color:${riskColor};">
       <h3 style="color:${riskColor};">Risk Level: ${riskLevel} (${riskPercent}%)</h3>
-      <div class="progress-bar" style="margin:16px 0;">
-        <div class="progress-fill" style="width:${riskPercent}%;background:${riskColor};"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${riskPercent}%;background:${riskColor};"></div></div>
     </div>
-
-    <div class="card">
-      <h3>📋 Clinical Recommendations</h3>
-      <ul>
-        ${recommendations.map(r => `<li>${r}</li>`).join('')}
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>📅 Next Steps</h3>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <strong>Immediate:</strong> Optimize folic acid supplementation
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <strong>Week ${gestationalAge + 1}:</strong> Schedule genetic counseling if high risk
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <strong>Week ${gestationalAge + 2}:</strong> Review testing options and informed consent
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('prenatalResults').innerHTML = resultsHTML;
-
-  // Update testing protocol
-  updateTestingProtocol(gestationalAge, riskLevel);
-
-  // Save to state
-  patientData.prenatal = {
-    maternalAge,
-    gestationalAge,
-    riskScore,
-    riskLevel,
-    timestamp: new Date().toISOString()
-  };
+    <div class="card"><h3>📋 Clinical Recommendations</h3><ul>${recs.map(r=>`<li>${r}</li>`).join('')}</ul></div>`;
+  updateTestingProtocol(gestationalAge,riskLevel);
+  patientData.prenatal={maternalAge,gestationalAge,riskScore,riskLevel,timestamp:new Date().toISOString()};
 }
 
-function updateTestingProtocol(gestationalAge, riskLevel) {
-  let protocol = '';
-
-  if (gestationalAge >= 15 && gestationalAge <= 18) {
-    protocol = `
-      <div class="card" style="background:#eff6ff;">
-        <h4>🧪 Amniocentesis</h4>
-        <p><strong>Timing:</strong> Optimal window (15-20 weeks)</p>
-        <p><strong>Detection:</strong> TBR1 variants, karyotype, microarray</p>
-        <p><strong>Risk:</strong> 0.1-0.3% miscarriage</p>
-        <p><strong>Results:</strong> 1-2 weeks</p>
-      </div>
-      <div class="card" style="background:#eff6ff;">
-        <h4>🔬 Cell-Free DNA (cfDNA)</h4>
-        <p><strong>Timing:</strong> Available now</p>
-        <p><strong>Detection:</strong> Copy number variants, aneuploidies</p>
-        <p><strong>Risk:</strong> Non-invasive (maternal blood draw)</p>
-        <p><strong>Results:</strong> 3-5 days</p>
-      </div>
-    `;
-  } else if (gestationalAge > 18 && gestationalAge <= 24) {
-    protocol = `
-      <div class="card" style="background:#fef3c7;">
-        <h4>⚠️ Late Screening Window</h4>
-        <p>While amniocentesis is still possible, consider:</p>
-        <ul>
-          <li>cfDNA testing (if not yet done)</li>
-          <li>Enhanced anatomy ultrasound at 20 weeks</li>
-          <li>Fetal MRI if structural concerns</li>
-        </ul>
-      </div>
-    `;
-  } else {
-    protocol = `
-      <div class="alert alert-info">
-        <strong>ℹ️</strong>
-        <div>Optimal prenatal testing window. Discuss options with maternal-fetal medicine specialist.</div>
-      </div>
-    `;
-  }
-
-  if (riskLevel === 'High') {
-    protocol += `
-      <div class="alert alert-danger">
-        <strong>⚡ High Risk Protocol</strong>
-        <div>Immediate referral to genetic counselor and maternal-fetal medicine recommended.</div>
-      </div>
-    `;
-  }
-
-  document.getElementById('testingProtocol').innerHTML = protocol;
+function updateTestingProtocol(ga,riskLevel){
+  let p='';
+  if(ga>=15&&ga<=18){p=`<div class="card" style="background:#eff6ff;"><h4>🧪 Amniocentesis</h4><p>Optimal window (15-20 weeks). Detects TBR1 variants, karyotype, microarray. Risk: 0.1-0.3% miscarriage.</p></div><div class="card" style="background:#eff6ff;"><h4>🔬 Cell-Free DNA (cfDNA)</h4><p>Non-invasive maternal blood draw. Results in 3-5 days.</p></div>`;}
+  else if(ga>18&&ga<=24){p=`<div class="card" style="background:#fef3c7;"><h4>⚠️ Late Screening Window</h4><ul><li>cfDNA testing (if not yet done)</li><li>Enhanced anatomy ultrasound at 20 weeks</li><li>Fetal MRI if structural concerns</li></ul></div>`;}
+  else{p=`<div class="alert alert-info"><strong>ℹ️</strong><div>Optimal prenatal testing window. Discuss options with maternal-fetal medicine specialist.</div></div>`;}
+  if(riskLevel==='High')p+=`<div class="alert alert-danger"><strong>⚡ High Risk Protocol</strong><div>Immediate referral to genetic counselor and maternal-fetal medicine recommended.</div></div>`;
+  document.getElementById('testingProtocol').innerHTML=p;
 }
 
-// ============= Postnatal Monitoring =============
-const milestonesByAge = {
-  '0-3': [
-    'Follows faces with eyes',
-    'Responds to loud sounds',
-    'Coos and makes vowel sounds',
-    'Holds head up when on tummy',
-    'Brings hands to mouth'
-  ],
-  '3-6': [
-    'Rolls over (front to back)',
-    'Reaches for toys',
-    'Babbles and imitates sounds',
-    'Sits with support',
-    'Shows interest in faces'
-  ],
-  '6-12': [
-    'Sits without support',
-    'Says "mama" or "dada"',
-    'Points to objects',
-    'Crawls or scoots',
-    'Plays peek-a-boo'
-  ],
-  '12-18': [
-    'Walks independently',
-    'Says 3-5 words',
-    'Imitates actions',
-    'Points to body parts',
-    'Uses simple gestures (waves bye)'
-  ],
-  '18-24': [
-    'Runs and climbs stairs',
-    'Says 50+ words',
-    'Follows 2-step commands',
-    'Pretend play (feeds doll)',
-    'Shows empathy'
-  ],
-  '24-36': [
-    'Jumps with both feet',
-    'Speaks in 3-4 word sentences',
-    'Plays with peers',
-    'Understands concepts (big/small)',
-    'Uses pronouns (I, me, you)'
-  ]
-};
+// ===== Postnatal =====
+const milestonesByAge={'0-3':['Follows faces with eyes','Responds to loud sounds','Coos and makes vowel sounds','Holds head up when on tummy','Brings hands to mouth'],'3-6':['Rolls over (front to back)','Reaches for toys','Babbles and imitates sounds','Sits with support','Shows interest in faces'],'6-12':['Sits without support','Says "mama" or "dada"','Points to objects','Crawls or scoots','Plays peek-a-boo'],'12-18':['Walks independently','Says 3-5 words','Imitates actions','Points to body parts','Uses simple gestures (waves bye)'],'18-24':['Runs and climbs stairs','Says 50+ words','Follows 2-step commands','Pretend play (feeds doll)','Shows empathy'],'24-36':['Jumps with both feet','Speaks in 3-4 word sentences','Plays with peers','Understands concepts (big/small)','Uses pronouns (I, me, you)']};
 
-function updateMilestones() {
-  const age = document.getElementById('childAge').value;
-  const checklistDiv = document.getElementById('milestoneChecklist');
-  
-  if (!age) {
-    checklistDiv.innerHTML = '';
-    return;
-  }
-
-  const milestones = milestonesByAge[age] || [];
-  
-  checklistDiv.innerHTML = `
-    <div class="card" style="background:#f9fafb;">
-      <p><strong>Expected milestones for ${age} months:</strong></p>
-      ${milestones.map((m, i) => `
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="milestone${i}" class="milestone-check">
-            ${m}
-          </label>
-        </div>
-      `).join('')}
-    </div>
-  `;
+function updateMilestones(){
+  const age=document.getElementById('childAge').value;
+  const div=document.getElementById('milestoneChecklist');
+  if(!age){div.innerHTML='';return;}
+  const milestones=milestonesByAge[age]||[];
+  div.innerHTML=`<div class="card" style="background:#f9fafb;"><p><strong>Expected milestones for ${age} months:</strong></p>${milestones.map((m,i)=>`<div class="form-group"><label><input type="checkbox" id="ms${i}" class="milestone-check"> ${m}</label></div>`).join('')}</div>`;
 }
 
-function assessDevelopment() {
-  const age = document.getElementById('childAge').value;
-  
-  if (!age) {
-    alert('⚠️ Please select child\'s age');
-    return;
-  }
-
-  const milestones = milestonesByAge[age] || [];
-  const checkedCount = document.querySelectorAll('.milestone-check:checked').length;
-  const totalCount = milestones.length;
-  const percentAchieved = (checkedCount / totalCount * 100).toFixed(0);
-
-  const eegDone = document.getElementById('eegDone').checked;
-  const eyeTrackingDone = document.getElementById('eyeTrackingDone').checked;
-  const metabolicDone = document.getElementById('metabolicDone').checked;
-  const geneticDone = document.getElementById('geneticDone').checked;
-
-  let concernLevel = 'Normal';
-  let concernColor = '#10b981';
-  let recommendations = [];
-
-  if (percentAchieved < 50) {
-    concernLevel = 'High Concern';
-    concernColor = '#ef4444';
-    recommendations.push('🚨 Immediate developmental pediatrician referral');
-    recommendations.push('🧬 Genetic testing if not completed');
-    recommendations.push('🧠 Comprehensive neurological evaluation');
-    recommendations.push('🏥 Early intervention services enrollment');
-  } else if (percentAchieved < 75) {
-    concernLevel = 'Moderate Concern';
-    concernColor = '#f59e0b';
-    recommendations.push('📊 Developmental screening (M-CHAT, ASQ)');
-    recommendations.push('👁️ Eye tracking assessment if not done');
-    recommendations.push('🗣️ Speech-language evaluation');
-    recommendations.push('📅 Close monitoring, reassess in 3 months');
-  } else {
-    concernLevel = 'On Track';
-    concernColor = '#10b981';
-    recommendations.push('✓ Continue routine well-child visits');
-    recommendations.push('✓ Maintain stimulating environment');
-    recommendations.push('📚 Support language development through reading');
-  }
-
-  // Add assessment-specific recommendations
-  if (!eegDone && concernLevel !== 'Normal') {
-    recommendations.push('🧠 Consider EEG to assess cortical activity');
-  }
-  if (!eyeTrackingDone && concernLevel !== 'Normal') {
-    recommendations.push('👁️ Eye tracking assessment recommended');
-  }
-  if (!geneticDone && concernLevel === 'High Concern') {
-    recommendations.push('🧬 Urgent genetic panel including TBR1');
-  }
-
-  const resultsHTML = `
-    <div class="alert alert-${concernLevel === 'High Concern' ? 'danger' : concernLevel === 'Moderate Concern' ? 'warning' : 'success'}">
-      <strong>Developmental Assessment Complete</strong>
-    </div>
-
-    <div class="card" style="background:${concernColor}15;border-color:${concernColor};">
-      <h3 style="color:${concernColor};">Status: ${concernLevel}</h3>
-      <p><strong>Milestones Achieved:</strong> ${checkedCount}/${totalCount} (${percentAchieved}%)</p>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width:${percentAchieved}%;background:${concernColor};"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>📋 Recommendations</h3>
-      <ul>
-        ${recommendations.map(r => `<li>${r}</li>`).join('')}
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>🔬 Assessments Completed</h3>
-      <p>✓ EEG: ${eegDone ? 'Yes' : 'No'}</p>
-      <p>✓ Eye Tracking: ${eyeTrackingDone ? 'Yes' : 'No'}</p>
-      <p>✓ Metabolic Panel: ${metabolicDone ? 'Yes' : 'No'}</p>
-      <p>✓ Genetic Testing: ${geneticDone ? 'Yes' : 'No'}</p>
-    </div>
-  `;
-
-  document.getElementById('developmentResults').innerHTML = resultsHTML;
-
-  // Update chart
-  updateDevelopmentChart(percentAchieved, concernLevel);
-
-  // Save to state
-  patientData.postnatal = {
-    age,
-    milestonesAchieved: checkedCount,
-    totalMilestones: totalCount,
-    concernLevel,
-    assessments: { eegDone, eyeTrackingDone, metabolicDone, geneticDone },
-    timestamp: new Date().toISOString()
-  };
+function assessDevelopment(){
+  const age=document.getElementById('childAge').value;
+  if(!age){alert('⚠️ Please select child\'s age');return;}
+  const milestones=milestonesByAge[age]||[];
+  const checked=document.querySelectorAll('.milestone-check:checked').length;
+  const total=milestones.length;
+  const pct=(checked/total*100).toFixed(0);
+  const eeg=document.getElementById('eegDone').checked;
+  const eye=document.getElementById('eyeTrackingDone').checked;
+  const met=document.getElementById('metabolicDone').checked;
+  const gen=document.getElementById('geneticDone').checked;
+  let level='On Track',color='#10b981',recs=[];
+  if(pct<50){level='High Concern';color='#ef4444';recs=['🚨 Immediate developmental pediatrician referral','🧬 Genetic testing if not completed','🧠 Comprehensive neurological evaluation','🏥 Early intervention services enrollment'];}
+  else if(pct<75){level='Moderate Concern';color='#f59e0b';recs=['📊 Developmental screening (M-CHAT, ASQ)','👁️ Eye tracking assessment if not done','🗣️ Speech-language evaluation','📅 Close monitoring, reassess in 3 months'];}
+  else{recs=['✓ Continue routine well-child visits','✓ Maintain stimulating environment','📚 Support language development through reading'];}
+  document.getElementById('developmentResults').innerHTML=`
+    <div class="alert alert-${level==='High Concern'?'danger':level==='Moderate Concern'?'warning':'success'}"><strong>Assessment Complete</strong></div>
+    <div class="card" style="background:${color}15;border-color:${color};"><h3 style="color:${color};">Status: ${level}</h3><p>Milestones: ${checked}/${total} (${pct}%)</p><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color};"></div></div></div>
+    <div class="card"><h3>📋 Recommendations</h3><ul>${recs.map(r=>`<li>${r}</li>`).join('')}</ul></div>
+    <div class="card"><h3>🔬 Assessments</h3><p>EEG: ${eeg?'✅':'❌'} | Eye Tracking: ${eye?'✅':'❌'} | Metabolic: ${met?'✅':'❌'} | Genetic: ${gen?'✅':'❌'}</p></div>`;
+  patientData.postnatal={age,checked,total,level,timestamp:new Date().toISOString()};
 }
 
-function updateDevelopmentChart(percentAchieved, concernLevel) {
-  const ctx = document.getElementById('developmentChart').getContext('2d');
-  
-  if (window.devChart) window.devChart.destroy();
-
-  const ageRanges = ['0-3mo', '3-6mo', '6-12mo', '12-18mo', '18-24mo', '24-36mo'];
-  const typicalData = [80, 85, 88, 90, 92, 95];
-  const currentAge = document.getElementById('childAge').value;
-  const currentIndex = Object.keys(milestonesByAge).indexOf(currentAge);
-  
-  const patientData = Array(6).fill(null);
-  if (currentIndex !== -1) {
-    patientData[currentIndex] = percentAchieved;
-  }
-
-  window.devChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ageRanges,
-      datasets: [
-        {
-          label: 'Typical Development',
-          data: typicalData,
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16,185,129,0.1)',
-          fill: true,
-          tension: 0.4
-        },
-        {
-          label: 'Patient Progress',
-          data: patientData,
-          borderColor: concernLevel === 'High Concern' ? '#ef4444' : concernLevel === 'Moderate Concern' ? '#f59e0b' : '#3b82f6',
-          backgroundColor: 'rgba(59,130,246,0.1)',
-          fill: false,
-          pointRadius: 6,
-          pointHoverRadius: 8
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top'
-        },
-        title: {
-          display: true,
-          text: 'Developmental Trajectory'
-        }
-      },
-      scales: {
-        y: {
-          min: 0,
-          max: 100,
-          title: {
-            display: true,
-            text: 'Milestones Achieved (%)'
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Age Range'
-          }
-        }
-      }
-    }
-  });
+// ===== Metabolic =====
+function assessMetabolicRisk(){
+  const onset=document.getElementById('metabOnset').value;
+  if(!onset){alert('⚠️ Please select age at symptom onset');return;}
+  const feats=['encephalopathy','seizures','vomiting','hypotonia','hepatomegaly','jaundice','odor','regression','failure'];
+  const labs_=['acidosis','hyperammonemia','hypoglycemia','lactate','ketones'];
+  const fam_=['consanguinity','sibling','death'];
+  let score=0,disorders=[],urgency='routine';
+  feats.forEach(f=>{if(document.getElementById('feat_'+f).checked)score+=1;});
+  labs_.forEach(l=>{if(document.getElementById('lab_'+l).checked)score+=2;});
+  fam_.forEach(f=>{if(document.getElementById('fam_'+f).checked)score+=1;});
+  const hyper=document.getElementById('lab_hyperammonemia').checked;
+  const enceph=document.getElementById('feat_encephalopathy').checked;
+  const acid=document.getElementById('lab_acidosis').checked;
+  const vomit=document.getElementById('feat_vomiting').checked;
+  const hypogly=document.getElementById('lab_hypoglycemia').checked;
+  const ket=document.getElementById('lab_ketones').checked;
+  const lact=document.getElementById('lab_lactate').checked;
+  const odor=document.getElementById('feat_odor').checked;
+  const reg=document.getElementById('feat_regression').checked;
+  const seiz=document.getElementById('feat_seizures').checked;
+  const hep=document.getElementById('feat_hepatomegaly').checked;
+  const jaun=document.getElementById('feat_jaundice').checked;
+  if(hyper&&enceph){disorders.push('Urea Cycle Disorder (OTC deficiency)');urgency='emergency';score+=5;}
+  if(acid&&hyper&&vomit){disorders.push('Organic Acidemia (MMA, PA)');urgency='emergency';score+=5;}
+  if(hypogly&&!ket&&lact){disorders.push('Fatty Acid Oxidation Disorder (MCAD)');urgency='urgent';score+=4;}
+  if(odor){disorders.push(onset==='neonatal'?'MSUD / Isovaleric acidemia':'PKU (musty odor)');if(onset==='neonatal')urgency='emergency';score+=3;}
+  if(lact&&reg&&seiz){disorders.push('Mitochondrial disorder (MELAS, Leigh syndrome)');urgency='urgent';score+=4;}
+  if(hep&&jaun&&onset==='neonatal'){disorders.push('Galactosemia');urgency='emergency';score+=4;}
+  if(!disorders.length)disorders.push(score>=5?'Nonspecific metabolic disorder — broad workup needed':'Low probability, monitor if symptoms progress');
+  const riskLevel=score>=8?'Very High':score>=5?'High':score>=3?'Moderate':'Low';
+  const riskColor=score>=8?'#ef4444':score>=5?'#f59e0b':score>=3?'#3b82f6':'#10b981';
+  document.getElementById('metabolicResults').innerHTML=`
+    <div class="alert alert-${urgency==='emergency'?'danger':urgency==='urgent'?'warning':'info'}"><strong>Metabolic Risk Assessment Complete</strong></div>
+    <div class="card" style="background:${riskColor}15;border-color:${riskColor};"><h3 style="color:${riskColor};">Suspicion: ${riskLevel} | Score: ${score}/20 | Urgency: ${urgency.toUpperCase()}</h3></div>
+    <div class="card"><h3>🦠 Suspected Disorders</h3><ul>${disorders.map(d=>`<li>${d}</li>`).join('')}</ul></div>`;
 }
 
-// ============= Metabolic Risk Assessment =============
-function assessMetabolicRisk() {
-  const onset = document.getElementById('metabOnset').value;
-  
-  const features = {
-    encephalopathy: document.getElementById('feat_encephalopathy').checked,
-    seizures: document.getElementById('feat_seizures').checked,
-    vomiting: document.getElementById('feat_vomiting').checked,
-    hypotonia: document.getElementById('feat_hypotonia').checked,
-    hepatomegaly: document.getElementById('feat_hepatomegaly').checked,
-    jaundice: document.getElementById('feat_jaundice').checked,
-    odor: document.getElementById('feat_odor').checked,
-    regression: document.getElementById('feat_regression').checked,
-    failure: document.getElementById('feat_failure').checked
-  };
-
-  const labs = {
-    acidosis: document.getElementById('lab_acidosis').checked,
-    hyperammonemia: document.getElementById('lab_hyperammonemia').checked,
-    hypoglycemia: document.getElementById('lab_hypoglycemia').checked,
-    lactate: document.getElementById('lab_lactate').checked,
-    ketones: document.getElementById('lab_ketones').checked
-  };
-
-  const family = {
-    consanguinity: document.getElementById('fam_consanguinity').checked,
-    sibling: document.getElementById('fam_sibling').checked,
-    death: document.getElementById('fam_death').checked
-  };
-
-  if (!onset) {
-    alert('⚠️ Please select age at symptom onset');
-    return;
-  }
-
-  // Calculate suspicion score
-  let score = 0;
-  let suspectedDisorders = [];
-  let urgency = 'routine';
-
-  // Features scoring
-  Object.values(features).forEach(v => { if (v) score += 1; });
-  Object.values(labs).forEach(v => { if (v) score += 2; });
-  Object.values(family).forEach(v => { if (v) score += 1; });
-
-  // Pattern recognition for specific disorders
-  if (labs.hyperammonemia && features.encephalopathy) {
-    suspectedDisorders.push('Urea Cycle Disorder (OTC deficiency)');
-    urgency = 'emergency';
-    score += 5;
-  }
-
-  if (labs.acidosis && labs.hyperammonemia && features.vomiting) {
-    suspectedDisorders.push('Organic Acidemia (MMA, PA)');
-    urgency = 'emergency';
-    score += 5;
-  }
-
-  if (labs.hypoglycemia && !labs.ketones && labs.lactate) {
-    suspectedDisorders.push('Fatty Acid Oxidation Disorder (MCAD)');
-    urgency = 'urgent';
-    score += 4;
-  }
-
-  if (features.odor) {
-    if (onset === 'neonatal') {
-      suspectedDisorders.push('MSUD (maple syrup odor)', 'Isovaleric acidemia (sweaty feet)');
-      urgency = 'emergency';
-    } else {
-      suspectedDisorders.push('PKU (musty odor)');
-    }
-    score += 3;
-  }
-
-  if (labs.lactate && features.regression && features.seizures) {
-    suspectedDisorders.push('Mitochondrial disorder (MELAS, Leigh syndrome)');
-    urgency = 'urgent';
-    score += 4;
-  }
-
-  if (features.hepatomegaly && features.jaundice && onset === 'neonatal') {
-    suspectedDisorders.push('Galactosemia');
-    urgency = 'emergency';
-    score += 4;
-  }
-
-  if (features.hepatomegaly && labs.hypoglycemia && labs.lactate) {
-    suspectedDisorders.push('Glycogen Storage Disease Type I');
-    urgency = 'urgent';
-    score += 3;
-  }
-
-  if (suspectedDisorders.length === 0) {
-    if (score >= 5) {
-      suspectedDisorders.push('Nonspecific metabolic disorder - broad workup needed');
-    } else {
-      suspectedDisorders.push('Low probability, but consider if symptoms progress');
-      urgency = 'routine';
-    }
-  }
-
-  const riskLevel = score >= 8 ? 'Very High' : score >= 5 ? 'High' : score >= 3 ? 'Moderate' : 'Low';
-  const riskColor = score >= 8 ? '#ef4444' : score >= 5 ? '#f59e0b' : score >= 3 ? '#3b82f6' : '#10b981';
-
-  // Generate testing recommendations
-  let testingRecs = [];
-  
-  if (urgency === 'emergency') {
-    testingRecs = [
-      '🚨 <strong>IMMEDIATE:</strong> Admit to ICU, contact metabolic specialist',
-      '🩸 Stat: Ammonia, lactate, blood gas, glucose, electrolytes',
-      '💉 Start emergency protocol: Stop protein, IV dextrose 10%',
-      '🧪 Urgent: Plasma amino acids, urine organic acids, acylcarnitine profile',
-      '🔬 Consider: Dialysis if ammonia >500 μmol/L'
-    ];
-  } else if (urgency === 'urgent') {
-    testingRecs = [
-      '⚡ <strong>URGENT:</strong> Refer to metabolic genetics within 24-48 hours',
-      '🩸 Priority labs: Ammonia, lactate, glucose, electrolytes',
-      '🧪 Metabolic panel: Plasma amino acids, urine organic acids',
-      '📋 Comprehensive evaluation: Acylcarnitine profile, transferrin isoforms'
-    ];
-  } else {
-    testingRecs = [
-      '📅 <strong>ROUTINE:</strong> Schedule metabolic genetics consult',
-      '🩸 Baseline: Comprehensive metabolic panel',
-      '🧪 Screening: Plasma amino acids, urine organic acids',
-      '📊 Consider: Extended newborn screening if not done'
-    ];
-  }
-
-  const resultsHTML = `
-    <div class="alert alert-${urgency === 'emergency' ? 'danger' : urgency === 'urgent' ? 'warning' : 'info'}">
-      <strong>Metabolic Risk Assessment Complete</strong>
-    </div>
-
-    <div class="card" style="background:${riskColor}15;border-color:${riskColor};">
-      <h3 style="color:${riskColor};">Suspicion Level: ${riskLevel}</h3>
-      <p><strong>Clinical Score:</strong> ${score}/20</p>
-      <p><strong>Urgency:</strong> ${urgency.toUpperCase()}</p>
-    </div>
-
-    <div class="card">
-      <h3>🦠 Suspected Disorders</h3>
-      <ul>
-        ${suspectedDisorders.map(d => `<li>${d}</li>`).join('')}
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>🔬 Recommended Actions</h3>
-      <ul>
-        ${testingRecs.map(r => `<li>${r}</li>`).join('')}
-      </ul>
-    </div>
-  `;
-
-  document.getElementById('metabolicResults').innerHTML = resultsHTML;
-
-  // Update metabolic testing recommendations
-  updateMetabolicTesting(urgency, suspectedDisorders);
-}
-
-function updateMetabolicTesting(urgency, disorders) {
-  let testingHTML = '';
-
-  if (urgency === 'emergency') {
-    testingHTML = `
-      <div class="alert alert-danger">
-        <strong>🚨 EMERGENCY TESTING PROTOCOL</strong>
-      </div>
-      <div class="card" style="background:#fee2e2;">
-        <h4>Immediate Tests (STAT)</h4>
-        <ul>
-          <li>Ammonia (venous)</li>
-          <li>Blood gas (pH, bicarbonate)</li>
-          <li>Glucose</li>
-          <li>Electrolytes + anion gap</li>
-          <li>Lactate</li>
-          <li>Liver function tests</li>
-        </ul>
-      </div>
-      <div class="card" style="background:#fee2e2;">
-        <h4>Specialized Tests (Urgent)</h4>
-        <ul>
-          <li>Plasma amino acids</li>
-          <li>Urine organic acids</li>
-          <li>Acylcarnitine profile</li>
-          <li>Urine ketones</li>
-        </ul>
-      </div>
-    `;
-  } else if (urgency === 'urgent') {
-    testingHTML = `
-      <div class="alert alert-warning">
-        <strong>⚡ URGENT TESTING PROTOCOL</strong>
-      </div>
-      <div class="card" style="background:#fef3c7;">
-        <h4>Priority Tests (24-48 hours)</h4>
-        <ul>
-          <li>Comprehensive metabolic panel</li>
-          <li>Ammonia</li>
-          <li>Lactate</li>
-          <li>Plasma amino acids</li>
-          <li>Urine organic acids</li>
-        </ul>
-      </div>
-    `;
-  } else {
-    testingHTML = `
-      <div class="alert alert-info">
-        <strong>📅 ROUTINE TESTING PROTOCOL</strong>
-      </div>
-      <div class="card" style="background:#eff6ff;">
-        <h4>Screening Tests</h4>
-        <ul>
-          <li>Basic metabolic panel</li>
-          <li>Plasma amino acids</li>
-          <li>Urine organic acids</li>
-          <li>Consider: Acylcarnitine profile</li>
-        </ul>
-      </div>
-    `;
-  }
-
-  if (disorders.length > 0) {
-    testingHTML += `
-      <div class="card">
-        <h4>Disorder-Specific Testing</h4>
-        <ul>
-          ${disorders.map(d => {
-            if (d.includes('Urea Cycle')) return `<li><strong>${d}:</strong> Plasma amino acids (elevated glutamine), urine orotic acid</li>`;
-            if (d.includes('Organic Acidemia')) return `<li><strong>${d}:</strong> Urine organic acids (elevated methylmalonic/propionic acid)</li>`;
-            if (d.includes('Fatty Acid')) return `<li><strong>${d}:</strong> Acylcarnitine profile (elevated C8-C10)</li>`;
-            if (d.includes('Mitochondrial')) return `<li><strong>${d}:</strong> Plasma lactate, pyruvate, muscle biopsy if indicated</li>`;
-            if (d.includes('Galactosemia')) return `<li><strong>${d}:</strong> Galactose-1-phosphate uridyltransferase assay</li>`;
-            return `<li><strong>${d}:</strong> Comprehensive metabolic workup</li>`;
-          }).join('')}
-        </ul>
-      </div>
-    `;
-  }
-
-  document.getElementById('metabolicTesting').innerHTML = testingHTML;
-}
-
-// ============= Prevention Protocols =============
-function generatePreventionPlan() {
-  const plan = `
+// ===== Prevention Plan =====
+function generatePreventionPlan(){
+  document.getElementById('preventionPlan').innerHTML=`
     <div class="card" style="background:#f0fdf4;border:2px solid #10b981;">
       <h3>🎯 Personalized Prevention Protocol</h3>
-      
-      <h4>Phase 1: Pre-Conception (3 months before pregnancy)</h4>
-      <ul>
-        <li>✓ Begin folic acid 800 mcg daily</li>
-        <li>✓ Optimize diet: leafy greens, citrus, fortified grains</li>
-        <li>✓ Genetic counseling if family history present</li>
-        <li>✓ Assess and optimize vitamin D, B12 levels</li>
-      </ul>
-
+      <h4>Phase 1: Pre-Conception (3 months before)</h4>
+      <ul><li>✓ Begin folic acid 800 mcg daily</li><li>✓ Optimize diet: leafy greens, citrus, fortified grains</li><li>✓ Genetic counseling if family history present</li><li>✓ Assess vitamin D, B12 levels</li></ul>
       <h4>Phase 2: First Trimester (Weeks 1-12)</h4>
-      <ul>
-        <li>✓ Continue/increase folic acid to 800-1000 mcg</li>
-        <li>✓ Add DHA 200-300 mg daily</li>
-        <li>✓ Add choline 450 mg daily</li>
-        <li>✓ Avoid teratogens (alcohol, certain medications)</li>
-        <li>✓ Prenatal vitamin with B-complex</li>
-      </ul>
-
+      <ul><li>✓ Continue/increase folic acid to 800-1000 mcg</li><li>✓ Add DHA 200-300 mg daily</li><li>✓ Add choline 450 mg daily</li><li>✓ Avoid teratogens</li></ul>
       <h4>Phase 3: Second Trimester (Weeks 13-27)</h4>
-      <ul>
-        <li>✓ Continue all supplements</li>
-        <li>✓ Genetic screening if indicated (15-20 weeks)</li>
-        <li>✓ Anatomy ultrasound (20 weeks)</li>
-        <li>✓ Monitor maternal stress, ensure adequate sleep</li>
-        <li>✓ Continue healthy diet rich in folate</li>
-      </ul>
-
+      <ul><li>✓ Continue all supplements</li><li>✓ Genetic screening if indicated (15-20 weeks)</li><li>✓ Anatomy ultrasound (20 weeks)</li></ul>
       <h4>Phase 4: Third Trimester & Postnatal</h4>
-      <ul>
-        <li>✓ Continue supplements through breastfeeding</li>
-        <li>✓ Plan for newborn screening</li>
-        <li>✓ Arrange developmental monitoring schedule</li>
-        <li>✓ Identify early intervention resources</li>
-      </ul>
-
-      <div class="alert alert-success" style="margin-top:16px;">
-        <strong>📊 Expected Outcome:</strong> 40-50% reduction in neurodevelopmental risk with full protocol adherence
-      </div>
+      <ul><li>✓ Continue supplements through breastfeeding</li><li>✓ Plan for newborn screening</li><li>✓ Arrange developmental monitoring schedule</li></ul>
+      <div class="alert alert-success" style="margin-top:16px;"><strong>📊 Expected Outcome:</strong> 40-50% reduction in neurodevelopmental risk with full protocol adherence</div>
     </div>
-
-    <div class="card">
-      <h3>🛒 Shopping List</h3>
-      <h4>Prenatal Supplements (Daily)</h4>
-      <table>
-        <thead>
-          <tr><th>Supplement</th><th>Dose</th><th>Brand Examples</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Folic Acid</td><td>800-1000 mcg</td><td>Nature Made, Thorne</td></tr>
-          <tr><td>DHA (Omega-3)</td><td>200-300 mg</td><td>Nordic Naturals, Carlson</td></tr>
-          <tr><td>Choline</td><td>450 mg</td><td>NOW Foods, Jarrow</td></tr>
-          <tr><td>Vitamin D</td><td>1000-2000 IU</td><td>Included in prenatal</td></tr>
-          <tr><td>B12</td><td>2.6 mcg</td><td>Included in prenatal</td></tr>
-        </tbody>
-      </table>
-
-      <h4>Dietary Sources</h4>
-      <ul>
-        <li>🥬 <strong>Folate:</strong> Spinach, kale, Brussels sprouts, broccoli</li>
-        <li>🐟 <strong>DHA:</strong> Salmon, sardines, mackerel (low mercury)</li>
-        <li>🥚 <strong>Choline:</strong> Eggs, chicken, beef liver</li>
-        <li>🥛 <strong>Vitamin D:</strong> Fortified milk, fatty fish, sunlight</li>
-        <li>🥩 <strong>B12:</strong> Meat, fish, dairy, fortified cereals</li>
-      </ul>
-    </div>
-
-    <button class="btn btn-primary" onclick="window.print()">🖨️ Print Prevention Plan</button>
-  `;
-
-  document.getElementById('preventionPlan').innerHTML = plan;
-  
-  patientData.prevention = {
-    planGenerated: true,
-    timestamp: new Date().toISOString()
-  };
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Print Prevention Plan</button>`;
+  patientData.prevention={planGenerated:true,timestamp:new Date().toISOString()};
 }
 
-// ============= Early Intervention =============
-function generateInterventionPlan() {
-  const age = parseInt(document.getElementById('interventionAge').value) || 0;
-  const concerns = {
-    language: document.getElementById('concernLanguage').checked,
-    social: document.getElementById('concernSocial').checked,
-    motor: document.getElementById('concernMotor').checked,
-    behavior: document.getElementById('concernBehavior').checked,
-    sensory: document.getElementById('concernSensory').checked
-  };
-  const resources = document.getElementById('familyResources').value;
-
-  if (!age) {
-    alert('⚠️ Please enter child\'s age in months');
-    return;
-  }
-
-  let therapies = [];
-  let intensity = '';
-  let totalHours = 0;
-
-  // Determine therapies based on concerns
-  if (concerns.language) {
-    therapies.push({
-      name: 'Speech-Language Therapy',
-      frequency: '2-3x/week',
-      duration: '45 min',
-      hours: 2
-    });
-    totalHours += 2;
-  }
-
-  if (concerns.social) {
-    if (age >= 12) {
-      therapies.push({
-        name: 'Early Start Denver Model (ESDM)',
-        frequency: '15-25 hrs/week',
-        duration: 'Intensive',
-        hours: 20
-      });
-      totalHours += 20;
-    } else {
-      therapies.push({
-        name: 'Parent-Mediated Intervention',
-        frequency: 'Daily',
-        duration: '2-3 hrs',
-        hours: 15
-      });
-      totalHours += 15;
-    }
-  }
-
-  if (concerns.motor) {
-    therapies.push({
-      name: 'Occupational Therapy',
-      frequency: '1-2x/week',
-      duration: '45 min',
-      hours: 1.5
-    });
-    totalHours += 1.5;
-    
-    therapies.push({
-      name: 'Physical Therapy',
-      frequency: '1-2x/week',
-      duration: '45 min',
-      hours: 1.5
-    });
-    totalHours += 1.5;
-  }
-
-  if (concerns.behavior) {
-    therapies.push({
-      name: 'Applied Behavior Analysis (ABA)',
-      frequency: '10-25 hrs/week',
-      duration: 'Intensive',
-      hours: 15
-    });
-    totalHours += 15;
-  }
-
-  if (concerns.sensory) {
-    therapies.push({
-      name: 'Sensory Integration Therapy',
-      frequency: '1-2x/week',
-      duration: '45 min',
-      hours: 1.5
-    });
-    totalHours += 1.5;
-  }
-
-  // Always include parent training
-  therapies.push({
-    name: 'Parent Training & Support',
-    frequency: 'Weekly',
-    duration: '90 min',
-    hours: 1.5
-  });
-  totalHours += 1.5;
-
-  // Adjust based on resources
-  if (resources === 'low') {
-    intensity = 'Modified intensity based on insurance/public programs';
-  } else if (resources === 'medium') {
-    intensity = 'Standard intensity with mix of private/public services';
-  } else {
-    intensity = 'Intensive intervention recommended';
-  }
-
-  const planHTML = `
+// ===== Intervention Plan =====
+function generateInterventionPlan(){
+  const age=parseInt(document.getElementById('interventionAge').value)||0;
+  if(!age){alert('⚠️ Please enter child\'s age in months');return;}
+  const concerns={language:document.getElementById('concernLanguage').checked,social:document.getElementById('concernSocial').checked,motor:document.getElementById('concernMotor').checked,behavior:document.getElementById('concernBehavior').checked,sensory:document.getElementById('concernSensory').checked};
+  const resources=document.getElementById('familyResources').value;
+  let therapies=[],totalHours=0;
+  if(concerns.language){therapies.push({name:'Speech-Language Therapy',frequency:'2-3x/week',hours:2});totalHours+=2;}
+  if(concerns.social){therapies.push(age>=12?{name:'Early Start Denver Model (ESDM)',frequency:'15-25 hrs/week',hours:20}:{name:'Parent-Mediated Intervention',frequency:'Daily',hours:15});totalHours+=age>=12?20:15;}
+  if(concerns.motor){therapies.push({name:'Occupational Therapy',frequency:'1-2x/week',hours:1.5},{name:'Physical Therapy',frequency:'1-2x/week',hours:1.5});totalHours+=3;}
+  if(concerns.behavior){therapies.push({name:'Applied Behavior Analysis (ABA)',frequency:'10-25 hrs/week',hours:15});totalHours+=15;}
+  if(concerns.sensory){therapies.push({name:'Sensory Integration Therapy',frequency:'1-2x/week',hours:1.5});totalHours+=1.5;}
+  therapies.push({name:'Parent Training & Support',frequency:'Weekly',hours:1.5});totalHours+=1.5;
+  document.getElementById('interventionPlan').innerHTML=`
     <div class="card" style="background:#eff6ff;border:2px solid #3b82f6;">
       <h3>🎯 Personalized Intervention Plan</h3>
-      <p><strong>Child Age:</strong> ${age} months</p>
-      <p><strong>Total Weekly Hours:</strong> ${totalHours} hours</p>
-      <p><strong>Intensity Level:</strong> ${intensity}</p>
+      <p><strong>Age:</strong> ${age} months | <strong>Total Weekly Hours:</strong> ${totalHours}</p>
     </div>
-
-    <div class="card">
-      <h3>📋 Recommended Therapies</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Therapy</th>
-            <th>Frequency</th>
-            <th>Duration</th>
-            <th>Weekly Hours</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${therapies.map(t => `
-            <tr>
-              <td><strong>${t.name}</strong></td>
-              <td>${t.frequency}</td>
-              <td>${t.duration}</td>
-              <td>${t.hours}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+    <div class="card"><h3>📋 Recommended Therapies</h3>
+      <table><thead><tr><th>Therapy</th><th>Frequency</th><th>Weekly Hours</th></tr></thead>
+      <tbody>${therapies.map(t=>`<tr><td><strong>${t.name}</strong></td><td>${t.frequency}</td><td>${t.hours}</td></tr>`).join('')}</tbody></table>
     </div>
-
-    <div class="card">
-      <h3>📅 Implementation Timeline</h3>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <strong>Week 1-2:</strong> Complete comprehensive evaluations, establish baseline
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <strong>Week 3-4:</strong> Begin core therapies, parent training orientation
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <strong>Month 2-3:</strong> Ramp up to full intensity, coordinate team meetings
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content">
-            <strong>Month 3:</strong> First progress review, adjust plan as needed
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>💰 Funding & Resources</h3>
-      ${resources === 'low' ? `
-        <div class="alert alert-info">
-          <strong>Public Programs Available:</strong>
-          <ul>
-            <li>Early Intervention (Part C, ages 0-3): Free/low-cost</li>
-            <li>Medicaid: Comprehensive coverage in many states</li>
-            <li>School district services (ages 3+): Free through IEP</li>
-            <li>Autism Speaks grants and resources</li>
-          </ul>
-        </div>
-      ` : resources === 'medium' ? `
-        <div class="alert alert-info">
-          <strong>Funding Mix:</strong>
-          <ul>
-            <li>Private insurance: Check ABA/therapy coverage mandates</li>
-            <li>Early Intervention: Supplement with public services</li>
-            <li>Out-of-pocket: Consider sliding scale providers</li>
-          </ul>
-        </div>
-      ` : `
-        <div class="alert alert-success">
-          <strong>Optimal Access:</strong>
-          <ul>
-            <li>Private therapy centers with intensive programs</li>
-            <li>Supplemental early intervention services</li>
-            <li>Access to cutting-edge interventions and specialists</li>
-          </ul>
-        </div>
-      `}
-    </div>
-
-    <div class="card">
-      <h3>🎯 Expected Outcomes (6-12 months)</h3>
-      <ul>
-        <li>📈 60-70% improvement in targeted skills (evidence-based)</li>
-        <li>🗣️ Significant language gains (average 10-15 word increase)</li>
-        <li>🤝 Improved social engagement and joint attention</li>
-        <li>🎓 Better readiness for preschool/educational settings</li>
-      </ul>
-    </div>
-
-    <button class="btn btn-primary" onclick="window.print()">🖨️ Print Intervention Plan</button>
-    <button class="btn btn-secondary" onclick="exportData('intervention')">💾 Save to File</button>
-  `;
-
-  document.getElementById('interventionPlan').innerHTML = planHTML;
-
-  patientData.intervention = {
-    age,
-    concerns,
-    therapies,
-    totalHours,
-    resources,
-    timestamp: new Date().toISOString()
-  };
+    <div class="card"><h3>🎯 Expected Outcomes (6-12 months)</h3><ul><li>📈 60-70% improvement in targeted skills</li><li>🗣️ Significant language gains</li><li>🤝 Improved social engagement</li></ul></div>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Print Plan</button>`;
+  patientData.intervention={age,concerns,therapies,totalHours,resources,timestamp:new Date().toISOString()};
 }
 
-// ============= Modal Functions =============
-function showIntegrationModal() {
-  document.getElementById('integrationModal').classList.add('active');
+// ===== Export =====
+function exportData(format){
+  const ts=new Date().toISOString().split('T')[0];
+  const fn=`TBR1_Data_${ts}`;
+  if(format==='json'){downloadFile(JSON.stringify(patientData,null,2),fn+'.json','application/json');}
+  else if(format==='csv'){let csv='Section,Field,Value\n';Object.entries(patientData).forEach(([s,d])=>{Object.entries(d).forEach(([f,v])=>{csv+=`${s},${f},"${JSON.stringify(v)}"\n`;});});downloadFile(csv,fn+'.csv','text/csv');}
+  else if(format==='fhir'){const fhir={resourceType:'Bundle',type:'collection',entry:[{resource:{resourceType:'Observation',status:'final',effectiveDateTime:new Date().toISOString(),valueString:JSON.stringify(patientData)}}]};downloadFile(JSON.stringify(fhir,null,2),fn+'_FHIR.json','application/fhir+json');}
+  alert('✅ Data exported as '+format.toUpperCase());
 }
 
-function closeModal() {
-  document.getElementById('integrationModal').classList.remove('active');
+function downloadFile(content,filename,mimeType){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mimeType}));
+  a.download=filename;a.click();
 }
 
-// ============= Data Export =============
-function exportData(format) {
-  const timestamp = new Date().toISOString().split('T')[0];
-  const filename = `TBR1_Clinical_Data_${timestamp}`;
-
-  if (format === 'json') {
-    const json = JSON.stringify(patientData, null, 2);
-    downloadFile(json, `${filename}.json`, 'application/json');
-  } else if (format === 'csv') {
-    let csv = 'Section,Field,Value\n';
-    Object.entries(patientData).forEach(([section, data]) => {
-      Object.entries(data).forEach(([field, value]) => {
-        csv += `${section},${field},"${JSON.stringify(value)}"\n`;
-      });
-    });
-    downloadFile(csv, `${filename}.csv`, 'text/csv');
-  } else if (format === 'fhir') {
-    const fhir = {
-      resourceType: 'Bundle',
-      type: 'collection',
-      entry: [
-        {
-          resource: {
-            resourceType: 'Patient',
-            id: 'patient-1',
-            meta: {
-              lastUpdated: new Date().toISOString()
-            }
-          }
-        },
-        {
-          resource: {
-            resourceType: 'Observation',
-            status: 'final',
-            code: {
-              coding: [{
-                system: 'http://loinc.org',
-                code: '89204-5',
-                display: 'Developmental screening'
-              }]
-            },
-            effectiveDateTime: new Date().toISOString(),
-            valueString: JSON.stringify(patientData)
-          }
-        }
-      ]
-    };
-    downloadFile(JSON.stringify(fhir, null, 2), `${filename}_FHIR.json`, 'application/fhir+json');
-  } else if (format === 'hl7') {
-    const hl7 = `MSH|^~\\&|TBR1Clinical|NeuroGuardian|EHR|Hospital|${new Date().toISOString()}||ORU^R01|MSG001|P|2.5\n` +
-                `PID|1||PATIENT001||DOE^JANE||19900101|F\n` +
-                `OBR|1||${timestamp}|TBR1-RISK^TBR1 Risk Assessment\n` +
-                `OBX|1|ST|RISK^Risk Level||${patientData.prenatal?.riskLevel || 'N/A'}||||||F\n`;
-    downloadFile(hl7, `${filename}.hl7`, 'text/plain');
-  } else if (format === 'intervention') {
-    const json = JSON.stringify(patientData.intervention, null, 2);
-    downloadFile(json, `${filename}_Intervention.json`, 'application/json');
-  }
-
-  alert(`✅ Data exported as ${format.toUpperCase()}`);
-}
-
-function downloadFile(content, filename, mimeType) {
-  const blob = new Blob([content], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ============= Service Worker Registration =============
-if ('serviceWorker' in navigator) {
-  const swContent = `
-const CACHE_NAME = 'tbr1-clinical-v1';
-const ASSETS = ['/'];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n=>n!==CACHE_NAME).map(n=>caches.delete(n)))));
-  self.clients.claim();
-});
-self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-});
-  `;
-  const blob = new Blob([swContent], {type:'application/javascript'});
-  const swURL = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swURL)
-    .then(() => console.log('✅ PWA Service Worker registered'))
-    .catch(e => console.error('❌ SW registration failed', e));
-}
-
-// ============= Initialize =============
-document.addEventListener('DOMContentLoaded', function() {
+// ===== Init =====
+document.addEventListener('DOMContentLoaded',function(){
   initNeuroguardianChart();
   console.log('✅ TBR1 Clinical NeuroGuardian initialized');
-  console.log('📱 PWA-ready for offline use');
-  console.log('🔌 Integration API available');
 });
 </script>
-
 </body>
 </html>
