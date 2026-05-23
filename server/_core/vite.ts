@@ -5,7 +5,6 @@ import path from "path";
 
 export async function setupVite(app: Express, server: Server) {
   const { createServer: createViteServer } = await import("vite");
-
   const vite = await createViteServer({
     configFile: false,
     root: path.resolve(process.cwd(), "client"),
@@ -16,9 +15,7 @@ export async function setupVite(app: Express, server: Server) {
     },
     appType: "custom",
   });
-
   app.use(vite.middlewares);
-
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
     try {
@@ -39,15 +36,12 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
-
+  const distPath = path.resolve(process.cwd(), "dist", "public");
   if (!fs.existsSync(distPath)) {
-    console.error(`Could not find the build directory: ${distPath}`);
+    console.error(`Could not find the build directory: ${distPath}, cwd: ${process.cwd()}`);
   }
-
   app.use(express.static(distPath));
-
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
-  }
+}
