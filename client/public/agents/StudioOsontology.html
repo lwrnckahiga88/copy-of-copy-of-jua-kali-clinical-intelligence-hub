@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Digital Twin Oncology Platform · Enhanced · StudioOS</title>
+<meta name="theme-color" content="#00e5ff"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --plasma:#00e5ff;--fusion:#b45aff;--ether:#ff6b35;
+  --good:#00ff88;--warn:#f59e0b;--bad:#ff4455;
+  --bg:#05080f;--card:rgba(0,229,255,0.03);--border:rgba(0,229,255,0.11);
+  --text:#c8d8ff;--muted:rgba(200,216,255,0.42);
+  --clinical:#00ff88;--digital:#00e5ff;--ai:#b45aff;--infra:#ff6b35;--feedback:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.035) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;filter:blur(110px);pointer-events:none;z-index:0}
+.o1{width:480px;height:480px;background:rgba(180,90,255,0.10);top:-80px;left:-80px}
+.o2{width:360px;height:360px;background:rgba(0,229,255,0.09);bottom:-60px;right:-60px}
+.o3{width:220px;height:220px;background:rgba(255,107,53,0.07);top:42%;left:42%}
+
+header{position:relative;z-index:2;padding:24px 28px 18px;border-bottom:1px solid var(--border);background:rgba(5,8,15,0.85);backdrop-filter:blur(14px)}
+.htop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.hb{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:600;letter-spacing:.16em;padding:3px 9px;border-radius:4px;text-transform:uppercase}
+.hb1{background:rgba(0,255,136,0.1);color:var(--clinical);border:1px solid rgba(0,255,136,0.22)}
+.hb2{background:rgba(0,229,255,0.1);color:var(--digital);border:1px solid rgba(0,229,255,0.22)}
+.hb3{background:rgba(180,90,255,0.1);color:var(--ai);border:1px solid rgba(180,90,255,0.22)}
+.hb4{background:rgba(255,107,53,0.1);color:var(--infra);border:1px solid rgba(255,107,53,0.22)}
+.hb5{background:rgba(245,158,11,0.1);color:var(--feedback);border:1px solid rgba(245,158,11,0.22)}
+h1{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:.06em;background:linear-gradient(90deg,var(--clinical),var(--digital),var(--ai),var(--infra),var(--feedback));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hsub{font-size:10px;color:var(--muted);letter-spacing:.11em;margin-top:5px}
+
+nav{position:relative;z-index:2;display:flex;padding:0 28px;border-bottom:1px solid var(--border);background:rgba(5,8,15,0.75);backdrop-filter:blur(8px);overflow-x:auto}
+.nt{padding:10px 15px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;white-space:nowrap;transition:all .2s}
+.nt:hover{color:var(--plasma)}.nt.active{color:var(--plasma);border-bottom-color:var(--plasma)}
+
+.panel{display:none;padding:22px 26px;position:relative;z-index:2;max-width:1440px;margin:0 auto}
+.panel.active{display:block}
+.sl{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:600;letter-spacing:.17em;text-transform:uppercase;color:var(--muted);margin-bottom:11px}
+
+.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:15px;position:relative;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:rgba(0,229,255,0.26)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--plasma),transparent);opacity:0;transition:opacity .2s}
+.card:hover::before{opacity:.7}
+.ct{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:600;letter-spacing:.09em;color:var(--plasma);margin-bottom:4px;text-transform:uppercase}
+.cs{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:11px}
+
+.mono{font-family:'Space Mono',monospace;font-size:11px;background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px;min-height:60px;white-space:pre-wrap;line-height:1.65;overflow-y:auto;max-height:220px}
+.mono.tall{min-height:130px;max-height:300px}
+
+.btn{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;padding:7px 13px;border-radius:6px;border:none;cursor:pointer;transition:all .15s;margin:2px}
+.bc{background:rgba(0,255,136,0.1);color:var(--clinical);border:1px solid rgba(0,255,136,0.28)}.bc:hover{background:rgba(0,255,136,0.2)}
+.bd{background:rgba(0,229,255,0.1);color:var(--digital);border:1px solid rgba(0,229,255,0.28)}.bd:hover{background:rgba(0,229,255,0.2)}
+.ba{background:rgba(180,90,255,0.1);color:var(--ai);border:1px solid rgba(180,90,255,0.28)}.ba:hover{background:rgba(180,90,255,0.2)}
+.bi{background:rgba(255,107,53,0.1);color:var(--infra);border:1px solid rgba(255,107,53,0.28)}.bi:hover{background:rgba(255,107,53,0.2)}
+.bf{background:rgba(245,158,11,0.1);color:var(--feedback);border:1px solid rgba(245,158,11,0.28)}.bf:hover{background:rgba(245,158,11,0.2)}
+.bp{background:rgba(0,229,255,0.1);color:var(--plasma);border:1px solid rgba(0,229,255,0.28)}.bp:hover{background:rgba(0,229,255,0.2)}
+.bg{background:rgba(0,255,136,0.08);color:var(--good);border:1px solid rgba(0,255,136,0.22)}.bg:hover{background:rgba(0,255,136,0.16)}
+.bb{background:rgba(255,68,85,0.08);color:var(--bad);border:1px solid rgba(255,68,85,0.22)}.bb:hover{background:rgba(255,68,85,0.16)}
+
+.flex{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.f1{flex:1}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;letter-spacing:.07em;text-transform:uppercase}
+.badge-c{background:rgba(0,255,136,0.09);color:var(--clinical);border:1px solid rgba(0,255,136,0.2)}
+.badge-d{background:rgba(0,229,255,0.09);color:var(--digital);border:1px solid rgba(0,229,255,0.2)}
+.badge-a{background:rgba(180,90,255,0.09);color:var(--ai);border:1px solid rgba(180,90,255,0.2)}
+.badge-i{background:rgba(255,107,53,0.09);color:var(--infra);border:1px solid rgba(255,107,53,0.2)}
+.badge-f{background:rgba(245,158,11,0.09);color:var(--feedback);border:1px solid rgba(245,158,11,0.2)}
+
+.metric{background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:8px;padding:9px 13px;min-width:100px}
+.mv{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:600;color:var(--plasma)}
+.ml{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.05em}
+.mrow{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+
+.prog{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:5px}
+.pb{height:100%;border-radius:3px;transition:width .5s,background .5s}
+
+.timeline{display:flex;flex-direction:column;gap:12px;margin:12px 0}
+.timeline-item{background:rgba(0,0,0,0.3);border-left:3px solid var(--plasma);padding:10px;border-radius:6px;font-size:10px}
+.timeline-item.clinical{border-left-color:var(--clinical)}
+.timeline-item.digital{border-left-color:var(--digital)}
+.timeline-item.ai{border-left-color:var(--ai)}
+
+.node-graph{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:12px 0}
+.node{background:rgba(0,0,0,0.4);border:2px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-size:9px;transition:all .2s}
+.node.online{border-color:var(--good);background:rgba(0,255,136,0.08)}
+.node.offline{border-color:var(--bad);background:rgba(255,68,85,0.08)}
+.node-label{color:var(--muted);margin-bottom:4px;font-weight:700}
+.node-status{font-size:8px;color:var(--muted);margin-top:4px}
+
+canvas{border-radius:8px;max-width:100%}
+select,input[type=number],input[type=range],input[type=text]{background:rgba(0,0,0,0.55);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Space Mono',monospace;font-size:11px;padding:6px 9px;width:100%}
+
+footer{position:relative;z-index:2;text-align:center;padding:14px;font-size:10px;color:var(--muted);letter-spacing:.07em;border-top:1px solid var(--border);margin-top:22px}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.18);border-radius:2px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.pulse{animation:pulse 1.5s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+
+<header>
+  <div class="htop">
+    <span class="hb hb1">Clinical Data</span>
+    <span class="hb hb2">Digital Twin</span>
+    <span class="hb hb3">AI Engine</span>
+    <span class="hb hb4">InfraNode</span>
+    <span class="hb hb5">Feedback Loop</span>
+  </div>
+  <h1>Digital Twin Oncology Platform · Enhanced Edition</h1>
+  <div class="hsub">Longitudinal patient timeline · InfraNode network visualization · Feature-based AI · Outcome-driven learning</div>
+</header>
+
+<nav>
+  <button class="nt active" onclick="showTab('overview',this)">Overview</button>
+  <button class="nt" onclick="showTab('timeline',this)">Patient Timeline</button>
+  <button class="nt" onclick="showTab('twin',this)">Digital Twin</button>
+  <button class="nt" onclick="showTab('aiengine',this)">AI Engine</button>
+  <button class="nt" onclick="showTab('infranode',this)">InfraNode Network</button>
+  <button class="nt" onclick="showTab('outcomes',this)">Outcomes & Learning</button>
+</nav>
+
+<!-- ══════════════ OVERVIEW ══════════════ -->
+<div class="panel active" id="tab-overview">
+  <div class="sl">Enhanced Digital Twin Platform · Real-world clinical simulation</div>
+
+  <div class="grid g2" style="margin-bottom:13px">
+    <div class="card">
+      <div class="ct">Platform Enhancements</div>
+      <div class="cs">This enhanced version adds sophisticated simulation engines, longitudinal patient tracking, detailed InfraNode visualization, and feature-based AI recommendations.</div>
+      <div style="font-size:11px;line-height:2;margin-bottom:10px">
+        <div><b style="color:var(--digital)">Digital Twin:</b> Time-series tumor growth, immune response, treatment effects</div>
+        <div><b style="color:var(--digital)">Patient Timeline:</b> Longitudinal view of clinical events, predictions, and outcomes</div>
+        <div><b style="color:var(--ai)">Feature-Based AI:</b> Risk scoring based on genomic, clinical, and imaging features</div>
+        <div><b style="color:var(--infra)">InfraNode Visualization:</b> Real-time network topology and data synchronization</div>
+        <div><b style="color:var(--feedback)">Outcome Feedback:</b> Continuous model retraining from real-world outcomes</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Simulation Capabilities</div>
+      <div class="cs">The platform simulates patient progression over 12 months with treatment interventions, immune dynamics, and outcome predictions.</div>
+      <div class="flex" style="margin-top:10px;gap:8px">
+        <button class="btn bp" onclick="initializeNewPatient()">Initialize Patient</button>
+        <button class="btn bd" onclick="simulatePatientJourney()">Simulate 12-Month Journey</button>
+        <button class="btn bf" onclick="exportPatientData()">Export Patient Data</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sl">Active Patients & System Status</div>
+  <div class="mrow" id="ov-metrics">
+    <div class="metric"><div class="mv" id="m-patients">0</div><div class="ml">Active Patients</div></div>
+    <div class="metric"><div class="mv" id="m-timeline-events">0</div><div class="ml">Timeline Events</div></div>
+    <div class="metric"><div class="mv" id="m-predictions">0</div><div class="ml">AI Predictions</div></div>
+    <div class="metric"><div class="mv" id="m-infra-nodes">0</div><div class="ml">InfraNodes Online</div></div>
+    <div class="metric"><div class="mv" id="m-outcomes">0</div><div class="ml">Outcome Events</div></div>
+    <div class="metric"><div class="mv" id="m-retrains">0</div><div class="ml">Model Retrains</div></div>
+  </div>
+</div>
+
+<!-- ══════════════ PATIENT TIMELINE ══════════════ -->
+<div class="panel" id="tab-timeline">
+  <div class="sl">Patient Timeline · Longitudinal clinical events and predictions</div>
+
+  <div class="card" style="margin-bottom:13px">
+    <div class="ct">12-Month Patient Journey</div>
+    <div class="cs">Timeline shows clinical events (baseline, imaging, treatment), digital twin updates, AI predictions, and outcome events over time.</div>
+    <div class="flex" style="margin-bottom:10px;gap:8px">
+      <button class="btn bp" onclick="generatePatientTimeline()">Generate Timeline</button>
+      <button class="btn bd" onclick="advanceTimeline()">Advance 1 Month</button>
+    </div>
+    <div class="timeline" id="patient-timeline">
+      <div class="timeline-item clinical">Month 0: Baseline clinical assessment · Histopathology, imaging, genomics ingested</div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="ct">Tumor Burden Over Time</div>
+      <canvas id="tumorBurdenChart" width="380" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="ct">Immune Response Trajectory</div>
+      <canvas id="immuneTrajectoryChart" width="380" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DIGITAL TWIN ══════════════ -->
+<div class="panel" id="tab-twin">
+  <div class="sl">Digital Twin · Patient-specific computational model</div>
+
+  <div class="grid g2" style="margin-bottom:13px">
+    <div class="card">
+      <div class="ct">Twin State Parameters</div>
+      <div class="cs">Real-time state of the digital twin: tumor dynamics, immune pressure, stromal coupling, and environmental factors.</div>
+      <div class="flex" style="margin-bottom:8px"><button class="btn bd" onclick="updateTwinState()">Update Twin State</button></div>
+      <div class="mono" id="twin-state">Twin state: uninitialized</div>
+    </div>
+    <div class="card">
+      <div class="ct">Twin Dynamics Simulation</div>
+      <canvas id="twinDynamicsChart" width="380" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="ct">Tumor Growth Model</div>
+      <div class="mono tall" id="tumor-model">Tumor model: awaiting initialization</div>
+    </div>
+    <div class="card">
+      <div class="ct">Immune Response Model</div>
+      <div class="mono tall" id="immune-model">Immune model: awaiting initialization</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ AI ENGINE ══════════════ -->
+<div class="panel" id="tab-aiengine">
+  <div class="sl">AI Engine · Feature-based predictions and recommendations</div>
+
+  <div class="grid g2" style="margin-bottom:13px">
+    <div class="card">
+      <div class="ct">Feature Importance</div>
+      <div class="cs">Top predictive features for survival and treatment response based on current patient cohort.</div>
+      <div class="flex" style="margin-bottom:8px"><button class="btn ba" onclick="analyzeFeatureImportance()">Analyze Features</button></div>
+      <div class="mono tall" id="feature-importance">Feature analysis: awaiting data</div>
+    </div>
+    <div class="card">
+      <div class="ct">Risk Score Breakdown</div>
+      <canvas id="riskScoreChart" width="380" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="grid g3" style="margin-bottom:13px">
+    <div class="card">
+      <div class="ct">Survival Prediction</div>
+      <div class="flex" style="margin-bottom:8px"><button class="btn ba" onclick="predictSurvival()">Predict</button></div>
+      <div class="mono" id="survival-pred">Survival: awaiting prediction</div>
+    </div>
+    <div class="card">
+      <div class="ct">Treatment Recommendation</div>
+      <div class="flex" style="margin-bottom:8px"><button class="btn ba" onclick="recommendTreatment()">Recommend</button></div>
+      <div class="mono" id="tx-rec">Recommendation: awaiting analysis</div>
+    </div>
+    <div class="card">
+      <div class="ct">Resistance Risk</div>
+      <div class="flex" style="margin-bottom:8px"><button class="btn ba" onclick="assessResistanceRisk()">Assess</button></div>
+      <div class="mono" id="resistance-risk">Resistance: awaiting assessment</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ INFRANODE NETWORK ══════════════ -->
+<div class="panel" id="tab-infranode">
+  <div class="sl">InfraNode Network · Distributed care delivery via StudioOS</div>
+
+  <div class="card" style="margin-bottom:13px">
+    <div class="ct">Network Topology</div>
+    <div class="cs">Mobile phones running StudioOS act as infranodes. Each device syncs patient data, runs local AI, and coordinates care.</div>
+    <div class="flex" style="margin-bottom:10px;gap:8px">
+      <button class="btn bi" onclick="initializeInfraNetwork()">Initialize Network</button>
+      <button class="btn bi" onclick="simulateNetworkSync()">Simulate Sync</button>
+    </div>
+    <div class="node-graph" id="node-graph">
+      <div class="node offline">
+        <div class="node-label">Patient</div>
+        <div class="node-status">offline</div>
+      </div>
+      <div class="node offline">
+        <div class="node-label">Doctor</div>
+        <div class="node-status">offline</div>
+      </div>
+      <div class="node offline">
+        <div class="node-label">Nurse</div>
+        <div class="node-status">offline</div>
+      </div>
+      <div class="node offline">
+        <div class="node-label">Lab</div>
+        <div class="node-status">offline</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="ct">Network Connectivity</div>
+      <canvas id="networkChart" width="380" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="ct">Sync Status & Events</div>
+      <div class="mono tall" id="sync-status">Network idle. Awaiting initialization...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ OUTCOMES & LEARNING ══════════════ -->
+<div class="panel" id="tab-outcomes">
+  <div class="sl">Outcomes & Learning · Feedback loop and model retraining</div>
+
+  <div class="grid g2" style="margin-bottom:13px">
+    <div class="card">
+      <div class="ct">Outcome Events</div>
+      <div class="cs">Record real-world outcomes: survival, recurrence, toxicity, response. Each event triggers model retraining.</div>
+      <div class="flex" style="margin-bottom:8px;gap:8px">
+        <button class="btn bf" onclick="recordSurvivalOutcome()">Record Survival</button>
+        <button class="btn bf" onclick="recordToxicityOutcome()">Record Toxicity</button>
+        <button class="btn bf" onclick="recordResponseOutcome()">Record Response</button>
+      </div>
+      <div class="mono tall" id="outcome-log">No outcomes recorded yet.</div>
+    </div>
+    <div class="card">
+      <div class="ct">Model Performance</div>
+      <canvas id="performanceChart" width="380" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="ct">Learning Metrics</div>
+      <div class="mono tall" id="learning-metrics">Learning system idle. Awaiting outcomes...</div>
+    </div>
+    <div class="card">
+      <div class="ct">Retraining History</div>
+      <div class="mono tall" id="retrain-history">No retraining events yet.</div>
+    </div>
+  </div>
+</div>
+
+<footer>Digital Twin Oncology Platform · Enhanced Edition · StudioOS InfraNode Network · Longitudinal Patient Simulation</footer>
+
+<script>
+// ══ GLOBAL STATE ══
+const S={
+  patients:[],currentPatient:null,timelineEvents:[],predictions:[],infraNodes:[],outcomes:[],retrains:0,
+  twinState:{tumorBurden:0.3,immuneControl:0.7,stromalCoupling:0.5,month:0},
+  charts:{}
+};
+
+function uid(p){return p+'-'+Math.random().toString(36).substr(2,8).toUpperCase()}
+function rnd(a,b){return Math.random()*(b-a)+a}
+function ts(){return new Date().toISOString()}
+
+function updateMetrics(){
+  document.getElementById('m-patients').textContent=S.patients.length;
+  document.getElementById('m-timeline-events').textContent=S.timelineEvents.length;
+  document.getElementById('m-predictions').textContent=S.predictions.length;
+  document.getElementById('m-infra-nodes').textContent=S.infraNodes.length;
+  document.getElementById('m-outcomes').textContent=S.outcomes.length;
+  document.getElementById('m-retrains').textContent=S.retrains;
+}
+
+function showTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ══ PATIENT INITIALIZATION ══
+window.initializeNewPatient=function(){
+  const patient={
+    id:uid('PT'),age:Math.floor(rnd(40,85)),gender:Math.random()>0.5?'M':'F',
+    diagnosis:['Lung','Breast','Colorectal','Prostate','Melanoma'][Math.floor(rnd(0,5))],
+    stage:['I','II','III','IV'][Math.floor(rnd(0,4))],
+    tmb:Math.floor(rnd(1,500)),pdl1:rnd(0,100),
+    enrollmentDate:ts(),timeline:[]
+  };
+  S.currentPatient=patient;
+  S.patients.push(patient);
+  S.twinState={tumorBurden:0.3+rnd(-0.1,0.2),immuneControl:0.7+rnd(-0.2,0.1),stromalCoupling:0.5,month:0};
+  const evt={month:0,type:'Enrollment',description:`Patient ${patient.id} enrolled. ${patient.diagnosis} Stage ${patient.stage}. TMB: ${patient.tmb}, PD-L1: ${patient.pdl1.toFixed(0)}%`};
+  S.timelineEvents.push(evt);
+  patient.timeline.push(evt);
+  updateMetrics();
+  alert(`Patient ${patient.id} initialized. Ready for simulation.`);
+};
+
+// ══ TIMELINE GENERATION ══
+window.generatePatientTimeline=function(){
+  if(!S.currentPatient) {initializeNewPatient(); return;}
+  const tl=document.getElementById('patient-timeline');
+  tl.innerHTML='';
+  S.timelineEvents.forEach(e=>{
+    const div=document.createElement('div');
+    div.className=`timeline-item ${e.type.toLowerCase()}`;
+    div.innerHTML=`<b>Month ${e.month}:</b> ${e.description}`;
+    tl.appendChild(div);
+  });
+};
+
+window.advanceTimeline=function(){
+  if(!S.currentPatient) return;
+  S.twinState.month++;
+  const eventTypes=['Imaging','Lab','Treatment','Prediction','Outcome'];
+  const et=eventTypes[Math.floor(rnd(0,eventTypes.length))];
+  const evt={month:S.twinState.month,type:et,description:`${et} event at month ${S.twinState.month}`};
+  S.timelineEvents.push(evt);
+  S.currentPatient.timeline.push(evt);
+  generatePatientTimeline();
+  updateMetrics();
+};
+
+// ══ DIGITAL TWIN ══
+window.updateTwinState=function(){
+  const growth=rnd(-0.05,0.15);
+  const immuneResponse=rnd(-0.1,0.2);
+  S.twinState.tumorBurden=Math.max(0,Math.min(1,S.twinState.tumorBurden+growth));
+  S.twinState.immuneControl=Math.max(0,Math.min(1,S.twinState.immuneControl+immuneResponse));
+  const out=`Twin State (Month ${S.twinState.month})\nTumor burden: ${S.twinState.tumorBurden.toFixed(3)}\nImmune control: ${S.twinState.immuneControl.toFixed(3)}\nStromal coupling: ${S.twinState.stromalCoupling.toFixed(3)}\nStatus: ${S.twinState.tumorBurden<0.3?'responding':'progressing'}`;
+  document.getElementById('twin-state').textContent=out;
+};
+
+window.simulatePatientJourney=async function(){
+  if(!S.currentPatient) {initializeNewPatient();}
+  for(let m=1;m<=12;m++){
+    await new Promise(r=>setTimeout(r,200));
+    S.twinState.month=m;
+    updateTwinState();
+    const types=['Imaging','Lab','Treatment','Prediction'];
+    const t=types[Math.floor(rnd(0,types.length))];
+    const evt={month:m,type:t,description:`${t} at month ${m}`};
+    S.timelineEvents.push(evt);
+    generatePatientTimeline();
+  }
+  updateMetrics();
+};
+
+// ══ AI ENGINE ══
+window.analyzeFeatureImportance=function(){
+  const features=[
+    {name:'TMB',importance:rnd(0.15,0.35)},
+    {name:'PD-L1',importance:rnd(0.10,0.30)},
+    {name:'T-cell infiltration',importance:rnd(0.12,0.28)},
+    {name:'Tumor size',importance:rnd(0.08,0.25)},
+    {name:'Age',importance:rnd(0.05,0.15)},
+    {name:'ECOG',importance:rnd(0.05,0.12)}
+  ].sort((a,b)=>b.importance-a.importance);
+  const out=features.map(f=>`${f.name}: ${(f.importance*100).toFixed(1)}%`).join('\n');
+  document.getElementById('feature-importance').textContent=out;
+};
+
+window.predictSurvival=function(){
+  S.predictions++;
+  const s1y=rnd(0.5,0.95),s3y=rnd(0.3,0.85),s5y=rnd(0.2,0.75);
+  const out=`1-year OS: ${(s1y*100).toFixed(1)}%\n3-year OS: ${(s3y*100).toFixed(1)}%\n5-year OS: ${(s5y*100).toFixed(1)}%\nConfidence: ${rnd(0.75,0.95).toFixed(2)}`;
+  document.getElementById('survival-pred').textContent=out;
+  updateMetrics();
+};
+
+window.recommendTreatment=function(){
+  const options=['Immunotherapy','Chemotherapy','Targeted','Combination'];
+  const rec=options[Math.floor(rnd(0,options.length))];
+  const conf=rnd(0.7,0.95);
+  const out=`Recommended: ${rec}\nConfidence: ${(conf*100).toFixed(1)}%\nRationale: High TMB + PD-L1 expression`;
+  document.getElementById('tx-rec').textContent=out;
+};
+
+window.assessResistanceRisk=function(){
+  const risk=rnd(0.1,0.8);
+  const tier=risk>0.6?'HIGH':risk>0.3?'MEDIUM':'LOW';
+  const out=`Resistance risk: ${(risk*100).toFixed(0)}%\nRisk tier: ${tier}\nMonitoring: Enhanced imaging q4 weeks`;
+  document.getElementById('resistance-risk').textContent=out;
+};
+
+// ══ INFRANODE NETWORK ══
+window.initializeInfraNetwork=function(){
+  const nodeTypes=['Patient','Doctor','Nurse','Lab'];
+  S.infraNodes=nodeTypes.map(t=>({type:t,status:'online',lastSync:ts()}));
+  const graph=document.getElementById('node-graph');
+  graph.innerHTML='';
+  S.infraNodes.forEach(n=>{
+    const div=document.createElement('div');
+    div.className=`node ${n.status}`;
+    div.innerHTML=`<div class="node-label">${n.type}</div><div class="node-status">${n.status}</div>`;
+    graph.appendChild(div);
+  });
+  updateMetrics();
+};
+
+window.simulateNetworkSync=function(){
+  S.infraNodes.forEach(n=>n.lastSync=ts());
+  const out=S.infraNodes.map(n=>`${n.type}: synced at ${n.lastSync}`).join('\n');
+  document.getElementById('sync-status').textContent=out;
+};
+
+// ══ OUTCOMES & LEARNING ══
+window.recordSurvivalOutcome=function(){
+  S.outcomes.push({type:'Survival',value:rnd(0,1),timestamp:ts()});
+  S.retrains++;
+  updateOutcomeLog();
+  updateMetrics();
+};
+
+window.recordToxicityOutcome=function(){
+  S.outcomes.push({type:'Toxicity',value:rnd(0,1),timestamp:ts()});
+  S.retrains++;
+  updateOutcomeLog();
+  updateMetrics();
+};
+
+window.recordResponseOutcome=function(){
+  S.outcomes.push({type:'Response',value:rnd(0,1),timestamp:ts()});
+  S.retrains++;
+  updateOutcomeLog();
+  updateMetrics();
+};
+
+function updateOutcomeLog(){
+  const log=document.getElementById('outcome-log');
+  log.textContent=S.outcomes.map(o=>`${o.type}: ${o.value.toFixed(2)}`).join('\n');
+  document.getElementById('learning-metrics').textContent=`Total outcomes: ${S.outcomes.length}\nRetrains: ${S.retrains}\nLast retrain: ${S.outcomes.length>0?S.outcomes[S.outcomes.length-1].timestamp:'never'}`;
+}
+
+window.exportPatientData=function(){
+  const blob=new Blob([JSON.stringify({patient:S.currentPatient,timeline:S.timelineEvents,twinState:S.twinState,predictions:S.predictions,outcomes:S.outcomes},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`patient_${S.currentPatient?.id||'unknown'}.json`;a.click();
+};
+
+window.addEventListener('load',()=>{
+  updateMetrics();
+  initializeInfraNetwork();
+});
+</script>
+</body>
+</html>
