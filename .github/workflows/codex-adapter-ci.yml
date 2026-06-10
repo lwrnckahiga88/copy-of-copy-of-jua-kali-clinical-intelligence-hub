@@ -1,0 +1,205 @@
+name: juA.kali Codex Adapter CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/adapters/**'
+      - 'server/**'
+      - 'client/**'
+      - 'AGENTS.md'
+      - '.github/workflows/codex-adapter-ci.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Codex task to run (natural language)'
+        required: false
+        default: 'Review the healthcare adapter files in lib/adapters/healthcare/ and check that all Willcox UQ contracts are satisfied. Report findings to codex-output.md.'
+        type: string
+      inject_file:
+        description: 'Base64-encoded file content to inject'
+        required: false
+        type: string
+      inject_path:
+        description: 'Target path for injected file'
+        required: false
+        type: string
+      skip_codex:
+        description: 'Skip Codex review (run build/typecheck only)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+
+  # ── 1. TypeScript type-check ─────────────────────────────────────────────────
+  typecheck:
+    name: Type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: tsc --noEmit
+        run: pnpm exec tsc --noEmit
+
+  # ── 2. Adapter contract tests ─────────────────────────────────────────────────
+  adapter-tests:
+    name: Adapter contract tests
+    runs-on: ubuntu-latest
+    needs: typecheck
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run adapter tests
+        run: pnpm test -- --testPathPattern="lib/adapters" --passWithNoTests
+
+  # ── 3. File injection (workflow_dispatch only) ────────────────────────────────
+  inject-file:
+    name: Inject file
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      inputs.inject_file != '' &&
+      inputs.inject_path != ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Decode and write file
+        run: |
+          mkdir -p "$(dirname "${{ inputs.inject_path }}")"
+          echo "${{ inputs.inject_file }}" | base64 -d > "${{ inputs.inject_path }}"
+          echo "Injected: ${{ inputs.inject_path }}"
+
+      - name: Commit injected file
+        run: |
+          git config user.name  "juA.kali Codex CI"
+          git config user.email "ci@juakali.health"
+          git add "${{ inputs.inject_path }}"
+          git diff --cached --quiet || git commit -m "ci(inject): ${{ inputs.inject_path }}"
+          git push
+
+  # ── 4. Codex review (openai/codex-action@v1) ──────────────────────────────────
+  codex-review:
+    name: Codex adapter review
+    runs-on: ubuntu-latest
+    needs: [typecheck, adapter-tests]
+    if: ${{ !inputs.skip_codex }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Codex reads AGENTS.md automatically — no extra config needed
+      - name: Run Codex review
+        uses: openai/codex-action@v1
+        with:
+          prompt: ${{ inputs.task || '.github/codex/prompts/adapter-review.md' }}
+          model: codex-mini-latest
+          effort: medium
+          sandbox: workspace-write
+          output-file: codex-output.md
+          codex-args: '["--ephemeral"]'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload Codex output
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-review-${{ github.sha }}
+          path: codex-output.md
+          retention-days: 30
+
+      - name: Post Codex summary to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.existsSync('codex-output.md')
+              ? fs.readFileSync('codex-output.md', 'utf8')
+              : 'No Codex output generated.';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🤖 Codex Adapter Review\n\n${output.slice(0, 65000)}`
+            });
+
+  # ── 5. Build ──────────────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [adapter-tests]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+        env:
+          NODE_ENV: production
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+  # ── 6. Railway deploy ─────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: [build, codex-review]
+    if: >
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request' &&
+      always() &&
+      needs.build.result == 'success'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm install -g @railway/cli
+
+      - name: Deploy
+        run: railway up --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
