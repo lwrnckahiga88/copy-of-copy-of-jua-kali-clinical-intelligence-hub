@@ -215,6 +215,15 @@ export const pageMapping: AgentConfig[] = [
     htmlFile: "studio_os_admin.html",
     creditCost: 25,
   },
+  {
+    id: "sigcanvas",
+    name: "Insight Canvas",
+    description: "Live operational intelligence graph for healthcare and system monitoring",
+    category: "Analytics",
+    htmlFile: "sig-canvas.html",
+    creditCost: 20,
+    isEnterprise: true,
+  },
 ];
 
 export function getAgentsByCategory(category: string): AgentConfig[] {

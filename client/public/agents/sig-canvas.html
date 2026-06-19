@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudioOS Insight Canvas (SIG)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --accent: #8b5cf6;
+            --accent-foreground: #ffffff;
+            --background: #020617;
+            --card: #0f172a;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: #f8fafc;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #network-container {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+        }
+
+        .node-label {
+            font-size: 12px;
+            font-weight: 600;
+            fill: #fff;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .risk-pulse {
+            animation: pulse-red 2s infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+    <!-- Top Header -->
+    <header class="h-14 border-b border-white/10 flex items-center justify-between px-6 glass-panel z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                <i data-lucide="network" class="w-5 h-5 text-purple-400"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight uppercase">StudioOS <span class="gradient-text">Insight Canvas</span></h1>
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">SIG Kernel v1.0.4 - Live Reality Stream</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-6 px-4 py-1.5 bg-slate-900/50 rounded-full border border-white/5 text-[11px] font-semibold text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="text-purple-400">Entities:</span> <span id="count-entities">0</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-blue-400">Clusters:</span> <span id="count-clusters">0</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-red-400">Risks:</span> <span id="count-risks">0</span>
+                </div>
+            </div>
+            <button class="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden relative">
+        <!-- Left Panel: Live Graph Controls & Legend -->
+        <aside class="w-64 border-r border-white/10 glass-panel flex flex-col z-10">
+            <div class="p-4 border-b border-white/5">
+                <h2 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">Graph Filters</h2>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors group">
+                        <input type="checkbox" checked class="w-4 h-4 rounded border-white/10 bg-slate-800 text-purple-500 focus:ring-purple-500/20">
+                        <span class="text-xs font-medium text-slate-300 group-hover:text-white">Patients</span>
+                        <span class="ml-auto w-2 h-2 rounded-full bg-purple-500"></span>
+                    </label>
+                    <label class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors group">
+                        <input type="checkbox" checked class="w-4 h-4 rounded border-white/10 bg-slate-800 text-blue-500 focus:ring-blue-500/20">
+                        <span class="text-xs font-medium text-slate-300 group-hover:text-white">Facilities</span>
+                        <span class="ml-auto w-2 h-2 rounded-full bg-blue-500"></span>
+                    </label>
+                    <label class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors group">
+                        <input type="checkbox" checked class="w-4 h-4 rounded border-white/10 bg-slate-800 text-green-500 focus:ring-green-500/20">
+                        <span class="text-xs font-medium text-slate-300 group-hover:text-white">Resources</span>
+                        <span class="ml-auto w-2 h-2 rounded-full bg-green-500"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto custom-scrollbar">
+                <h2 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">Emerging Clusters</h2>
+                <div id="clusters-list" class="space-y-3">
+                    <!-- Clusters will be injected here -->
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-white/5 bg-black/20">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System Health</span>
+                    <span class="text-[10px] font-bold text-green-500">98.2%</span>
+                </div>
+                <div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                    <div class="bg-green-500 h-full w-[98%]"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center: Live Graph Visualization -->
+        <main class="flex-1 relative overflow-hidden">
+            <div id="network-container"></div>
+            
+            <!-- Floating Graph Overlay -->
+            <div class="absolute bottom-6 left-6 right-6 flex justify-between items-end pointer-events-none">
+                <div class="glass-panel p-4 rounded-2xl border-white/10 pointer-events-auto max-w-xs">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i>
+                        <span class="text-xs font-bold uppercase tracking-tight">Real-time Inference</span>
+                    </div>
+                    <p id="inference-text" class="text-[11px] text-slate-400 leading-relaxed">
+                        Detecting multi-layer semantic connections between patient events and facility resources...
+                    </p>
+                </div>
+
+                <div class="flex gap-2 pointer-events-auto">
+                    <button id="reset-view" class="p-3 bg-slate-900/80 hover:bg-slate-800 border border-white/10 rounded-xl text-slate-400 transition-all">
+                        <i data-lucide="maximize" class="w-4 h-4"></i>
+                    </button>
+                    <button id="play-pause" class="p-3 bg-purple-600 hover:bg-purple-500 border border-purple-400/30 rounded-xl text-white shadow-lg shadow-purple-500/20 transition-all">
+                        <i data-lucide="pause" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel: Meaning Stream & Action Layer -->
+        <aside class="w-80 border-l border-white/10 glass-panel flex flex-col z-10">
+            <div class="flex-1 flex flex-col min-h-0">
+                <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Meaning Stream</h2>
+                    <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase">Live</span>
+                </div>
+                <div id="meaning-stream" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                    <!-- Meaning logs will be injected here -->
+                </div>
+            </div>
+
+            <div class="h-1/3 border-t border-white/10 flex flex-col min-h-0 bg-slate-900/30">
+                <div class="p-4 border-b border-white/5">
+                    <h2 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Action Layer</h2>
+                </div>
+                <div id="action-layer" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                    <!-- Actions will be injected here -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // --- MOCK DATA GENERATION ---
+        const ENTITIES = {
+            PATIENT: { color: '#8b5cf6', icon: 'user' },
+            FACILITY: { color: '#0ea5e9', icon: 'hospital' },
+            RESOURCE: { color: '#22c55e', icon: 'package' },
+            RISK: { color: '#ef4444', icon: 'alert-triangle' }
+        };
+
+        let nodes = new vis.DataSet([
+            { id: 1, label: 'Kibera Health Center', group: 'FACILITY', title: 'Level 4 Facility' },
+            { id: 2, label: 'Mbagathi Hospital', group: 'FACILITY', title: 'Referral Hospital' },
+            { id: 3, label: 'Ambulance B-12', group: 'RESOURCE', title: 'Active' },
+            { id: 4, label: 'CHV Network - East', group: 'RESOURCE', title: '12 Active Volunteers' },
+            { id: 5, label: 'Patient: Mary A.', group: 'PATIENT', title: '32 weeks pregnant' },
+            { id: 6, label: 'Patient: John D.', group: 'PATIENT', title: 'Fever symptoms' },
+            { id: 7, label: 'Preeclampsia Risk', group: 'RISK', title: 'High Probability Cluster' }
+        ]);
+
+        let edges = new vis.DataSet([
+            { from: 5, to: 1, label: 'VISITED', arrows: 'to' },
+            { from: 1, to: 2, label: 'REFERRAL_PATH', dashes: true },
+            { from: 3, to: 1, label: 'ASSIGNED' },
+            { from: 4, to: 5, label: 'MONITORING' },
+            { from: 5, to: 7, label: 'INCREASES_RISK', color: '#ef4444', width: 2 },
+            { from: 7, to: 1, label: 'IMPACTS', color: '#ef4444' }
+        ]);
+
+        const container = document.getElementById('network-container');
+        const data = { nodes, edges };
+        const options = {
+            nodes: {
+                shape: 'dot',
+                size: 20,
+                font: { size: 12, color: '#cbd5e1', face: 'Inter' },
+                borderWidth: 2,
+                shadow: { enabled: true, color: 'rgba(0,0,0,0.5)', size: 10 }
+            },
+            edges: {
+                width: 1,
+                color: { color: 'rgba(148, 163, 184, 0.3)', highlight: '#8b5cf6' },
+                font: { size: 10, align: 'middle', color: '#64748b' },
+                smooth: { type: 'continuous' }
+            },
+            groups: {
+                FACILITY: { color: { background: '#0ea5e9', border: '#0284c7' }, size: 25 },
+                PATIENT: { color: { background: '#8b5cf6', border: '#7c3aed' } },
+                RESOURCE: { color: { background: '#22c55e', border: '#16a34a' }, shape: 'diamond' },
+                RISK: { color: { background: '#ef4444', border: '#dc2626' }, shape: 'triangle' }
+            },
+            physics: {
+                forceAtlas2Based: { gravitationalConstant: -50, centralGravity: 0.01, springLength: 100, springConstant: 0.08 },
+                maxVelocity: 50,
+                solver: 'forceAtlas2Based',
+                timestep: 0.35,
+                stabilization: { iterations: 150 }
+            },
+            interaction: { hover: true, tooltipDelay: 200 }
+        };
+
+        const network = new vis.Network(container, data, options);
+
+        // --- UI UPDATES ---
+        function updateStats() {
+            document.getElementById('count-entities').innerText = nodes.length;
+            document.getElementById('count-clusters').innerText = '3';
+            document.getElementById('count-risks').innerText = nodes.get({ filter: n => n.group === 'RISK' }).length;
+        }
+
+        const CLUSTERS = [
+            { id: 'c1', name: 'Maternal Danger Zone', type: 'risk', location: 'East Nairobi', intensity: 0.82 },
+            { id: 'c2', name: 'Unused Capacity', type: 'opportunity', location: 'West Clinic', intensity: 0.45 },
+            { id: 'c3', name: 'Referral Bottleneck', type: 'bottleneck', location: 'Mbagathi-Kibera', intensity: 0.68 }
+        ];
+
+        function renderClusters() {
+            const list = document.getElementById('clusters-list');
+            list.innerHTML = CLUSTERS.map(c => `
+                <div class="p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider ${c.type === 'risk' ? 'text-red-400' : c.type === 'opportunity' ? 'text-green-400' : 'text-yellow-400'}">${c.type}</span>
+                        <span class="text-[10px] text-slate-500 font-medium">${Math.round(c.intensity * 100)}% Match</span>
+                    </div>
+                    <h3 class="text-xs font-bold text-slate-200 group-hover:text-white transition-colors">${c.name}</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">${c.location}</p>
+                </div>
+            `).join('');
+        }
+
+        const MEANING_STREAM = [
+            { time: '14:22:05', text: 'Maternal risk cluster forming in Kibera', type: 'warning' },
+            { time: '14:21:48', text: '3 facilities nearing capacity threshold', type: 'info' },
+            { time: '14:21:30', text: 'Delayed referrals increasing complication probability', type: 'error' },
+            { time: '14:20:12', text: 'CHV network sync complete: 12 active nodes', type: 'success' }
+        ];
+
+        function renderMeaningStream() {
+            const stream = document.getElementById('meaning-stream');
+            stream.innerHTML = MEANING_STREAM.map(m => `
+                <div class="flex gap-3">
+                    <div class="text-[10px] font-mono text-slate-600 pt-0.5">${m.time}</div>
+                    <div class="flex-1">
+                        <p class="text-[11px] leading-relaxed ${m.type === 'warning' ? 'text-yellow-400/90' : m.type === 'error' ? 'text-red-400/90' : m.type === 'success' ? 'text-green-400/90' : 'text-slate-300'}">
+                            ${m.text}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        const ACTIONS = [
+            { id: 'a1', text: 'Dispatch CHV', priority: 'High', confidence: 0.87, icon: 'user-plus' },
+            { id: 'a2', text: 'Escalate Case', priority: 'Medium', confidence: 0.92, icon: 'arrow-up-circle' }
+        ];
+
+        function renderActions() {
+            const layer = document.getElementById('action-layer');
+            layer.innerHTML = ACTIONS.map(a => `
+                <div class="p-3 rounded-xl bg-purple-600/10 border border-purple-500/20 hover:bg-purple-600/20 transition-all cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                            <i data-lucide="${a.icon}" class="w-4 h-4 text-purple-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-200">${a.text}</span>
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-500 text-white uppercase">${a.priority}</span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <div class="flex-1 bg-white/5 h-1 rounded-full overflow-hidden">
+                                    <div class="bg-purple-500 h-full" style="width: ${a.confidence * 100}%"></div>
+                                </div>
+                                <span class="text-[9px] font-bold text-slate-500">${Math.round(a.confidence * 100)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // --- INITIALIZATION ---
+        updateStats();
+        renderClusters();
+        renderMeaningStream();
+        renderActions();
+
+        // Simulate live updates
+        setInterval(() => {
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            const events = [
+                'New BP reading: 160/110 for Patient Mary A.',
+                'Facility load increased at Kibera Health Center',
+                'Ambulance B-12 rerouted to emergency call',
+                'Risk probability updated for Preeclampsia cluster: 0.85'
+            ];
+            const text = events[Math.floor(Math.random() * events.length)];
+            MEANING_STREAM.unshift({ time, text, type: 'info' });
+            if (MEANING_STREAM.length > 20) MEANING_STREAM.pop();
+            renderMeaningStream();
+            
+            // Randomly update inference text
+            const inferences = [
+                "3 rising risk pathways are converging on maternal health failures in East Nairobi...",
+                "Detecting potential facility overload in West District within next 4 hours...",
+                "Semantic link strengthened between transport delays and referral outcomes..."
+            ];
+            document.getElementById('inference-text').innerText = inferences[Math.floor(Math.random() * inferences.length)];
+        }, 5000);
+
+        document.getElementById('reset-view').onclick = () => network.fit();
+        
+        let isPlaying = true;
+        document.getElementById('play-pause').onclick = function() {
+            isPlaying = !isPlaying;
+            this.innerHTML = `<i data-lucide="${isPlaying ? 'pause' : 'play'}" class="w-4 h-4"></i>`;
+            lucide.createIcons();
+            if (isPlaying) network.startSimulation();
+            else network.stopSimulation();
+        };
+
+        // Handle window resizing
+        window.addEventListener('resize', () => network.redraw());
+    </script>
+</body>
+</html>

@@ -41,6 +41,20 @@ Framework plumbing (OAuth, context, Vite bridge) lives under `server/_core`.
 
 ---
 
+## WRS-OS Architecture (StudioOS)
+
+StudioOS is built on the **WRS-OS (World Runtime System)** stack, a five-layer intelligence architecture that transforms live operational data into actionable interventions.
+
+| Layer | Component | Function |
+| :--- | :--- | :--- |
+| **1** | **Event Reality Stream** | Ingests live data from clinics, IoT, and field networks as discrete events. |
+| **2** | **Semantic Graph Engine** | Maps entities (Patients, Facilities) into a dynamic, multi-layer world graph. |
+| **3** | **Belief Engine** | Computes probabilistic beliefs about system states using uncertainty quantification. |
+| **4** | **Pattern Detection** | Automatically identifies Risk Clusters, Opportunity Clusters, and Bottlenecks. |
+| **5** | **Insight & Action (SIG)** | The StudioOS Insight Graph (SIG) provides the narrative meaning and action layer. |
+
+For a deep dive into the SIG architecture and the WRS-OS stack, see [DOCUMENTATION.md](./DOCUMENTATION.md).
+
 ## File Structure
 
 ```
